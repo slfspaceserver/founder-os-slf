@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Founder OS Pro</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -23,26 +23,56 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font); }
         body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; transition: background 0.3s, color 0.3s; overflow-x: hidden; }
 
+        /* Login Overlay - Hidden by default to prevent flashing on refresh */
+        #auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg);
+            z-index: 9999;
+            display: none; 
+            align-items: center;
+            justify-content: center;
+        }
+
         /* Mobile Header */
-        .mobile-header { display: none; width: 100%; background: var(--panel); border-bottom: 1px solid var(--panel-border); padding: 1rem; align-items: center; justify-content: space-between; position: fixed; top: 0; z-index: 20; }
+        .mobile-header { display: none; width: 100%; background: var(--panel); border-bottom: 1px solid var(--panel-border); padding: 1rem; align-items: center; justify-content: space-between; position: fixed; top: 0; left: 0; z-index: 40; }
         .menu-btn { background: none; border: none; color: var(--text); font-size: 1.5rem; cursor: pointer; }
 
-        /* Navigation */
-        aside { width: 240px; background: var(--panel); border-right: 1px solid var(--panel-border); display: flex; flex-direction: column; padding: 1.5rem; position: fixed; height: 100vh; z-index: 30; overflow-y: auto; transition: left 0.3s ease; left: 0;}
-        .logo-container { margin-bottom: 2rem; display: flex; align-items: center; gap: 0.5rem; height: 40px; }
+        /* Navigation & Sidebar */
+        aside { 
+            width: 240px; 
+            background: var(--panel); 
+            border-right: 1px solid var(--panel-border); 
+            display: flex; 
+            flex-direction: column; 
+            padding: 1.5rem; 
+            position: fixed; 
+            height: 100vh; 
+            height: -webkit-fill-available;
+            z-index: 50; 
+            overflow-y: auto; 
+            -webkit-overflow-scrolling: touch;
+            transition: transform 0.3s ease; 
+        }
+
+        .logo-container { margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; height: 40px; }
         .logo-text { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.03em; display: flex; align-items: center; gap: 0.5rem; }
         .logo-text span { background: var(--text); color: var(--bg); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem; }
-        #customLogoImg { max-height: 40px; max-width: 100%; object-fit: contain; border-radius: 4px; display: none; }
+        #customLogoImg, #mobileCustomLogoImg { max-height: 40px; max-width: 120px; object-fit: contain; border-radius: 4px; display: none; }
         .close-menu-btn { display: none; background: none; border: none; color: var(--text); font-size: 1.5rem; cursor: pointer; margin-left: auto; }
         
-        .nav-links { display: flex; flex-direction: column; gap: 0.25rem; list-style: none; flex-grow: 1; margin-top: 1rem;}
+        .nav-links { display: flex; flex-direction: column; gap: 0.25rem; list-style: none; flex-grow: 1; padding-bottom: 2rem; }
         .nav-item { padding: 0.6rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; color: var(--text-muted); transition: all 0.2s ease; }
         .nav-item:hover, .nav-item.active { background: var(--panel-border); color: var(--text); }
         .nav-group-label { font-size: 0.65rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; margin: 1rem 0 0.25rem 0.5rem; font-weight: 600; }
         
         /* Main Workspace */
         main { margin-left: 240px; flex-grow: 1; padding: 2rem; width: calc(100% - 240px); }
-        header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+        header { display: flex; justify-content: space-between; align-items: flex-start; margin-top: 1rem; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+        
         .header-controls { display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem; }
         .time-filters { display: flex; gap: 0.5rem; flex-wrap: wrap; }
         .btn-filter { background: var(--panel); border: 1px solid var(--panel-border); color: var(--text); padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.8rem; cursor: pointer; }
@@ -80,7 +110,7 @@
         .btn-danger { background: transparent; color: var(--red); border: none; padding: 0; font-size: 0.8rem; text-decoration: underline;}
         .btn-edit { background: transparent; color: var(--text-muted); border: none; padding: 0; font-size: 0.8rem; text-decoration: underline; margin-right: 0.75rem;}
 
-        .view-section { display: none; flex-direction: column; }
+        .view-section { display: none; flex-direction: column; margin-top: 0.5rem; }
         .view-section.active { display: flex; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         
@@ -96,20 +126,21 @@
             .inline-form .full { grid-column: span 1; }
         }
         @media (max-width: 768px) {
-            aside { left: -240px; box-shadow: none; }
-            aside.open { left: 0; box-shadow: 0 0 20px rgba(0,0,0,0.8); }
+            aside { transform: translateX(-100%); width: 260px; box-shadow: none; padding-bottom: 100px; }
+            aside.open { transform: translateX(0); box-shadow: 5px 0 25px rgba(0,0,0,0.8); }
             .close-menu-btn { display: block; }
             main { margin-left: 0; width: 100%; padding: 1rem; padding-top: 80px; }
             .mobile-header { display: flex; }
-            header { flex-direction: column; align-items: flex-start; }
-            .header-controls { align-items: flex-start; width: 100%;}
+            header { flex-direction: column; align-items: flex-start; margin-top: 0.5rem; }
+            .header-controls { align-items: flex-start; width: 100%; }
             .toolbar { max-width: 100%; }
         }
     </style>
 </head>
 <body>
 
-    <div id="auth-overlay" style="position: fixed; top:0; left:0; width:100%; height:100%; background: var(--bg); z-index: 9999; display: flex; align-items: center; justify-content: center;">
+    <!-- Login Overlay -->
+    <div id="auth-overlay">
         <div class="card" style="width: 350px; text-align: center; border: 1px solid var(--panel-border);">
             <h2 style="margin-bottom: 1rem;">Founder OS Login</h2>
             <input type="email" id="authEmail" placeholder="Email Address" style="margin-bottom: 0.5rem; padding: 0.5rem;">
@@ -119,14 +150,16 @@
         </div>
     </div>
 
+    <!-- Mobile Header -->
     <div class="mobile-header">
         <div style="display: flex; align-items: center; gap:0.5rem;">
-            <img id="mobileCustomLogoImg" alt="Brand Logo" style="max-height: 24px; max-width: 120px; object-fit: contain; border-radius: 4px; display: none;">
+            <img id="mobileCustomLogoImg" alt="Brand Logo">
             <div id="mobileDefaultLogoText" style="font-weight: 700; display:flex; align-items:center; gap:0.5rem;">FOUNDER <span style="background:var(--text); color:var(--bg); padding:0.1rem 0.4rem; border-radius:4px; font-size:0.7rem;">OS</span></div>
         </div>
         <button class="menu-btn" onclick="toggleMenu()">☰</button>
     </div>
 
+    <!-- SIDEBAR NAVIGATION -->
     <aside id="sidebar">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
             <div class="logo-container" style="margin-bottom: 0;">
@@ -148,7 +181,7 @@
             <div class="nav-group-label">Ecosystem</div>
             <li class="nav-item" onclick="navigate('ventures')">Ventures</li>
             <li class="nav-item" onclick="navigate('team')">Team & Shares</li>
-            <li class="nav-item" onclick="navigate('investments')">Investments & Equity</li>
+            <li class="nav-item" onclick="navigate('investments')">Properties & Assets</li>
             
             <div class="nav-group-label">System</div>
             <li class="nav-item" onclick="navigate('goals')">Goals</li>
@@ -157,9 +190,10 @@
         </ul>
     </aside>
 
+    <!-- MAIN APP AREA -->
     <main>
         <header>
-            <h2 style="font-size: 1.3rem; font-weight: 600;" id="viewTitle">Overview Dashboard</h2>
+            <h2 style="font-size: 1.4rem; font-weight: 600;" id="viewTitle">Overview Dashboard</h2>
             <div class="header-controls">
                 <div class="time-filters">
                     <button class="btn-filter" id="f-today" onclick="setFilter('today')">Today</button>
@@ -177,6 +211,7 @@
             </div>
         </header>
 
+        <!-- DASHBOARD -->
         <section id="view-dashboard" class="view-section active">
             <div class="metrics-grid">
                 <div class="metric-card"><div class="metric-label">Gross Revenue</div><div class="metric-value green" id="m-rev">0</div><div class="growth-txt" id="g-rev">0%</div></div>
@@ -209,6 +244,7 @@
             </div>
         </section>
 
+        <!-- ANALYTICS -->
         <section id="view-analytics" class="view-section">
             <div class="card">
                 <div class="card-title">Project Profitability Matrix</div>
@@ -225,6 +261,7 @@
             </div>
         </section>
 
+        <!-- PAYMENTS -->
         <section id="view-payments" class="view-section">
             <div class="card">
                 <div class="card-title">
@@ -251,7 +288,7 @@
                     <select id="payStatus"><option value="Paid">Paid</option><option value="Pending">Pending</option></select>
                     
                     <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--green); cursor: pointer;" class="full">
-                        <input type="checkbox" id="payAddSavings"> Auto-add Paid amount to "Cash Savings" portfolio
+                        <input type="checkbox" id="payAddSavings"> Auto-add Paid amount to "Cash Savings"
                     </label>
 
                     <div class="full" style="display: flex; gap: 0.5rem;"><button onclick="savePayment()">Save Transaction</button><button class="btn-sec" onclick="closeForm('payment')">Cancel</button></div>
@@ -265,6 +302,7 @@
             </div>
         </section>
 
+        <!-- EXPENSES -->
         <section id="view-expenses" class="view-section">
             <div class="card">
                 <div class="card-title">
@@ -300,6 +338,7 @@
             </div>
         </section>
 
+        <!-- CLIENTS -->
         <section id="view-clients" class="view-section">
             <div class="card">
                 <div class="card-title">Client Roster <button onclick="openForm('client')">+ Add Client</button></div>
@@ -322,6 +361,7 @@
             </div>
         </section>
 
+        <!-- VENTURES -->
         <section id="view-ventures" class="view-section">
             <div class="card">
                 <div class="card-title">Active Ventures <button onclick="openForm('venture')">+ Add Venture</button></div>
@@ -340,6 +380,7 @@
             </div>
         </section>
 
+        <!-- TEAM -->
         <section id="view-team" class="view-section">
             <div class="card">
                 <div class="card-title">Team Directory & Equity <button onclick="openForm('team')">+ Add Member</button></div>
@@ -360,6 +401,7 @@
             </div>
         </section>
 
+        <!-- INVESTMENTS -->
         <section id="view-investments" class="view-section">
             <div class="two-col-grid">
                 <div class="card">
@@ -393,6 +435,7 @@
             </div>
         </section>
 
+        <!-- GOALS -->
         <section id="view-goals" class="view-section">
             <div class="card">
                 <div class="card-title">Personal Metrics Goals <button onclick="openForm('goal')">+ Add Goal</button></div>
@@ -412,6 +455,7 @@
             </div>
         </section>
 
+        <!-- DOCUMENTS -->
         <section id="view-documents" class="view-section">
             <div class="card">
                 <div class="card-title">Important Documents Locker <button onclick="openForm('document')">+ Add Link</button></div>
@@ -431,6 +475,7 @@
             </div>
         </section>
 
+        <!-- SETTINGS -->
         <section id="view-settings" class="view-section">
             <div class="two-col-grid">
                 <div class="card">
@@ -447,7 +492,7 @@
                 </div>
                 <div class="card">
                     <div class="card-title">Data Management</div>
-                    <p style="font-size:0.8rem; color:var(--text-muted);">Your data is synced directly to Google Firestore.</p>
+                    <p style="font-size:0.8rem; color:var(--text-muted);">Your data is synced directly to Google's Cloud Firestore.</p>
                     <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
                         <button onclick="exportData()">Export Data Backup (JSON)</button>
                         <button class="btn-sec" onclick="document.getElementById('importFile').click()">Import Backup</button>
@@ -458,8 +503,9 @@
         </section>
     </main>
 
+    <!-- MAIN APP SCRIPT -->
     <script>
-        var db = { payments: [], expenses: [], clients: [], ventures: [], team: [], investments: [], equities: [], goals: [], documents: [] };
+        var db = { logo: null, payments: [], expenses: [], clients: [], ventures: [], team: [], investments: [], equities: [], goals: [], documents: [] };
         var sys_filter = '30days';
         var activeView = 'dashboard';
         var currency = '₹';
@@ -496,18 +542,40 @@
             return `<span class="growth-txt ${isPos ? 'pos' : 'neg'}">${isPos ? '+' : ''}${pct.toFixed(1)}% vs prev</span>`;
         }
 
-        window.applyLogo = function(base64) { 
+        window.applyLogo = function(base64) {
+            if (!base64) {
+                getEl('defaultLogoText').style.display = 'flex';
+                getEl('customLogoImg').style.display = 'none';
+                getEl('mobileDefaultLogoText').style.display = 'flex';
+                getEl('mobileCustomLogoImg').style.display = 'none';
+                return;
+            } 
             getEl('defaultLogoText').style.display = 'none'; 
             const img = getEl('customLogoImg'); img.src = base64; img.style.display = 'block'; 
             const mText = getEl('mobileDefaultLogoText'); if(mText) mText.style.display = 'none';
             const mImg = getEl('mobileCustomLogoImg'); if(mImg) { mImg.src = base64; mImg.style.display = 'block'; }
         }
 
+        function handleLogoUpload(e) { 
+            const file = e.target.files[0]; 
+            if(file){ 
+                const reader = new FileReader(); 
+                reader.onload = function(evt) { 
+                    const logoData = evt.target.result;
+                    db.logo = logoData;
+                    localStorage.setItem('founder_os_logo', logoData); 
+                    window.applyLogo(logoData); 
+                    saveDB();
+                }; 
+                reader.readAsDataURL(file); 
+            } 
+        }
+
         function resetLogo() { 
+            db.logo = null;
             localStorage.removeItem('founder_os_logo'); 
-            getEl('customLogoImg').style.display = 'none'; getEl('defaultLogoText').style.display = 'flex'; 
-            const mImg = getEl('mobileCustomLogoImg'); if(mImg) mImg.style.display = 'none';
-            const mText = getEl('mobileDefaultLogoText'); if(mText) mText.style.display = 'flex';
+            window.applyLogo(null);
+            saveDB();
         }
 
         // --- SYSTEM INITIALIZATION ---
@@ -526,8 +594,13 @@
                 currency = localStorage.getItem('founder_os_cur') || '₹';
             }
             if(getEl('optCurrency')) getEl('optCurrency').value = currency;
-            const logo = localStorage.getItem('founder_os_logo');
-            if (logo) window.applyLogo(logo);
+            
+            if (db.logo) {
+                window.applyLogo(db.logo);
+            } else {
+                const localLogo = localStorage.getItem('founder_os_logo');
+                if (localLogo) window.applyLogo(localLogo);
+            }
             
             window.renderAll(false); 
         }
@@ -546,7 +619,7 @@
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             getEl(`view-${view}`).classList.add('active');
             
-            const titles = { dashboard:'Overview Dashboard', analytics:'Analytics & Profitability', payments:'Revenue Ledger', expenses:'Expenses & Payouts', clients:'Client Roster', ventures:'Venture Management', team:'Team & Equity Directory', investments:'Investments & Assets', goals:'Milestone Goals', documents:'Secure Documents', settings:'System Settings' };
+            const titles = { dashboard:'Overview Dashboard', analytics:'Analytics & Profitability', payments:'Revenue Ledger', expenses:'Expenses & Payouts', clients:'Client Roster', ventures:'Venture Management', team:'Team & Equity Directory', investments:'Investments & Equity', goals:'Milestone Goals', documents:'Secure Documents', settings:'System Settings' };
             getEl('viewTitle').innerText = titles[view] || view;
             getEl('sidebar').classList.remove('open'); 
             
@@ -763,12 +836,11 @@
             }).join('');
         }
 
-        function handleLogoUpload(e) { const file = e.target.files[0]; if(file){ const reader = new FileReader(); reader.onload = function(evt) { localStorage.setItem('founder_os_logo', evt.target.result); window.applyLogo(evt.target.result); }; reader.readAsDataURL(file); } }
-        function updateCurrency() { currency = getVal('optCurrency'); localStorage.setItem('founder_os_cur', currency); window.renderAll(false); }
         function exportData() { const a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db)); a.download = "founder_os_backup.json"; a.click(); }
         function importData(e) { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = function(evt) { try { db = JSON.parse(evt.target.result); saveDB(); alert("Restored successfully."); } catch(err) { alert("Invalid backup file."); } }; reader.readAsText(file); }
     </script>
 
+    <!-- REAL-TIME FIREBASE SYNC SCRIPT -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
@@ -802,21 +874,25 @@
             }
         }
 
-        // REAL-TIME LISTEN FUNCTION (Fires automatically when data on server changes)
+        // AUTH LISTENER
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 document.getElementById('auth-overlay').style.display = 'none';
                 window.currentUser = user;
                 
-                // Real-time listener for instant sync
+                // Real-time listener for2 instant345678901234567890...
                 onSnapshot(doc(firestoreDb, "users", user.uid), (docSnap) => {
                     if (docSnap.exists() && docSnap.data().os_data) {
                         window.db = docSnap.data().os_data;
                         window.currency = docSnap.data().currency || '₹';
                         if(document.getElementById('optCurrency')) document.getElementById('optCurrency').value = window.currency;
                         
-                        const logo = localStorage.getItem('founder_os_logo');
-                        if (logo) window.applyLogo(logo);
+                        if (window.db.logo) {
+                            window.applyLogo(window.db.logo);
+                        } else {
+                            const localLogo = localStorage.getItem('founder_os_logo');
+                            if (localLogo) window.applyLogo(localLogo);
+                        }
                         
                         window.renderAll(false);
                     } else {
