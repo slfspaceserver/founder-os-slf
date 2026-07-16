@@ -45,7 +45,7 @@
         .logo-container { margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; height: 40px; }
         .logo-text { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.03em; display: flex; align-items: center; gap: 0.5rem; }
         .logo-text span { background: var(--text); color: var(--bg); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem; }
-        #customLogoImg, #mobileCustomLogoImg { max-width: 100%; height: auto; max-height: 40px; object-fit: contain; border-radius: 4px; display: none; }
+        #customLogoImg, #mobileCustomLogoImg { max-width: 100%; height: auto; max-height: 45px; object-fit: contain; border-radius: 4px; display: none; }
         .close-menu-btn { display: none; background: none; border: none; color: var(--text); font-size: 1.5rem; cursor: pointer; }
         
         .nav-links { display: flex; flex-direction: column; gap: 0.25rem; list-style: none; flex-grow: 1; padding-bottom: 2rem; }
@@ -103,6 +103,7 @@
         .progress-bg { background: var(--panel-border); height: 6px; border-radius: 3px; overflow: hidden; margin-top: 0.5rem; }
         .progress-fill { background: var(--text); height: 100%; transition: width 0.3s; }
         .toolbar { display: flex; gap: 0.5rem; align-items: center; width: 100%; max-width: 400px;}
+        .export-btn { font-size: 0.7rem; background: var(--panel-border); color: var(--text-muted); padding: 0.3rem 0.6rem; border-radius: 4px; cursor: pointer; display: inline-block; white-space: nowrap; }
 
         @media (max-width: 900px) {
             .two-col-grid { grid-template-columns: 1fr; }
@@ -110,7 +111,7 @@
             .inline-form .full { grid-column: span 1; }
         }
         @media (max-width: 768px) {
-            aside { transform: translateX(-100%); width: 280px; box-shadow: none; }
+            aside { transform: translateX(-100%); width: 280px; box-shadow: none; padding-bottom: 100px;}
             aside.open { transform: translateX(0); box-shadow: 0 0 0 10000px rgba(0,0,0,0.5), 5px 0 25px rgba(0,0,0,0.8); }
             .close-menu-btn { display: block; }
             main { margin-left: 0; width: 100%; padding: 1rem; padding-top: 80px; }
@@ -161,8 +162,8 @@
     </div>
 
     <aside id="sidebar">
-        <div class="logo-container">
-            <div style="font-weight: 700; display:flex; align-items:center; gap:0.5rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div class="logo-container" style="margin-bottom: 0;">
                 <img id="customLogoImg" alt="Brand Logo">
                 <div class="logo-text" id="defaultLogoText">FOUNDER <span>OS</span></div>
             </div>
@@ -266,8 +267,8 @@
                 <div class="card-title">
                     Revenue Ledger 
                     <div style="display:flex; gap:0.5rem; align-items:center;">
-                        <button class="btn-sec" style="font-size:0.75rem; padding:0.3rem 0.6rem; margin:0;" onclick="exportSectionData('payments')">Export Data</button>
-                        <button style="margin:0;" onclick="openForm('payment')">+ Add Revenue</button>
+                        <button class="export-btn" onclick="exportSectionData('payments')">Export Data</button>
+                        <button style="margin:0; padding:0.3rem 0.6rem;" onclick="openForm('payment')">+ Add Revenue</button>
                     </div>
                 </div>
                 
@@ -317,8 +318,8 @@
                 <div class="card-title">
                     Expenses & Payouts 
                     <div style="display:flex; gap:0.5rem; align-items:center;">
-                        <button class="btn-sec" style="font-size:0.75rem; padding:0.3rem 0.6rem; margin:0;" onclick="exportSectionData('expenses')">Export Data</button>
-                        <button style="margin:0;" onclick="openForm('expense')">+ Add Expense</button>
+                        <button class="export-btn" onclick="exportSectionData('expenses')">Export Data</button>
+                        <button style="margin:0; padding:0.3rem 0.6rem;" onclick="openForm('expense')">+ Add Expense</button>
                     </div>
                 </div>
 
@@ -355,8 +356,8 @@
             <div class="card">
                 <div class="card-title">Client Roster 
                     <div style="display:flex; gap:0.5rem; align-items:center;">
-                        <button class="btn-sec" style="font-size:0.75rem; padding:0.3rem 0.6rem; margin:0;" onclick="exportSectionData('clients')">Export Data</button>
-                        <button style="margin:0;" onclick="openForm('client')">+ Add Client</button>
+                        <button class="export-btn" onclick="exportSectionData('clients')">Export Data</button>
+                        <button style="margin:0; padding:0.3rem 0.6rem;" onclick="openForm('client')">+ Add Client</button>
                     </div>
                 </div>
                 <div id="form-client" class="inline-form" style="display: none;">
@@ -382,8 +383,8 @@
             <div class="card">
                 <div class="card-title">Active Ventures 
                     <div style="display:flex; gap:0.5rem; align-items:center;">
-                        <button class="btn-sec" style="font-size:0.75rem; padding:0.3rem 0.6rem; margin:0;" onclick="exportSectionData('ventures')">Export Data</button>
-                        <button style="margin:0;" onclick="openForm('venture')">+ Add Venture</button>
+                        <button class="export-btn" onclick="exportSectionData('ventures')">Export Data</button>
+                        <button style="margin:0; padding:0.3rem 0.6rem;" onclick="openForm('venture')">+ Add Venture</button>
                     </div>
                 </div>
                 <div id="form-venture" class="inline-form" style="display: none;">
@@ -405,8 +406,8 @@
             <div class="card">
                 <div class="card-title">Team Directory & Equity 
                     <div style="display:flex; gap:0.5rem; align-items:center;">
-                        <button class="btn-sec" style="font-size:0.75rem; padding:0.3rem 0.6rem; margin:0;" onclick="exportSectionData('team')">Export Data</button>
-                        <button style="margin:0;" onclick="openForm('team')">+ Add Member</button>
+                        <button class="export-btn" onclick="exportSectionData('team')">Export Data</button>
+                        <button style="margin:0; padding:0.3rem 0.6rem;" onclick="openForm('team')">+ Add Member</button>
                     </div>
                 </div>
                 <div id="form-team" class="inline-form" style="display: none;">
@@ -431,13 +432,13 @@
                 <div class="card">
                     <div class="card-title">Liquid Assets & Savings 
                         <div style="display:flex; gap:0.5rem; align-items:center;">
-                            <button class="btn-sec" style="font-size:0.75rem; padding:0.3rem 0.6rem; margin:0;" onclick="exportSectionData('investments')">Export Data</button>
-                            <button style="margin:0;" onclick="openForm('investment')">+ Add Asset</button>
+                            <button class="export-btn" onclick="exportSectionData('investments')">Export Data</button>
+                            <button style="margin:0; padding:0.3rem 0.6rem;" onclick="openForm('investment')">+ Add Asset</button>
                         </div>
                     </div>
                     <div id="form-investment" class="inline-form" style="display: none; grid-template-columns: 1fr;">
                         <input type="hidden" id="invId">
-                        <input type="text" id="invName" placeholder="Asset Name (e.g. HDFC Savings, BMW Car)">
+                        <input type="text" id="invName" placeholder="Asset Name (e.g. HDFC Savings, BTC)">
                         <select id="invType">
                             <option value="Cash/Savings">Cash & Savings</option>
                             <option value="Mutual Funds">Mutual Funds</option>
@@ -457,8 +458,8 @@
                 <div class="card">
                     <div class="card-title">Private Company Equities 
                         <div style="display:flex; gap:0.5rem; align-items:center;">
-                            <button class="btn-sec" style="font-size:0.75rem; padding:0.3rem 0.6rem; margin:0;" onclick="exportSectionData('equities')">Export Data</button>
-                            <button style="margin:0;" onclick="openForm('equity')">+ Add Equity</button>
+                            <button class="export-btn" onclick="exportSectionData('equities')">Export Data</button>
+                            <button style="margin:0; padding:0.3rem 0.6rem;" onclick="openForm('equity')">+ Add Equity</button>
                         </div>
                     </div>
                     <div id="form-equity" class="inline-form" style="display: none; grid-template-columns: 1fr;">
@@ -480,8 +481,8 @@
             <div class="card">
                 <div class="card-title">Personal Metrics Goals 
                     <div style="display:flex; gap:0.5rem; align-items:center;">
-                        <button class="btn-sec" style="font-size:0.75rem; padding:0.3rem 0.6rem; margin:0;" onclick="exportSectionData('goals')">Export Data</button>
-                        <button style="margin:0;" onclick="openForm('goal')">+ Add Goal</button>
+                        <button class="export-btn" onclick="exportSectionData('goals')">Export Data</button>
+                        <button style="margin:0; padding:0.3rem 0.6rem;" onclick="openForm('goal')">+ Add Goal</button>
                     </div>
                 </div>
                 <div id="form-goal" class="inline-form" style="display: none;">
@@ -504,8 +505,8 @@
             <div class="card">
                 <div class="card-title">Important Documents Locker 
                     <div style="display:flex; gap:0.5rem; align-items:center;">
-                        <button class="btn-sec" style="font-size:0.75rem; padding:0.3rem 0.6rem; margin:0;" onclick="exportSectionData('documents')">Export Data</button>
-                        <button style="margin:0;" onclick="openForm('document')">+ Add Link</button>
+                        <button class="export-btn" onclick="exportSectionData('documents')">Export Data</button>
+                        <button style="margin:0; padding:0.3rem 0.6rem;" onclick="openForm('document')">+ Add Link</button>
                     </div>
                 </div>
                 <div id="form-document" class="inline-form" style="display: none;">
@@ -542,7 +543,7 @@
                     <div class="card-title">Data Management</div>
                     <p style="font-size:0.8rem; color:var(--text-muted);">Your data is securely synced to the cloud.</p>
                     <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                        <button onclick="exportData()">Export Data Backup (JSON)</button>
+                        <button onclick="exportData()">Export Full JSON Backup</button>
                         <button class="btn-sec" onclick="document.getElementById('importFile').click()">Import Backup</button>
                         <input type="file" id="importFile" style="display: none;" onchange="importData(event)">
                     </div>
@@ -565,7 +566,15 @@
         function toggleMenu() { getEl('sidebar').classList.toggle('open'); }
         function formatMoney(val) { return currency + Math.floor(val).toLocaleString(); }
         
-        // Updated: Password View Toggle Logic
+        // Input Sanitizer to prevent XSS attacks
+        function sanitize(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>'"]/g, match => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+            }[match]));
+        }
+        
+        // Password Visibility Toggle
         window.togglePass = function() {
             var p = document.getElementById('authPass');
             var b = document.getElementById('togglePassBtn');
@@ -573,24 +582,21 @@
             else { p.type = 'password'; b.innerText = 'SHOW'; }
         };
 
-        // Export Data Logic (All pages / specific sections)
+        // Added saveDB call inside updateCurrency so it syncs to cloud correctly
+        window.updateCurrency = function() {
+            currency = getVal('optCurrency'); 
+            localStorage.setItem('founder_os_cur', currency); 
+            saveDB(); 
+        };
+        
+        // Export Specific Section Data
         window.exportSectionData = function(section) {
-            const dataToExport = db[section];
+            if(!db[section]) return;
             const a = document.createElement('a'); 
-            a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataToExport, null, 2)); 
+            a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db[section], null, 2)); 
             a.download = `founder_os_${section}_data.json`; 
             a.click(); 
         };
-
-        // Export Full DB
-        window.exportData = function() { 
-            const a = document.createElement('a'); 
-            a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2)); 
-            a.download = "founder_os_complete_backup.json"; 
-            a.click(); 
-        };
-
-        function importData(e) { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = function(evt) { try { db = JSON.parse(evt.target.result); saveDB(); alert("Restored successfully."); } catch(err) { alert("Invalid backup file."); } }; reader.readAsText(file); }
 
         function animateValue(id, start, end, duration) {
             const obj = getEl(id);
@@ -748,15 +754,23 @@
         }
         function closeForm(type) { getEl('form-'+type).style.display = 'none'; }
 
-        // --- CRUD OPERATIONS ---
+        // --- CRUD OPERATIONS (Wrapped with Sanitize) ---
         function savePayment() { 
             const id = getVal('payId'); 
             const amt = parseFloat(getVal('payAmount'));
             const status = getVal('payStatus');
             const addToSavings = getEl('payAddSavings') && getEl('payAddSavings').checked;
 
-            // Updated to save Stream
-            const obj = { id: id||'p'+Date.now(), client: getVal('payClient'), venture: getVal('payVentureSelect'), service: getVal('payService'), stream: getVal('payStream'), amount: amt, date: getVal('payDate'), status: status }; 
+            const obj = { 
+                id: id||'p'+Date.now(), 
+                client: sanitize(getVal('payClient')), 
+                venture: getVal('payVentureSelect'), 
+                service: sanitize(getVal('payService')), 
+                stream: getVal('payStream'), 
+                amount: amt, 
+                date: getVal('payDate'), 
+                status: status 
+            }; 
             if(id) db.payments = db.payments.map(x=>x.id===id?obj:x); else db.payments.push(obj); 
 
             if(status === 'Paid' && addToSavings && amt > 0) {
@@ -764,18 +778,110 @@
                 if(savings) savings.current += amt;
                 else db.investments.push({ id: 'i'+Date.now(), name: 'Main Cash/Savings', type: 'Cash/Savings', current: amt });
             }
-
             saveDB(); closeForm('payment'); 
         }
 
-        function saveExpense() { const id = getVal('expId'); const obj = { id: id||'e'+Date.now(), category: getVal('expCategory'), venture: getVal('expVentureSelect'), teamId: getVal('expTeamSelect'), amount: parseFloat(getVal('expAmount')), date: getVal('expDate'), notes: getVal('expNotes') }; if(id) db.expenses = db.expenses.map(x=>x.id===id?obj:x); else db.expenses.push(obj); saveDB(); closeForm('expense'); }
-        function saveClient() { const id = getVal('cliId'); const obj = { id: id||'c'+Date.now(), name: getVal('cliName'), email: getVal('cliEmail'), service: getVal('cliService'), fee: parseFloat(getVal('cliFee'))||0, start: getVal('cliStart'), status: getVal('cliStatus') }; if(id) db.clients = db.clients.map(x=>x.id===id?obj:x); else db.clients.push(obj); saveDB(); closeForm('client'); }
-        function saveVenture() { const id = getVal('vId'); const obj = { id: id||'v'+Date.now(), name: getVal('vName'), desc: getVal('vDesc') }; if(id) db.ventures = db.ventures.map(x=>x.id===id?obj:x); else db.ventures.push(obj); saveDB(); closeForm('venture'); }
-        function saveTeamMember() { const id = getVal('teamId'); const obj = { id: id||'team'+Date.now(), name: getVal('teamName'), role: getVal('teamRole'), type: getVal('teamType'), share: parseFloat(getVal('teamShare'))||0 }; if(id) db.team = db.team.map(x=>x.id===id?obj:x); else db.team.push(obj); saveDB(); closeForm('team'); }
-        function saveInvestment() { const id = getVal('invId'); const obj = { id: id||'i'+Date.now(), name: getVal('invName'), type: getVal('invType'), current: parseFloat(getVal('invCurrent'))||0 }; if(id) db.investments = db.investments.map(x=>x.id===id?obj:x); else db.investments.push(obj); saveDB(); closeForm('investment'); }
-        function saveEquity() { const id = getVal('eqId'); const obj = { id: id||'eq'+Date.now(), name: getVal('eqName'), percent: parseFloat(getVal('eqPercent'))||0, companyVal: parseFloat(getVal('eqVal'))||0 }; if(id) db.equities = db.equities.map(x=>x.id===id?obj:x); else db.equities.push(obj); saveDB(); closeForm('equity'); }
-        function saveGoal() { const id = getVal('goalId'); const obj = { id: id||'g'+Date.now(), name: getVal('goalName'), type: getVal('goalType'), val: parseFloat(getVal('goalVal'))||0 }; if(id) db.goals = db.goals.map(x=>x.id===id?obj:x); else db.goals.push(obj); saveDB(); closeForm('goal'); }
-        function saveDocument() { const id = getVal('docId'); const obj = { id: id||'d'+Date.now(), name: getVal('docName'), category: getVal('docCategory'), link: getVal('docLink') }; if(id) db.documents = db.documents.map(x=>x.id===id?obj:x); else db.documents.push(obj); saveDB(); closeForm('document'); }
+        function saveExpense() { 
+            const id = getVal('expId'); 
+            const obj = { 
+                id: id||'e'+Date.now(), 
+                category: getVal('expCategory'), 
+                venture: getVal('expVentureSelect'), 
+                teamId: getVal('expTeamSelect'), 
+                amount: parseFloat(getVal('expAmount')), 
+                date: getVal('expDate'), 
+                notes: sanitize(getVal('expNotes')) 
+            }; 
+            if(id) db.expenses = db.expenses.map(x=>x.id===id?obj:x); else db.expenses.push(obj); 
+            saveDB(); closeForm('expense'); 
+        }
+
+        function saveClient() { 
+            const id = getVal('cliId'); 
+            const obj = { 
+                id: id||'c'+Date.now(), 
+                name: sanitize(getVal('cliName')), 
+                email: sanitize(getVal('cliEmail')), 
+                service: sanitize(getVal('cliService')), 
+                fee: parseFloat(getVal('cliFee'))||0, 
+                start: getVal('cliStart'), 
+                status: getVal('cliStatus') 
+            }; 
+            if(id) db.clients = db.clients.map(x=>x.id===id?obj:x); else db.clients.push(obj); 
+            saveDB(); closeForm('client'); 
+        }
+
+        function saveVenture() { 
+            const id = getVal('vId'); 
+            const obj = { 
+                id: id||'v'+Date.now(), 
+                name: sanitize(getVal('vName')), 
+                desc: sanitize(getVal('vDesc')) 
+            }; 
+            if(id) db.ventures = db.ventures.map(x=>x.id===id?obj:x); else db.ventures.push(obj); 
+            saveDB(); closeForm('venture'); 
+        }
+
+        function saveTeamMember() { 
+            const id = getVal('teamId'); 
+            const obj = { 
+                id: id||'team'+Date.now(), 
+                name: sanitize(getVal('teamName')), 
+                role: sanitize(getVal('teamRole')), 
+                type: getVal('teamType'), 
+                share: parseFloat(getVal('teamShare'))||0 
+            }; 
+            if(id) db.team = db.team.map(x=>x.id===id?obj:x); else db.team.push(obj); 
+            saveDB(); closeForm('team'); 
+        }
+
+        function saveInvestment() { 
+            const id = getVal('invId'); 
+            const obj = { 
+                id: id||'i'+Date.now(), 
+                name: sanitize(getVal('invName')), 
+                type: getVal('invType'), 
+                current: parseFloat(getVal('invCurrent'))||0 
+            }; 
+            if(id) db.investments = db.investments.map(x=>x.id===id?obj:x); else db.investments.push(obj); 
+            saveDB(); closeForm('investment'); 
+        }
+
+        function saveEquity() { 
+            const id = getVal('eqId'); 
+            const obj = { 
+                id: id||'eq'+Date.now(), 
+                name: sanitize(getVal('eqName')), 
+                percent: parseFloat(getVal('eqPercent'))||0, 
+                companyVal: parseFloat(getVal('eqVal'))||0 
+            }; 
+            if(id) db.equities = db.equities.map(x=>x.id===id?obj:x); else db.equities.push(obj); 
+            saveDB(); closeForm('equity'); 
+        }
+
+        function saveGoal() { 
+            const id = getVal('goalId'); 
+            const obj = { 
+                id: id||'g'+Date.now(), 
+                name: sanitize(getVal('goalName')), 
+                type: getVal('goalType'), 
+                val: parseFloat(getVal('goalVal'))||0 
+            }; 
+            if(id) db.goals = db.goals.map(x=>x.id===id?obj:x); else db.goals.push(obj); 
+            saveDB(); closeForm('goal'); 
+        }
+
+        function saveDocument() { 
+            const id = getVal('docId'); 
+            const obj = { 
+                id: id||'d'+Date.now(), 
+                name: sanitize(getVal('docName')), 
+                category: getVal('docCategory'), 
+                link: sanitize(getVal('docLink')) 
+            }; 
+            if(id) db.documents = db.documents.map(x=>x.id===id?obj:x); else db.documents.push(obj); 
+            saveDB(); closeForm('document'); 
+        }
 
         function editRecord(type, id, arrName) { 
             const obj = db[arrName].find(x=>x.id===id); 
@@ -849,7 +955,6 @@
             if (activeView === 'payments') { 
                 const sQ = getVal('searchRev').toLowerCase(); const sStat = getVal('filterRevStatus');
                 const list = fRevs.filter(p => (sStat==='All' || p.status===sStat) && (p.client.toLowerCase().includes(sQ) || p.venture.toLowerCase().includes(sQ) || p.service.toLowerCase().includes(sQ)));
-                // Updated table row to render the stream
                 getEl('tblPayments').innerHTML = list.map(p => `<tr><td>${p.date}</td><td><strong>${p.client}</strong><br><span style="font-size:0.7rem;color:var(--text-muted);">${p.venture}</span></td><td>${p.service}<br><span style="font-size:0.65rem;color:var(--text-muted);">${p.stream || ''}</span></td><td style="font-weight:600;">${currency}${p.amount.toLocaleString()}</td><td><span style="color:${p.status==='Paid'?'var(--green)':'var(--orange)'}">${p.status}</span><br>${p.status==='Pending'?`<button class="btn-sec" style="font-size:0.65rem; padding:0.15rem 0.4rem; margin-top:4px;" onclick="markPaid('${p.id}')">Mark Paid</button>`:''}</td><td><button class="btn-edit" onclick="editRecord('payment','${p.id}','payments')">Edit</button><button class="btn-danger" onclick="deleteRecord('payments','${p.id}')">Del</button></td></tr>`).join('') || '<tr><td colspan="6">No records found.</td></tr>'; 
             }
             if (activeView === 'expenses') { 
@@ -899,24 +1004,17 @@
             if (charts.vRev) charts.vRev.destroy(); charts.vRev = new Chart(getEl('chartVentureRev').getContext('2d'), { type: 'bar', data: { labels: vStats.map(s => s.name), datasets: [{ label: 'Gross Rev', data: vStats.map(s => s.rev), backgroundColor: '#ffffff' }] }, options: { responsive: true, maintainAspectRatio: false } });
         }
 
-        function renderGoals(fRevs) {
-            const revTotal = fRevs.filter(p => p.status === 'Paid').reduce((a, b) => a + b.amount, 0);
-            const clientsAct = db.clients.filter(c => c.status === 'Active').length;
-            const nw = calculateNetWorth();
-            const savingsMF = db.investments.filter(i => i.type === 'Cash/Savings' || i.type === 'Mutual Funds').reduce((sum, i) => sum + i.current, 0);
-
-            getEl('goalsContainer').innerHTML = db.goals.map(g => {
-                let curr = 0; if(g.type==='Net Worth') curr = nw; else if(g.type==='Monthly Revenue') curr = revTotal; else if(g.type==='Active Clients') curr = clientsAct; else if(g.type==='Cash Savings') curr = savingsMF;
-                const pct = Math.min(Math.round((curr / g.val) * 100), 100);
-                return `<div class="card" style="margin-bottom:0;"><div style="display:flex; justify-content:space-between;"><strong>${g.name} <span style="font-size:0.6rem; font-weight:normal; color:var(--text-muted)">(${g.type})</span></strong><div><span class="btn-edit" onclick="editRecord('goal','${g.id}','goals')">Edit</span><span class="btn-danger" onclick="deleteRecord('goals','${g.id}')">Del</span></div></div><div style="font-size:1.5rem; font-weight:700; margin-top:0.5rem;">${pct}%</div><div class="progress-bg"><div class="progress-fill" style="width:${pct}%"></div></div><div style="font-size:0.75rem; color:var(--text-muted); display:flex; justify-content:space-between; margin-top:0.5rem;"><span>Current: ${curr.toLocaleString()}</span><span>Target: ${g.val.toLocaleString()}</span></div></div>`;
-            }).join('');
-        }
+        function exportData() { const a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2)); a.download = "founder_os_backup.json"; a.click(); }
+        function importData(e) { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = function(evt) { try { db = JSON.parse(evt.target.result); saveDB(); alert("Restored successfully."); } catch(err) { alert("Invalid backup file."); } }; reader.readAsText(file); }
     </script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
+        
+        // Added Firebase App Check logic based on your uploaded Site Key
+        import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app-check.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCzVh0thAt9v42FFWTTNKCT662ogNi60X4",
@@ -929,6 +1027,13 @@
         };
 
         const app = initializeApp(firebaseConfig);
+        
+        // Initialize App Check with the Site Key provided
+        const appCheck = initializeAppCheck(app, {
+            provider: new ReCaptchaV3Provider('6LfGQIctAAAAACYL9S44DsgrsYiNeHvu9lmarUsd'),
+            isTokenAutoRefreshEnabled: true
+        });
+
         const auth = getAuth(app);
         const firestoreDb = getFirestore(app);
         const googleProvider = new GoogleAuthProvider();
@@ -959,10 +1064,11 @@
                     if (!name) { errorEl.innerText = "Please enter your name."; return; }
                     const userCred = await createUserWithEmailAndPassword(auth, email, pass);
                     
+                    // Immediately initialize a blank DB for the new user, tagging it with their name
                     let initialDb = { logo: null, payments: [], expenses: [], clients: [], ventures: [], team: [], investments: [], equities: [], goals: [], documents: [] };
                     await setDoc(doc(firestoreDb, "users", userCred.user.uid), {
-                        name: name,
-                        email: email,
+                        name: sanitize(name), // Sanitized name for security
+                        email: sanitize(email),
                         os_data: initialDb,
                         currency: '₹',
                         updatedAt: new Date().toISOString()
@@ -992,16 +1098,7 @@
             window.location.reload();
         };
 
-        // Fix for Currency Saving to Cloud directly
-        window.updateCurrency = async function() {
-            currency = getVal('optCurrency'); 
-            localStorage.setItem('founder_os_cur', currency);
-            if (window.currentUser) {
-                await setDoc(doc(firestoreDb, "users", window.currentUser.uid), { currency: currency }, { merge: true });
-            }
-            window.renderAll(); 
-        };
-
+        // REAL-TIME SAVE FUNCTION
         window.syncToCloud = async function(databaseData, cur) {
             if (!window.currentUser) return;
             try {
@@ -1015,6 +1112,7 @@
             }
         }
 
+        // AUTH LISTENER
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 document.getElementById('auth-overlay').style.display = 'none';
@@ -1044,6 +1142,7 @@
                 document.getElementById('auth-overlay').style.display = 'flex';
             }
         });
+
     </script>
 </body>
 </html>
