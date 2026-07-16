@@ -188,7 +188,7 @@
             <div class="nav-group-label">Ecosystem</div>
             <li class="nav-item" onclick="navigate('ventures')">Ventures</li>
             <li class="nav-item" onclick="navigate('team')">Team & Shares</li>
-            <li class="nav-item" onclick="navigate('investments')">Properties & Assets</li>
+            <li class="nav-item" onclick="navigate('investments')">Investments & Equity</li>
             
             <div class="nav-group-label">System</div>
             <li class="nav-item" onclick="navigate('goals')">Goals</li>
@@ -616,7 +616,7 @@
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             getEl(`view-${view}`).classList.add('active');
             
-            const titles = { dashboard:'Overview Dashboard', analytics:'Analytics & Profitability', payments:'Revenue Ledger', expenses:'Expenses & Payouts', clients:'Client Roster', ventures:'Venture Management', team:'Team & Equity Directory', investments:'Properties & Assets', goals:'Milestone Goals', documents:'Secure Documents', settings:'System Settings' };
+            const titles = { dashboard:'Overview Dashboard', analytics:'Analytics & Profitability', payments:'Revenue Ledger', expenses:'Expenses & Payouts', clients:'Client Roster', ventures:'Venture Management', team:'Team & Equity Directory', investments:'Investments & Equity', goals:'Milestone Goals', documents:'Secure Documents', settings:'System Settings' };
             getEl('viewTitle').innerText = titles[view] || view;
             getEl('sidebar').classList.remove('open'); 
             
