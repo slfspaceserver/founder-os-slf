@@ -132,25 +132,33 @@
             main { margin-left: 0; width: 100%; padding: 1rem; padding-top: 80px; }
             .mobile-header { display: flex; }
             header { flex-direction: column; align-items: flex-start; margin-top: 0.5rem; }
-            .header-controls { align-items: flex-start; width: 100%; }
+            .header-controls { align-items: flex-start; width: 100%; margin-top: 0.5rem; }
             .toolbar { max-width: 100%; }
         }
     </style>
 </head>
 <body>
 
-    <!-- Login Overlay -->
+    <audio id="moneySound" src="https://actions.google.com/sounds/v1/foley/cash_register.ogg" preload="auto"></audio>
+
     <div id="auth-overlay">
         <div class="card" style="width: 350px; text-align: center; border: 1px solid var(--panel-border);">
-            <h2 style="margin-bottom: 1rem;">Founder OS Login</h2>
-            <input type="email" id="authEmail" placeholder="Email Address" style="margin-bottom: 0.5rem; padding: 0.5rem;">
-            <input type="password" id="authPass" placeholder="Password" style="margin-bottom: 1rem; padding: 0.5rem;">
-            <button onclick="handleLogin()" style="width: 100%;">Secure Login</button>
+            <h2 id="authTitle" style="margin-bottom: 1rem;">Login to Founder OS</h2>
+            
+            <input type="text" id="authName" placeholder="Full Name" style="display: none; margin-bottom: 0.5rem; padding: 0.5rem; width: 100%;">
+            <input type="email" id="authEmail" placeholder="Email Address" style="margin-bottom: 0.5rem; padding: 0.5rem; width: 100%;">
+            <input type="password" id="authPass" placeholder="Password" style="margin-bottom: 1rem; padding: 0.5rem; width: 100%;">
+            
+            <button id="mainAuthBtn" onclick="handleAuth()" style="width: 100%;">Secure Login</button>
+            
+            <p id="toggleText" style="margin-top: 1rem; font-size: 0.8rem; color: var(--text-muted); cursor: pointer;" onclick="toggleAuthMode()">
+                Don't have an account? <u style="color: var(--accent);">Create one</u>
+            </p>
+            
             <p id="authError" style="color: var(--red); font-size: 0.8rem; margin-top: 1rem;"></p>
         </div>
     </div>
 
-    <!-- Mobile Header -->
     <div class="mobile-header">
         <div style="display: flex; align-items: center; gap:0.5rem;">
             <img id="mobileCustomLogoImg" alt="Brand Logo">
@@ -159,7 +167,6 @@
         <button class="menu-btn" onclick="toggleMenu()">☰</button>
     </div>
 
-    <!-- SIDEBAR NAVIGATION -->
     <aside id="sidebar">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
             <div class="logo-container" style="margin-bottom: 0;">
@@ -188,9 +195,11 @@
             <li class="nav-item" onclick="navigate('documents')">Documents</li>
             <li class="nav-item" onclick="navigate('settings')">Settings</li>
         </ul>
+        <div style="margin-top: auto; padding-top: 1rem;">
+            <button class="btn-sec" style="width: 100%; border-color: var(--panel-border); color: var(--text-muted);" onclick="handleLogout()">Sign Out</button>
+        </div>
     </aside>
 
-    <!-- MAIN APP AREA -->
     <main>
         <header>
             <h2 style="font-size: 1.4rem; font-weight: 600;" id="viewTitle">Overview Dashboard</h2>
@@ -211,7 +220,6 @@
             </div>
         </header>
 
-        <!-- DASHBOARD -->
         <section id="view-dashboard" class="view-section active">
             <div class="metrics-grid">
                 <div class="metric-card"><div class="metric-label">Gross Revenue</div><div class="metric-value green" id="m-rev">0</div><div class="growth-txt" id="g-rev">0%</div></div>
@@ -244,7 +252,6 @@
             </div>
         </section>
 
-        <!-- ANALYTICS -->
         <section id="view-analytics" class="view-section">
             <div class="card">
                 <div class="card-title">Project Profitability Matrix</div>
@@ -261,7 +268,6 @@
             </div>
         </section>
 
-        <!-- PAYMENTS -->
         <section id="view-payments" class="view-section">
             <div class="card">
                 <div class="card-title">
@@ -302,7 +308,6 @@
             </div>
         </section>
 
-        <!-- EXPENSES -->
         <section id="view-expenses" class="view-section">
             <div class="card">
                 <div class="card-title">
@@ -338,7 +343,6 @@
             </div>
         </section>
 
-        <!-- CLIENTS -->
         <section id="view-clients" class="view-section">
             <div class="card">
                 <div class="card-title">Client Roster <button onclick="openForm('client')">+ Add Client</button></div>
@@ -361,7 +365,6 @@
             </div>
         </section>
 
-        <!-- VENTURES -->
         <section id="view-ventures" class="view-section">
             <div class="card">
                 <div class="card-title">Active Ventures <button onclick="openForm('venture')">+ Add Venture</button></div>
@@ -380,7 +383,6 @@
             </div>
         </section>
 
-        <!-- TEAM -->
         <section id="view-team" class="view-section">
             <div class="card">
                 <div class="card-title">Team Directory & Equity <button onclick="openForm('team')">+ Add Member</button></div>
@@ -401,7 +403,6 @@
             </div>
         </section>
 
-        <!-- INVESTMENTS -->
         <section id="view-investments" class="view-section">
             <div class="two-col-grid">
                 <div class="card">
@@ -435,7 +436,6 @@
             </div>
         </section>
 
-        <!-- GOALS -->
         <section id="view-goals" class="view-section">
             <div class="card">
                 <div class="card-title">Personal Metrics Goals <button onclick="openForm('goal')">+ Add Goal</button></div>
@@ -455,7 +455,6 @@
             </div>
         </section>
 
-        <!-- DOCUMENTS -->
         <section id="view-documents" class="view-section">
             <div class="card">
                 <div class="card-title">Important Documents Locker <button onclick="openForm('document')">+ Add Link</button></div>
@@ -475,7 +474,6 @@
             </div>
         </section>
 
-        <!-- SETTINGS -->
         <section id="view-settings" class="view-section">
             <div class="two-col-grid">
                 <div class="card">
@@ -492,7 +490,7 @@
                 </div>
                 <div class="card">
                     <div class="card-title">Data Management</div>
-                    <p style="font-size:0.8rem; color:var(--text-muted);">Your data is synced directly to Google's Cloud Firestore.</p>
+                    <p style="font-size:0.8rem; color:var(--text-muted);">Your data is securely synced to the cloud.</p>
                     <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
                         <button onclick="exportData()">Export Data Backup (JSON)</button>
                         <button class="btn-sec" onclick="document.getElementById('importFile').click()">Import Backup</button>
@@ -503,7 +501,6 @@
         </section>
     </main>
 
-    <!-- MAIN APP SCRIPT -->
     <script>
         var db = { logo: null, payments: [], expenses: [], clients: [], ventures: [], team: [], investments: [], equities: [], goals: [], documents: [] };
         var sys_filter = '30days';
@@ -619,7 +616,7 @@
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             getEl(`view-${view}`).classList.add('active');
             
-            const titles = { dashboard:'Overview Dashboard', analytics:'Analytics & Profitability', payments:'Revenue Ledger', expenses:'Expenses & Payouts', clients:'Client Roster', ventures:'Venture Management', team:'Team & Equity Directory', investments:'Investments & Equity', goals:'Milestone Goals', documents:'Secure Documents', settings:'System Settings' };
+            const titles = { dashboard:'Overview Dashboard', analytics:'Analytics & Profitability', payments:'Revenue Ledger', expenses:'Expenses & Payouts', clients:'Client Roster', ventures:'Venture Management', team:'Team & Equity Directory', investments:'Properties & Assets', goals:'Milestone Goals', documents:'Secure Documents', settings:'System Settings' };
             getEl('viewTitle').innerText = titles[view] || view;
             getEl('sidebar').classList.remove('open'); 
             
@@ -840,10 +837,9 @@
         function importData(e) { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = function(evt) { try { db = JSON.parse(evt.target.result); saveDB(); alert("Restored successfully."); } catch(err) { alert("Invalid backup file."); } }; reader.readAsText(file); }
     </script>
 
-    <!-- REAL-TIME FIREBASE SYNC SCRIPT -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
 
         const firebaseConfig = {
@@ -859,6 +855,55 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const firestoreDb = getFirestore(app);
+
+        let isLoginMode = true;
+
+        window.toggleAuthMode = () => {
+            isLoginMode = !isLoginMode;
+            document.getElementById('authTitle').innerText = isLoginMode ? "Login to Founder OS" : "Create New Account";
+            document.getElementById('mainAuthBtn').innerText = isLoginMode ? "Secure Login" : "Sign Up";
+            document.getElementById('authName').style.display = isLoginMode ? "none" : "block";
+            document.getElementById('toggleText').innerHTML = isLoginMode ? "Don't have an account? <u style='color: var(--accent);'>Create one</u>" : "Already have an account? <u style='color: var(--accent);'>Login</u>";
+            document.getElementById('authError').innerText = "";
+        };
+
+        window.handleAuth = async () => {
+            const email = document.getElementById('authEmail').value;
+            const pass = document.getElementById('authPass').value;
+            const name = document.getElementById('authName').value;
+            const errorEl = document.getElementById('authError');
+            
+            errorEl.innerText = "Processing...";
+            
+            try {
+                if (isLoginMode) {
+                    await signInWithEmailAndPassword(auth, email, pass);
+                } else {
+                    if (!name) { errorEl.innerText = "Please enter your name."; return; }
+                    const userCred = await createUserWithEmailAndPassword(auth, email, pass);
+                    
+                    // Immediately initialize a blank DB for the new user, tagging it with their name
+                    let initialDb = { logo: null, payments: [], expenses: [], clients: [], ventures: [], team: [], investments: [], equities: [], goals: [], documents: [] };
+                    await setDoc(doc(firestoreDb, "users", userCred.user.uid), {
+                        name: name,
+                        email: email,
+                        os_data: initialDb,
+                        currency: '₹',
+                        updatedAt: new Date().toISOString()
+                    }, { merge: true });
+                    
+                    alert("Account created successfully!");
+                }
+            } catch(e) { 
+                console.error("Auth Error:", e);
+                errorEl.innerText = "Error: " + e.message; 
+            }
+        };
+
+        window.handleLogout = async () => {
+            await signOut(auth);
+            window.location.reload();
+        };
 
         // REAL-TIME SAVE FUNCTION
         window.syncToCloud = async function(databaseData, cur) {
@@ -880,7 +925,6 @@
                 document.getElementById('auth-overlay').style.display = 'none';
                 window.currentUser = user;
                 
-                // Real-time listener for2 instant345678901234567890...
                 onSnapshot(doc(firestoreDb, "users", user.uid), (docSnap) => {
                     if (docSnap.exists() && docSnap.data().os_data) {
                         window.db = docSnap.data().os_data;
@@ -906,18 +950,6 @@
             }
         });
 
-        // LOGIN HANDLER
-        window.handleLogin = async function() {
-            const email = document.getElementById('authEmail').value;
-            const pass = document.getElementById('authPass').value;
-            const errorEl = document.getElementById('authError');
-            try {
-                await signInWithEmailAndPassword(auth, email, pass);
-            } catch (error) {
-                console.error("Login Error:", error);
-                errorEl.innerText = "Error: " + error.code;
-            }
-        }
     </script>
 </body>
 </html>
