@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Founder OS </title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg: #09090b; --panel: #141417; --panel-border: #27272a;
+            --text: #fafafa; --text-muted: #a1a1aa; --accent: #ffffff;
+            --green: #22c55e; --red: #ef4444; --orange: #f97316;
+            --blue: #3b82f6; --purple: #8b5cf6;
+            --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+        }
+
+        .light-mode {
+            --bg: #f4f4f5; --panel: #ffffff; --panel-border: #e4e4e7;
+            --text: #09090b; --text-muted: #71717a; --accent: #09090b;
+            --green: #16a34a; --red: #dc2626; --orange: #ea580c;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font); }
+        body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; transition: background 0.3s, color 0.3s; overflow-x: hidden; }
+
+        /* Mobile Header */
+        .mobile-header { display: none; width: 100%; background: var(--panel); border-bottom: 1px solid var(--panel-border); padding: 1rem; align-items: center; justify-content: space-between; position: fixed; top: 0; z-index: 20; }
+        .menu-btn { background: none; border: none; color: var(--text); font-size: 1.5rem; cursor: pointer; }
+
+        /* Navigation */
+        aside { width: 240px; background: var(--panel); border-right: 1px solid var(--panel-border); display: flex; flex-direction: column; padding: 1.5rem; position: fixed; height: 100vh; z-index: 30; overflow-y: auto; transition: left 0.3s ease; left: 0;}
+        .logo-container { margin-bottom: 2rem; display: flex; align-items: center; gap: 0.5rem; height: 40px; }
+        .logo-text { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.03em; display: flex; align-items: center; gap: 0.5rem; }
+        .logo-text span { background: var(--text); color: var(--bg); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem; }
+        #customLogoImg { max-height: 40px; max-width: 100%; object-fit: contain; border-radius: 4px; display: none; }
+        .close-menu-btn { display: none; background: none; border: none; color: var(--text); font-size: 1.5rem; cursor: pointer; margin-left: auto; }
+        
+        .nav-links { display: flex; flex-direction: column; gap: 0.25rem; list-style: none; flex-grow: 1; margin-top: 1rem;}
+        .nav-item { padding: 0.6rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; color: var(--text-muted); transition: all 0.2s ease; }
+        .nav-item:hover, .nav-item.active { background: var(--panel-border); color: var(--text); }
+        .nav-group-label { font-size: 0.65rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; margin: 1rem 0 0.25rem 0.5rem; font-weight: 600; }
+        
+        /* Main Workspace */
+        main { margin-left: 240px; flex-grow: 1; padding: 2rem; width: calc(100% - 240px); }
+        header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
+        .header-controls { display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem; }
+        .time-filters { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .btn-filter { background: var(--panel); border: 1px solid var(--panel-border); color: var(--text); padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.8rem; cursor: pointer; }
+        .btn-filter.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+        #customDateWrap { background: var(--panel); padding: 0.5rem; border-radius: 6px; border: 1px solid var(--panel-border); }
+
+        /* Grid & Cards */
+        .card { background: var(--panel); border: 1px solid var(--panel-border); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem; }
+        .card-title { font-size: 0.9rem; font-weight: 600; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;}
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+        .metric-card { background: var(--bg); border: 1px solid var(--panel-border); padding: 1rem; border-radius: 8px; position: relative;}
+        .metric-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+        .metric-value { font-size: 1.4rem; font-weight: 600; letter-spacing: -0.02em; }
+        .metric-value.green { color: var(--green); } .metric-value.red { color: var(--red); } .metric-value.purple { color: var(--purple); } .metric-value.blue { color: var(--blue); }
+        .growth-txt { font-size: 0.7rem; font-weight: 500; margin-top: 0.4rem; display: inline-block; padding: 0.15rem 0.4rem; border-radius: 4px; background: var(--panel-border); }
+        .growth-txt.pos { color: var(--green); background: rgba(34, 197, 94, 0.1); }
+        .growth-txt.neg { color: var(--red); background: rgba(239, 68, 68, 0.1); }
+        .two-col-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+
+        /* Tables & Forms */
+        .data-table-wrapper { width: 100%; overflow-x: auto; }
+        .scrollable-table-wrap { max-height: 350px; overflow-y: auto; }
+        .data-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; }
+        .data-table th, .data-table td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--panel-border); }
+        .data-table th { color: var(--text-muted); font-weight: 500; text-transform: uppercase; font-size: 0.7rem; position: sticky; top: 0; background: var(--panel); z-index: 2;}
+        .data-table tr:hover { background: rgba(255,255,255,0.02); }
+
+        input, select, textarea { background: var(--bg); border: 1px solid var(--panel-border); color: var(--text); padding: 0.5rem 0.75rem; border-radius: 6px; font-size: 0.875rem; outline: none; width: 100%; }
+        input[type="checkbox"] { width: auto; transform: scale(1.2); cursor: pointer; }
+        input:focus, select:focus { border-color: var(--text-muted); }
+        button { background: var(--accent); color: var(--bg); border: none; padding: 0.5rem 1rem; border-radius: 6px; font-size: 0.85rem; font-weight: 500; cursor: pointer; transition: opacity 0.2s; white-space: nowrap;}
+        button:hover { opacity: 0.9; }
+        .btn-sec { background: transparent; color: var(--text); border: 1px solid var(--panel-border); }
+        .btn-sec:hover { background: var(--panel-border); }
+        .btn-danger { background: transparent; color: var(--red); border: none; padding: 0; font-size: 0.8rem; text-decoration: underline;}
+        .btn-edit { background: transparent; color: var(--text-muted); border: none; padding: 0; font-size: 0.8rem; text-decoration: underline; margin-right: 0.75rem;}
+
+        .view-section { display: none; flex-direction: column; }
+        .view-section.active { display: flex; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .inline-form { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; background: var(--bg); border: 1px solid var(--panel-border); padding: 1.25rem; border-radius: 8px; margin-bottom: 1rem; scroll-margin-top: 100px;}
+        .inline-form .full { grid-column: span 2; }
+        .progress-bg { background: var(--panel-border); height: 6px; border-radius: 3px; overflow: hidden; margin-top: 0.5rem; }
+        .progress-fill { background: var(--text); height: 100%; transition: width 0.3s; }
+        .toolbar { display: flex; gap: 0.5rem; align-items: center; width: 100%; max-width: 400px;}
+
+        @media (max-width: 900px) {
+            .two-col-grid { grid-template-columns: 1fr; }
+            .inline-form { grid-template-columns: 1fr; }
+            .inline-form .full { grid-column: span 1; }
+        }
+        @media (max-width: 768px) {
+            aside { left: -240px; box-shadow: none; }
+            aside.open { left: 0; box-shadow: 0 0 20px rgba(0,0,0,0.8); }
+            .close-menu-btn { display: block; }
+            main { margin-left: 0; width: 100%; padding: 1rem; padding-top: 80px; }
+            .mobile-header { display: flex; }
+            header { flex-direction: column; align-items: flex-start; }
+            .header-controls { align-items: flex-start; width: 100%;}
+            .toolbar { max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="moneySound" src="https://actions.google.com/sounds/v1/foley/cash_register.ogg" preload="auto"></audio>
+
+    <div class="mobile-header">
+        <div style="display: flex; align-items: center; gap:0.5rem;">
+            <img id="mobileCustomLogoImg" alt="Brand Logo" style="max-height: 24px; max-width: 120px; object-fit: contain; border-radius: 4px; display: none;">
+            <div id="mobileDefaultLogoText" style="font-weight: 700; display:flex; align-items:center; gap:0.5rem;">FOUNDER <span style="background:var(--text); color:var(--bg); padding:0.1rem 0.4rem; border-radius:4px; font-size:0.7rem;">OS</span></div>
+        </div>
+        <button class="menu-btn" onclick="toggleMenu()">☰</button>
+    </div>
+
+    <aside id="sidebar">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div class="logo-container" style="margin-bottom: 0;">
+                <img id="customLogoImg" alt="Brand Logo">
+                <div class="logo-text" id="defaultLogoText">FOUNDER <span>OS</span></div>
+            </div>
+            <button class="close-menu-btn" onclick="toggleMenu()">✕</button>
+        </div>
+        <ul class="nav-links">
+            <div class="nav-group-label">Overview</div>
+            <li class="nav-item active" onclick="navigate('dashboard')">Dashboard</li>
+            <li class="nav-item" onclick="navigate('analytics')">Analytics Hub</li>
+            
+            <div class="nav-group-label">Operations</div>
+            <li class="nav-item" onclick="navigate('payments')">Revenue Ledger</li>
+            <li class="nav-item" onclick="navigate('expenses')">Expenses & Payroll</li>
+            <li class="nav-item" onclick="navigate('clients')">Clients Data</li>
+            
+            <div class="nav-group-label">Ecosystem</div>
+            <li class="nav-item" onclick="navigate('ventures')">Ventures</li>
+            <li class="nav-item" onclick="navigate('team')">Team & Shares</li>
+            <li class="nav-item" onclick="navigate('investments')">Investments & Equity</li>
+            
+            <div class="nav-group-label">System</div>
+            <li class="nav-item" onclick="navigate('goals')">Goals</li>
+            <li class="nav-item" onclick="navigate('documents')">Documents</li>
+            <li class="nav-item" onclick="navigate('settings')">Settings</li>
+        </ul>
+    </aside>
+
+    <main>
+        <header>
+            <h2 style="font-size: 1.3rem; font-weight: 600;" id="viewTitle">Overview Dashboard</h2>
+            <div class="header-controls">
+                <div class="time-filters">
+                    <button class="btn-filter" id="f-today" onclick="setFilter('today')">Today</button>
+                    <button class="btn-filter active" id="f-30days" onclick="setFilter('30days')">Last 30D</button>
+                    <button class="btn-filter" id="f-month" onclick="setFilter('month')">This Month</button>
+                    <button class="btn-filter" id="f-year" onclick="setFilter('year')">This Year</button>
+                    <button class="btn-filter" id="f-custom" onclick="setFilter('custom')">Custom</button>
+                    <button class="btn-filter" id="f-all" onclick="setFilter('all')">All Time</button>
+                </div>
+                <div id="customDateWrap" style="display: none;">
+                    <input type="date" id="customFrom" onchange="renderAll()" style="padding: 0.25rem;">
+                    <span style="color:var(--text-muted); font-size:0.8rem; padding:0 0.5rem;">to</span>
+                    <input type="date" id="customTo" onchange="renderAll()" style="padding: 0.25rem;">
+                </div>
+            </div>
+        </header>
+
+        <section id="view-dashboard" class="view-section active">
+            <div class="metrics-grid">
+                <div class="metric-card"><div class="metric-label">Gross Revenue</div><div class="metric-value green" id="m-rev">0</div><div class="growth-txt" id="g-rev">0%</div></div>
+                <div class="metric-card"><div class="metric-label">Operating Expenses</div><div class="metric-value red" id="m-exp">0</div><div class="growth-txt" id="g-exp">0%</div></div>
+                <div class="metric-card"><div class="metric-label">Team Payouts</div><div class="metric-value purple" id="m-pay">0</div><div class="growth-txt" id="g-pay">0%</div></div>
+                <div class="metric-card"><div class="metric-label">Net Margin</div><div class="metric-value" id="m-net">0</div><div class="growth-txt" id="g-net">0%</div></div>
+                
+                <div class="metric-card" style="border-top: 2px solid var(--green);"><div class="metric-label">Cash Savings</div><div class="metric-value green" id="m-sav-cash">0</div></div>
+                <div class="metric-card" style="border-top: 2px solid var(--blue);"><div class="metric-label">Mutual Funds</div><div class="metric-value blue" id="m-sav-mf">0</div></div>
+                <div class="metric-card" style="border-top: 2px solid var(--orange);"><div class="metric-label">Other Assets</div><div class="metric-value orange" id="m-sav-oth">0</div></div>
+                
+                <div class="metric-card" style="grid-column: span 2; background: rgba(255,255,255,0.02);"><div class="metric-label">Total Liquid Full Amount</div><div class="metric-value" id="m-sav-total" style="font-size: 1.8rem;">0</div></div>
+                <div class="metric-card" style="grid-column: span 2;"><div class="metric-label">Total Net Worth (Inc. Equity)</div><div class="metric-value" id="m-nw" style="font-size: 1.8rem;">0</div></div>
+            </div>
+
+            <div class="two-col-grid">
+                <div class="card">
+                    <div class="card-title">Cash Flow Trend</div>
+                    <div style="height: 250px;"><canvas id="chartDashboardFlow"></canvas></div>
+                </div>
+                <div class="card">
+                    <div class="card-title">
+                        Recent Activity Logs
+                        <div class="toolbar"><input type="text" id="searchAct" placeholder="Search logs..." onkeyup="renderAll(true)" style="padding:0.3rem 0.6rem;"></div>
+                    </div>
+                    <div class="data-table-wrapper scrollable-table-wrap">
+                        <table class="data-table" id="dashboardActivity"></table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-analytics" class="view-section">
+            <div class="card">
+                <div class="card-title">Project Profitability Matrix</div>
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead><tr><th>Venture / Project</th><th>Gross Revenue</th><th>Ops Expenses</th><th>Team Payouts</th><th>Net Profit</th><th>Margin %</th></tr></thead>
+                        <tbody id="tblAnalyticsVenture"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="two-col-grid">
+                <div class="card"><div class="card-title">Team Payroll Distribution</div><div style="height: 250px;"><canvas id="chartTeamPayroll"></canvas></div></div>
+                <div class="card"><div class="card-title">Venture Revenue Contribution</div><div style="height: 250px;"><canvas id="chartVentureRev"></canvas></div></div>
+            </div>
+        </section>
+
+        <section id="view-payments" class="view-section">
+            <div class="card">
+                <div class="card-title">
+                    Revenue Ledger 
+                    <button onclick="openForm('payment')">+ Add Revenue</button>
+                </div>
+                
+                <div class="toolbar" style="margin-bottom: 1rem; max-width: 600px;">
+                    <input type="text" id="searchRev" placeholder="Search Client, Venture..." onkeyup="renderAll(true)">
+                    <select id="filterRevStatus" onchange="renderAll(true)" style="max-width: 150px;">
+                        <option value="All">All Status</option>
+                        <option value="Paid">Paid Only</option>
+                        <option value="Pending">Pending Only</option>
+                    </select>
+                </div>
+
+                <div id="form-payment" class="inline-form" style="display: none;">
+                    <input type="hidden" id="payId">
+                    <input type="text" id="payClient" placeholder="Client Name">
+                    <select id="payVentureSelect"></select>
+                    <input type="text" id="payService" placeholder="Service Rendered">
+                    <input type="number" id="payAmount" placeholder="Amount" step="0.01">
+                    <input type="date" id="payDate">
+                    <select id="payStatus"><option value="Paid">Paid</option><option value="Pending">Pending</option></select>
+                    
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--green); cursor: pointer;" class="full">
+                        <input type="checkbox" id="payAddSavings"> Auto-add Paid amount to "Cash Savings" portfolio
+                    </label>
+
+                    <div class="full" style="display: flex; gap: 0.5rem;"><button onclick="savePayment()">Save Transaction</button><button class="btn-sec" onclick="closeForm('payment')">Cancel</button></div>
+                </div>
+                <div class="data-table-wrapper scrollable-table-wrap" style="max-height: 500px;">
+                    <table class="data-table">
+                        <thead><tr><th>Date</th><th>Client / Venture</th><th>Service</th><th>Amount</th><th>Status</th><th>Actions</th></tr></thead>
+                        <tbody id="tblPayments"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-expenses" class="view-section">
+            <div class="card">
+                <div class="card-title">
+                    Expenses & Payouts 
+                    <button onclick="openForm('expense')">+ Add Expense</button>
+                </div>
+
+                <div class="toolbar" style="margin-bottom: 1rem;">
+                    <input type="text" id="searchExp" placeholder="Search category, notes, or venture..." onkeyup="renderAll(true)">
+                </div>
+
+                <div id="form-expense" class="inline-form" style="display: none;">
+                    <input type="hidden" id="expId">
+                    <select id="expCategory" onchange="toggleTeamSelector()">
+                        <option value="Operations">Operations / General</option>
+                        <option value="Software">Software & API</option>
+                        <option value="Marketing">Marketing</option>
+                        <option value="Salary / Payout">Salary / Team Payout</option>
+                    </select>
+                    <select id="expVentureSelect"></select>
+                    <select id="expTeamSelect" style="display: none;"></select>
+                    <input type="number" id="expAmount" placeholder="Amount" step="0.01">
+                    <input type="date" id="expDate">
+                    <input type="text" id="expNotes" placeholder="Notes / Description">
+                    <div class="full" style="display: flex; gap: 0.5rem;"><button onclick="saveExpense()">Save Expense</button><button class="btn-sec" onclick="closeForm('expense')">Cancel</button></div>
+                </div>
+                <div class="data-table-wrapper scrollable-table-wrap" style="max-height: 500px;">
+                    <table class="data-table">
+                        <thead><tr><th>Date</th><th>Category / Venture</th><th>Description/Recipient</th><th>Amount</th><th>Actions</th></tr></thead>
+                        <tbody id="tblExpenses"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-clients" class="view-section">
+            <div class="card">
+                <div class="card-title">Client Roster <button onclick="openForm('client')">+ Add Client</button></div>
+                <div id="form-client" class="inline-form" style="display: none;">
+                    <input type="hidden" id="cliId">
+                    <input type="text" id="cliName" placeholder="Client / Company Name">
+                    <input type="email" id="cliEmail" placeholder="Email Address">
+                    <input type="text" id="cliService" placeholder="Core Service">
+                    <input type="number" id="cliFee" placeholder="Monthly Retainer / MRR (Optional)" step="0.01">
+                    <input type="date" id="cliStart" placeholder="Start Date">
+                    <select id="cliStatus"><option value="Active">Active</option><option value="Completed">Completed / Inactive</option></select>
+                    <div class="full" style="display: flex; gap: 0.5rem;"><button onclick="saveClient()">Save Client</button><button class="btn-sec" onclick="closeForm('client')">Cancel</button></div>
+                </div>
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead><tr><th>Client Details</th><th>Service Focus</th><th>MRR Contribution</th><th>Status</th><th>Actions</th></tr></thead>
+                        <tbody id="tblClients"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-ventures" class="view-section">
+            <div class="card">
+                <div class="card-title">Active Ventures <button onclick="openForm('venture')">+ Add Venture</button></div>
+                <div id="form-venture" class="inline-form" style="display: none;">
+                    <input type="hidden" id="vId">
+                    <input type="text" id="vName" class="full" placeholder="Venture Name">
+                    <input type="text" id="vDesc" class="full" placeholder="Description">
+                    <div class="full" style="display: flex; gap: 0.5rem;"><button onclick="saveVenture()">Save Venture</button><button class="btn-sec" onclick="closeForm('venture')">Cancel</button></div>
+                </div>
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead><tr><th>Venture Name</th><th>Description</th><th>Actions</th></tr></thead>
+                        <tbody id="tblVentures"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-team" class="view-section">
+            <div class="card">
+                <div class="card-title">Team Directory & Equity <button onclick="openForm('team')">+ Add Member</button></div>
+                <div id="form-team" class="inline-form" style="display: none;">
+                    <input type="hidden" id="teamId">
+                    <input type="text" id="teamName" placeholder="Full Name">
+                    <input type="text" id="teamRole" placeholder="Role (e.g. Founder, Intern, Ops)">
+                    <select id="teamType"><option value="Partner">Partner / Founder</option><option value="Employee">Employee</option><option value="Intern">Intern</option><option value="Contractor">Contractor</option></select>
+                    <input type="number" id="teamShare" placeholder="Profit/Equity Share % (Optional)" step="0.01">
+                    <div class="full" style="display: flex; gap: 0.5rem;"><button onclick="saveTeamMember()">Save Member</button><button class="btn-sec" onclick="closeForm('team')">Cancel</button></div>
+                </div>
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead><tr><th>Name</th><th>Role & Type</th><th>Equity/Share</th><th>Total Payouts (Period)</th><th>Actions</th></tr></thead>
+                        <tbody id="tblTeam"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-investments" class="view-section">
+            <div class="two-col-grid">
+                <div class="card">
+                    <div class="card-title">Liquid Assets & Savings <button onclick="openForm('investment')">+ Add Asset</button></div>
+                    <div id="form-investment" class="inline-form" style="display: none; grid-template-columns: 1fr;">
+                        <input type="hidden" id="invId">
+                        <input type="text" id="invName" placeholder="Asset Name (e.g. HDFC Savings, BTC)">
+                        <select id="invType"><option value="Cash/Savings">Cash & Savings</option><option value="Mutual Funds">Mutual Funds</option><option value="Crypto">Crypto</option><option value="Stocks">Stocks</option><option value="Other">Other</option></select>
+                        <input type="number" id="invCurrent" placeholder="Current Realizable Value" step="0.01">
+                        <div style="display: flex; gap: 0.5rem;"><button onclick="saveInvestment()">Save</button><button class="btn-sec" onclick="closeForm('investment')">Cancel</button></div>
+                    </div>
+                    <table class="data-table">
+                        <thead><tr><th>Asset Name / Type</th><th>Current Value</th><th>Actions</th></tr></thead>
+                        <tbody id="tblInvestments"></tbody>
+                    </table>
+                </div>
+                <div class="card">
+                    <div class="card-title">Private Company Equities <button onclick="openForm('equity')">+ Add Equity</button></div>
+                    <div id="form-equity" class="inline-form" style="display: none; grid-template-columns: 1fr;">
+                        <input type="hidden" id="eqId">
+                        <input type="text" id="eqName" placeholder="Company Name">
+                        <input type="number" id="eqPercent" placeholder="Your Ownership %" step="0.01">
+                        <input type="number" id="eqVal" placeholder="Estimated Total Company Valuation" step="0.01">
+                        <div style="display: flex; gap: 0.5rem;"><button onclick="saveEquity()">Save</button><button class="btn-sec" onclick="closeForm('equity')">Cancel</button></div>
+                    </div>
+                    <table class="data-table">
+                        <thead><tr><th>Company</th><th>Stake %</th><th>Stake Value</th><th>Actions</th></tr></thead>
+                        <tbody id="tblEquities"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-goals" class="view-section">
+            <div class="card">
+                <div class="card-title">Personal Metrics Goals <button onclick="openForm('goal')">+ Add Goal</button></div>
+                <div id="form-goal" class="inline-form" style="display: none;">
+                    <input type="hidden" id="goalId">
+                    <input type="text" id="goalName" placeholder="Target Name (e.g. 10L Cash)">
+                    <select id="goalType">
+                        <option value="Cash Savings">Cash Savings (Cash/MF)</option>
+                        <option value="Net Worth">Total Net Worth</option>
+                        <option value="Monthly Revenue">Period Business Revenue</option>
+                        <option value="Active Clients">Active Client Count</option>
+                    </select>
+                    <input type="number" id="goalVal" placeholder="Target Amount/Number">
+                    <div class="full" style="display: flex; gap: 0.5rem;"><button onclick="saveGoal()">Save Goal</button><button class="btn-sec" onclick="closeForm('goal')">Cancel</button></div>
+                </div>
+                <div class="two-col-grid" id="goalsContainer"></div>
+            </div>
+        </section>
+
+        <section id="view-documents" class="view-section">
+            <div class="card">
+                <div class="card-title">Important Documents Locker <button onclick="openForm('document')">+ Add Link</button></div>
+                <div id="form-document" class="inline-form" style="display: none;">
+                    <input type="hidden" id="docId">
+                    <input type="text" id="docName" placeholder="Document Name (e.g. GST Cert)">
+                    <select id="docCategory"><option value="Tax/Legal">Tax & Legal</option><option value="Contracts">Contracts</option><option value="Invoices">Invoices</option></select>
+                    <input type="text" id="docLink" class="full" placeholder="Cloud Drive Link URL">
+                    <div class="full" style="display: flex; gap: 0.5rem;"><button onclick="saveDocument()">Save Document</button><button class="btn-sec" onclick="closeForm('document')">Cancel</button></div>
+                </div>
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead><tr><th>Document Name</th><th>Category</th><th>Link Reference</th><th>Actions</th></tr></thead>
+                        <tbody id="tblDocuments"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-settings" class="view-section">
+            <div class="two-col-grid">
+                <div class="card">
+                    <div class="card-title">Brand & App Preferences</div>
+                    <label style="font-size:0.8rem; color:var(--text-muted);">Currency Symbol</label>
+                    <select id="optCurrency" onchange="updateCurrency()"><option value="₹">INR (₹)</option><option value="$">USD ($)</option><option value="AED">AED</option></select>
+                    
+                    <label style="font-size:0.8rem; color:var(--text-muted); margin-top:1rem;">Upload Custom Logo</label>
+                    <input type="file" accept="image/*" onchange="handleLogoUpload(event)">
+                    <div style="display: flex; gap: 0.5rem; margin-top:0.5rem; flex-wrap:wrap;">
+                        <button class="btn-sec" onclick="resetLogo()">Reset Logo</button>
+                        <button class="btn-sec" onclick="document.body.classList.toggle('light-mode')">Toggle Dark/Light Mode</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Data Management</div>
+                    <p style="font-size:0.8rem; color:var(--text-muted);">This app runs completely locally. Back up your data often.</p>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <button onclick="exportData()">Export Data Backup (JSON)</button>
+                        <button class="btn-sec" onclick="document.getElementById('importFile').click()">Import Backup</button>
+                        <input type="file" id="importFile" style="display: none;" onchange="importData(event)">
+                    </div>
+                    <button class="btn-sec" style="margin-top:2rem; color:var(--red); border-color:var(--red);" onclick="nukeStorage()">Factory Reset & Delete All Data</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        var db = { payments: [], expenses: [], clients: [], ventures: [], team: [], investments: [], equities: [], goals: [], documents: [] };
+        var sys_filter = '30days';
+        var activeView = 'dashboard';
+        var currency = '₹';
+        var charts = {};
+
+        function getEl(id) { return document.getElementById(id); }
+        function getVal(id) { return getEl(id) ? getEl(id).value : ''; }
+        function setVal(id, val) { if(getEl(id)) getEl(id).value = val; }
+
+        function toggleMenu() { getEl('sidebar').classList.toggle('open'); }
+
+        // --- SOUND & ANIMATIONS ---
+        function playMoneySound() {
+            const audio = getEl('moneySound');
+            if(audio) {
+                audio.currentTime = 0;
+                audio.play().catch(e => console.log("Audio play blocked by browser auto-play policy until interaction"));
+            }
+        }
+
+        function formatMoney(val) { return currency + Math.floor(val).toLocaleString(); }
+        
+        function animateValue(id, start, end, duration) {
+            const obj = getEl(id);
+            if (!obj) return;
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const current = Math.floor(progress * (end - start) + start);
+                obj.innerText = formatMoney(current);
+                if (progress < 1) window.requestAnimationFrame(step);
+                else obj.innerText = formatMoney(end);
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        function calculateGrowth(current, total) {
+            if(total === 0 || total === current) return `<span class="growth-txt pos">+0.0%</span>`;
+            const prev = total - current;
+            if(prev === 0) return `<span class="growth-txt pos">+100.0%</span>`;
+            const pct = ((current - prev) / prev) * 100;
+            const isPos = pct >= 0;
+            return `<span class="growth-txt ${isPos ? 'pos' : 'neg'}">${isPos ? '+' : ''}${pct.toFixed(1)}% vs prev</span>`;
+        }
+
+        window.applyLogo = function(base64) { 
+            getEl('defaultLogoText').style.display = 'none'; 
+            const img = getEl('customLogoImg'); img.src = base64; img.style.display = 'block'; 
+            const mText = getEl('mobileDefaultLogoText'); if(mText) mText.style.display = 'none';
+            const mImg = getEl('mobileCustomLogoImg'); if(mImg) { mImg.src = base64; mImg.style.display = 'block'; }
+        }
+
+        function resetLogo() { 
+            localStorage.removeItem('founder_os_logo'); 
+            getEl('customLogoImg').style.display = 'none'; getEl('defaultLogoText').style.display = 'flex'; 
+            const mImg = getEl('mobileCustomLogoImg'); if(mImg) mImg.style.display = 'none';
+            const mText = getEl('mobileDefaultLogoText'); if(mText) mText.style.display = 'flex';
+        }
+
+        // --- SYSTEM INITIALIZATION (LOCAL ONLY) ---
+        function initializeApp() {
+            if (!localStorage.getItem('founder_os_v9')) { // Bumped version to reset clean
+                db.ventures = [{ id: 'v1', name: 'Linkdify', desc: 'LinkedIn positioning agency.' }];
+                db.team = [{ id: 't1', name: 'Fidha Farzana', role: 'Partner', type: 'Partner', share: 50 }];
+                db.payments = [{ id: 'p1', client: 'Acme Corp', venture: 'Linkdify', service: 'Profile Optimization', amount: 85000, date: new Date().toISOString().split('T')[0], status: 'Paid' }];
+                db.expenses = [{ id: 'e1', category: 'Software', venture: 'Linkdify', amount: 5000, date: new Date().toISOString().split('T')[0], notes: 'API Cost', teamId: '' }];
+                db.clients = [{ id: 'c1', name: 'Acme Corp', email: 'hello@acme.co', service: 'Growth', fee: 40000, start: new Date().toISOString().split('T')[0], status: 'Active' }];
+                db.investments = [{ id: 'i1', name: 'Main Cash/Savings', type: 'Cash/Savings', current: 150000 }, { id: 'i2', name: 'Nippon India', type: 'Mutual Funds', current: 200000 }];
+                db.goals = [{ id:'g1', name:'Emergency Fund', type:'Cash Savings', val: 1000000 }];
+                saveDB();
+            } else {
+                db = JSON.parse(localStorage.getItem('founder_os_v9'));
+                currency = localStorage.getItem('founder_os_cur') || '₹';
+            }
+            if(getEl('optCurrency')) getEl('optCurrency').value = currency;
+            const logo = localStorage.getItem('founder_os_logo');
+            if (logo) window.applyLogo(logo);
+            
+            // Initial render with animations
+            window.renderAll(false); 
+        }
+
+        function saveDB() {
+            localStorage.setItem('founder_os_v9', JSON.stringify(db));
+            // Re-render and trigger animations to celebrate new data
+            window.renderAll(false);
+        }
+
+        // --- NAVIGATION & FILTERS ---
+        function navigate(view) {
+            activeView = view;
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            getEl(`view-${view}`).classList.add('active');
+            
+            const titles = { dashboard:'Overview Dashboard', analytics:'Analytics & Profitability', payments:'Revenue Ledger', expenses:'Expenses & Payouts', clients:'Client Roster', ventures:'Venture Management', team:'Team & Equity Directory', investments:'Investments & Assets', goals:'Milestone Goals', documents:'Secure Documents', settings:'System Settings' };
+            getEl('viewTitle').innerText = titles[view] || view;
+            getEl('sidebar').classList.remove('open'); 
+            
+            // Re-render without animations if just switching tabs, or with animations if it's the dashboard
+            window.renderAll(view !== 'dashboard');
+        }
+
+        function setFilter(filter) {
+            sys_filter = filter;
+            document.querySelectorAll('.btn-filter').forEach(el => el.classList.remove('active'));
+            getEl(`f-${filter}`).classList.add('active');
+            getEl('customDateWrap').style.display = (filter === 'custom') ? 'flex' : 'none';
+            // User actively changed filter, so DO animate the numbers
+            window.renderAll(false);
+        }
+
+        function filterData(array) {
+            if(sys_filter === 'all') return array;
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            return array.filter(item => {
+                if(!item.date) return true; 
+                const d = new Date(item.date);
+                if (sys_filter === 'today') return d >= today;
+                if (sys_filter === '30days') return (now - d) / (1000 * 60 * 60 * 24) <= 30;
+                if (sys_filter === 'month') return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+                if (sys_filter === 'year') return d.getFullYear() === now.getFullYear();
+                if (sys_filter === 'custom') {
+                    const from = getVal('customFrom'); const to = getVal('customTo');
+                    if(from && to) { const dF = new Date(from); const dT = new Date(to); dT.setHours(23,59,59); return d >= dF && d <= dT; }
+                    return true;
+                }
+                return true;
+            });
+        }
+
+        function toggleTeamSelector() { getEl('expTeamSelect').style.display = (getVal('expCategory') === 'Salary / Payout') ? 'block' : 'none'; }
+        
+        function updateDropdowns() {
+            const vOpts = db.ventures.map(v => `<option value="${v.name}">${v.name}</option>`).join('');
+            if(getEl('payVentureSelect')) getEl('payVentureSelect').innerHTML = vOpts;
+            if(getEl('expVentureSelect')) getEl('expVentureSelect').innerHTML = vOpts;
+            const tOpts = `<option value="">-- Select Team Member --</option>` + db.team.map(t => `<option value="${t.id}">${t.name} (${t.role})</option>`).join('');
+            if(getEl('expTeamSelect')) getEl('expTeamSelect').innerHTML = tOpts;
+        }
+
+        function openForm(type) { 
+            const form = getEl('form-' + type);
+            form.querySelectorAll('input:not([type="date"]):not([type="checkbox"]), textarea').forEach(el => el.value = '');
+            form.querySelectorAll('input[type="date"]').forEach(el => el.value = new Date().toISOString().split('T')[0]);
+            form.querySelectorAll('input[type="checkbox"]').forEach(el => el.checked = false);
+            form.style.display = 'grid'; 
+            form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        function closeForm(type) { getEl('form-'+type).style.display = 'none'; }
+
+        // --- CRUD OPERATIONS ---
+        function savePayment() { 
+            const id = getVal('payId'); 
+            const amt = parseFloat(getVal('payAmount'));
+            const status = getVal('payStatus');
+            const addToSavings = getEl('payAddSavings') && getEl('payAddSavings').checked;
+
+            const obj = { id: id||'p'+Date.now(), client: getVal('payClient'), venture: getVal('payVentureSelect'), service: getVal('payService'), amount: amt, date: getVal('payDate'), status: status }; 
+            if(id) db.payments = db.payments.map(x=>x.id===id?obj:x); else db.payments.push(obj); 
+
+            if(status === 'Paid' && addToSavings && amt > 0) {
+                let savings = db.investments.find(i => i.type === 'Cash/Savings');
+                if(savings) savings.current += amt;
+                else db.investments.push({ id: 'i'+Date.now(), name: 'Main Cash/Savings', type: 'Cash/Savings', current: amt });
+            }
+
+            playMoneySound(); saveDB(); closeForm('payment'); 
+        }
+
+        function saveExpense() { const id = getVal('expId'); const obj = { id: id||'e'+Date.now(), category: getVal('expCategory'), venture: getVal('expVentureSelect'), teamId: getVal('expTeamSelect'), amount: parseFloat(getVal('expAmount')), date: getVal('expDate'), notes: getVal('expNotes') }; if(id) db.expenses = db.expenses.map(x=>x.id===id?obj:x); else db.expenses.push(obj); playMoneySound(); saveDB(); closeForm('expense'); }
+        function saveClient() { const id = getVal('cliId'); const obj = { id: id||'c'+Date.now(), name: getVal('cliName'), email: getVal('cliEmail'), service: getVal('cliService'), fee: parseFloat(getVal('cliFee'))||0, start: getVal('cliStart'), status: getVal('cliStatus') }; if(id) db.clients = db.clients.map(x=>x.id===id?obj:x); else db.clients.push(obj); saveDB(); closeForm('client'); }
+        function saveVenture() { const id = getVal('vId'); const obj = { id: id||'v'+Date.now(), name: getVal('vName'), desc: getVal('vDesc') }; if(id) db.ventures = db.ventures.map(x=>x.id===id?obj:x); else db.ventures.push(obj); saveDB(); closeForm('venture'); }
+        function saveTeamMember() { const id = getVal('teamId'); const obj = { id: id||'t'+Date.now(), name: getVal('teamName'), role: getVal('teamRole'), type: getVal('teamType'), share: parseFloat(getVal('teamShare'))||0 }; if(id) db.team = db.team.map(x=>x.id===id?obj:x); else db.team.push(obj); saveDB(); closeForm('team'); }
+        function saveInvestment() { const id = getVal('invId'); const obj = { id: id||'i'+Date.now(), name: getVal('invName'), type: getVal('invType'), current: parseFloat(getVal('invCurrent'))||0 }; if(id) db.investments = db.investments.map(x=>x.id===id?obj:x); else db.investments.push(obj); saveDB(); closeForm('investment'); }
+        function saveEquity() { const id = getVal('eqId'); const obj = { id: id||'eq'+Date.now(), name: getVal('eqName'), percent: parseFloat(getVal('eqPercent'))||0, companyVal: parseFloat(getVal('eqVal'))||0 }; if(id) db.equities = db.equities.map(x=>x.id===id?obj:x); else db.equities.push(obj); saveDB(); closeForm('equity'); }
+        function saveGoal() { const id = getVal('goalId'); const obj = { id: id||'g'+Date.now(), name: getVal('goalName'), type: getVal('goalType'), val: parseFloat(getVal('goalVal'))||0 }; if(id) db.goals = db.goals.map(x=>x.id===id?obj:x); else db.goals.push(obj); saveDB(); closeForm('goal'); }
+        function saveDocument() { const id = getVal('docId'); const obj = { id: id||'d'+Date.now(), name: getVal('docName'), category: getVal('docCategory'), link: getVal('docLink') }; if(id) db.documents = db.documents.map(x=>x.id===id?obj:x); else db.documents.push(obj); saveDB(); closeForm('document'); }
+
+        function editRecord(type, id, arrName) { 
+            const obj = db[arrName].find(x=>x.id===id); 
+            openForm(type);
+            Object.keys(obj).forEach(key => { const el = getEl(type === 'payment' ? 'pay'+key.charAt(0).toUpperCase()+key.slice(1) : type === 'expense' ? 'exp'+key.charAt(0).toUpperCase()+key.slice(1) : type === 'client' ? 'cli'+key.charAt(0).toUpperCase()+key.slice(1) : type === 'venture' ? 'v'+key.charAt(0).toUpperCase()+key.slice(1) : type === 'team' ? 'team'+key.charAt(0).toUpperCase()+key.slice(1) : type === 'investment' ? 'inv'+key.charAt(0).toUpperCase()+key.slice(1) : type === 'equity' ? 'eq'+(key==='companyVal'?'Val':key.charAt(0).toUpperCase()+key.slice(1)) : type === 'goal' ? 'goal'+key.charAt(0).toUpperCase()+key.slice(1) : 'doc'+key.charAt(0).toUpperCase()+key.slice(1)); if(el) el.value = obj[key]; }); 
+            if(type==='expense') toggleTeamSelector(); 
+            if(type==='payment') { getEl('payVentureSelect').value = obj.venture; } 
+            if(type==='expense'){getEl('expVentureSelect').value = obj.venture; getEl('expTeamSelect').value = obj.teamId;}
+        }
+        function deleteRecord(arrName, id) { if(confirm('Delete this record permanently?')) { db[arrName] = db[arrName].filter(x => x.id !== id); saveDB(); } }
+        function markPaid(id) { const p = db.payments.find(x => x.id === id); if(p){ p.status = 'Paid'; playMoneySound(); saveDB(); } }
+
+        function calculateNetWorth() {
+            const liquid = db.investments.reduce((sum, i) => sum + i.current, 0);
+            const equity = db.equities.reduce((sum, e) => sum + ((e.percent/100)*e.companyVal), 0);
+            return liquid + equity;
+        }
+
+        // --- GLOBAL RENDER FUNCTION ---
+        // skipAnimation parameter prevents the numbers from restarting when just searching
+        window.renderAll = function(skipAnimation = false) {
+            updateDropdowns();
+            let fRevs = filterData(db.payments).sort((a,b)=>new Date(b.date)-new Date(a.date));
+            let fExps = filterData(db.expenses).sort((a,b)=>new Date(b.date)-new Date(a.date));
+
+            // Dashboard Metrics Calculations (Filtered)
+            const revTotal = fRevs.filter(p => p.status === 'Paid').reduce((a, b) => a + b.amount, 0);
+            const opsExp = fExps.filter(e => e.category !== 'Salary / Payout').reduce((a, b) => a + b.amount, 0);
+            const payExp = fExps.filter(e => e.category === 'Salary / Payout').reduce((a, b) => a + b.amount, 0);
+            const netMargin = revTotal - opsExp - payExp;
+
+            // Global Metrics Calculations (For Growth comparison)
+            const globalRev = db.payments.filter(p => p.status === 'Paid').reduce((a, b) => a + b.amount, 0);
+            const globalOps = db.expenses.filter(e => e.category !== 'Salary / Payout').reduce((a, b) => a + b.amount, 0);
+            const globalPay = db.expenses.filter(e => e.category === 'Salary / Payout').reduce((a, b) => a + b.amount, 0);
+            const globalNet = globalRev - globalOps - globalPay;
+
+            const savCash = db.investments.filter(i => i.type === 'Cash/Savings').reduce((sum, i) => sum + i.current, 0);
+            const savMf = db.investments.filter(i => i.type === 'Mutual Funds').reduce((sum, i) => sum + i.current, 0);
+            const savOth = db.investments.filter(i => i.type !== 'Cash/Savings' && i.type !== 'Mutual Funds').reduce((sum, i) => sum + i.current, 0);
+            const savTotal = savCash + savMf + savOth;
+            const netWorth = calculateNetWorth();
+
+            // Populate Numbers (Animate or Static)
+            if (!skipAnimation) {
+                animateValue('m-rev', 0, revTotal, 800);
+                animateValue('m-exp', 0, opsExp, 800);
+                animateValue('m-pay', 0, payExp, 800);
+                animateValue('m-net', 0, netMargin, 800);
+                animateValue('m-sav-cash', 0, savCash, 800);
+                animateValue('m-sav-mf', 0, savMf, 800);
+                animateValue('m-sav-oth', 0, savOth, 800);
+                animateValue('m-sav-total', 0, savTotal, 800);
+                animateValue('m-nw', 0, netWorth, 800);
+            } else {
+                getEl('m-rev').innerText = formatMoney(revTotal);
+                getEl('m-exp').innerText = formatMoney(opsExp);
+                getEl('m-pay').innerText = formatMoney(payExp);
+                getEl('m-net').innerText = formatMoney(netMargin);
+                getEl('m-sav-cash').innerText = formatMoney(savCash);
+                getEl('m-sav-mf').innerText = formatMoney(savMf);
+                getEl('m-sav-oth').innerText = formatMoney(savOth);
+                getEl('m-sav-total').innerText = formatMoney(savTotal);
+                getEl('m-nw').innerText = formatMoney(netWorth);
+            }
+
+            if(getEl('g-rev')) getEl('g-rev').outerHTML = calculateGrowth(revTotal, globalRev).replace('class="', 'id="g-rev" class="');
+            if(getEl('g-exp')) getEl('g-exp').outerHTML = calculateGrowth(opsExp, globalOps).replace('class="', 'id="g-exp" class="');
+            if(getEl('g-pay')) getEl('g-pay').outerHTML = calculateGrowth(payExp, globalPay).replace('class="', 'id="g-pay" class="');
+            if(getEl('g-net')) getEl('g-net').outerHTML = calculateGrowth(netMargin, globalNet).replace('class="', 'id="g-net" class="');
+
+            // View Specific Renders & Sub-filters
+            if (activeView === 'dashboard') renderDashboard(fRevs, fExps);
+            if (activeView === 'analytics') renderAnalytics(fRevs, fExps);
+            
+            if (activeView === 'payments') { 
+                const sQ = getVal('searchRev').toLowerCase(); const sStat = getVal('filterRevStatus');
+                const list = fRevs.filter(p => (sStat==='All' || p.status===sStat) && (p.client.toLowerCase().includes(sQ) || p.venture.toLowerCase().includes(sQ) || p.service.toLowerCase().includes(sQ)));
+                getEl('tblPayments').innerHTML = list.map(p => `<tr><td>${p.date}</td><td><strong>${p.client}</strong><br><span style="font-size:0.7rem;color:var(--text-muted);">${p.venture}</span></td><td>${p.service}</td><td style="font-weight:600;">${currency}${p.amount.toLocaleString()}</td><td><span style="color:${p.status==='Paid'?'var(--green)':'var(--orange)'}">${p.status}</span><br>${p.status==='Pending'?`<button class="btn-sec" style="font-size:0.65rem; padding:0.15rem 0.4rem; margin-top:4px;" onclick="markPaid('${p.id}')">Mark Paid</button>`:''}</td><td><button class="btn-edit" onclick="editRecord('payment','${p.id}','payments')">Edit</button><button class="btn-danger" onclick="deleteRecord('payments','${p.id}')">Del</button></td></tr>`).join('') || '<tr><td colspan="6">No records found.</td></tr>'; 
+            }
+            if (activeView === 'expenses') { 
+                const sQ = getVal('searchExp').toLowerCase();
+                const list = fExps.filter(e => e.category.toLowerCase().includes(sQ) || e.notes.toLowerCase().includes(sQ) || e.venture.toLowerCase().includes(sQ));
+                getEl('tblExpenses').innerHTML = list.map(e => { let r = e.notes; if(e.category==='Salary / Payout'&&e.teamId){ const t=db.team.find(x=>x.id===e.teamId); if(t) r=`To: ${t.name} (${e.notes})`; } return `<tr><td>${e.date}</td><td><strong>${e.category}</strong><br><span style="font-size:0.7rem;color:var(--text-muted);">${e.venture}</span></td><td>${r}</td><td style="color:var(--red); font-weight:600;">${currency}${e.amount.toLocaleString()}</td><td><button class="btn-edit" onclick="editRecord('expense','${e.id}','expenses')">Edit</button><button class="btn-danger" onclick="deleteRecord('expenses','${e.id}')">Del</button></td></tr>`;}).join('') || '<tr><td colspan="5">No records found.</td></tr>'; 
+            }
+            if (activeView === 'clients') { getEl('tblClients').innerHTML = db.clients.map(c => `<tr><td><strong>${c.name}</strong><br><span style="font-size:0.7rem;color:var(--text-muted);">${c.email}</span></td><td>${c.service}</td><td>${currency}${c.fee.toLocaleString()} / mo</td><td><span style="color:${c.status==='Active'?'var(--green)':'var(--text-muted)'}">${c.status}</span></td><td><button class="btn-edit" onclick="editRecord('client','${c.id}','clients')">Edit</button><button class="btn-danger" onclick="deleteRecord('clients','${c.id}')">Del</button></td></tr>`).join(''); }
+            if (activeView === 'ventures') { getEl('tblVentures').innerHTML = db.ventures.map(v => `<tr><td><strong>${v.name}</strong></td><td>${v.desc}</td><td><button class="btn-edit" onclick="editRecord('venture','${v.id}','ventures')">Edit</button><button class="btn-danger" onclick="deleteRecord('ventures','${v.id}')">Del</button></td></tr>`).join(''); }
+            if (activeView === 'team') { getEl('tblTeam').innerHTML = db.team.map(t => { const pay = fExps.filter(e=>e.teamId===t.id).reduce((s,e)=>s+e.amount,0); return `<tr><td><strong>${t.name}</strong></td><td>${t.role} <span style="font-size:0.7rem;color:var(--text-muted)">(${t.type})</span></td><td>${t.share}%</td><td style="color:var(--purple);font-weight:600;">${currency}${pay.toLocaleString()}</td><td><button class="btn-edit" onclick="editRecord('team','${t.id}','team')">Edit</button><button class="btn-danger" onclick="deleteRecord('team','${t.id}')">Del</button></td></tr>`;}).join(''); }
+            if (activeView === 'investments') { 
+                getEl('tblInvestments').innerHTML = db.investments.map(i => `<tr><td><strong>${i.name}</strong><br><span style="font-size:0.7rem;color:var(--text-muted)">${i.type}</span></td><td style="font-weight:600;">${currency}${i.current.toLocaleString()}</td><td><button class="btn-edit" onclick="editRecord('investment','${i.id}','investments')">Edit</button><button class="btn-danger" onclick="deleteRecord('investments','${i.id}')">Del</button></td></tr>`).join('');
+                getEl('tblEquities').innerHTML = db.equities.map(e => `<tr><td><strong>${e.name}</strong></td><td>${e.percent}%</td><td style="font-weight:600;">${currency}${((e.percent/100)*e.companyVal).toLocaleString()}</td><td><button class="btn-edit" onclick="editRecord('equity','${e.id}','equities')">Edit</button><button class="btn-danger" onclick="deleteRecord('equities','${e.id}')">Del</button></td></tr>`).join('');
+            }
+            if (activeView === 'goals') renderGoals(fRevs);
+            if (activeView === 'documents') { getEl('tblDocuments').innerHTML = db.documents.map(d => `<tr><td><strong>${d.name}</strong></td><td>${d.category}</td><td><a href="${d.link}" target="_blank" style="color:var(--text); text-decoration:underline;">Open</a></td><td><button class="btn-edit" onclick="editRecord('document','${d.id}','documents')">Edit</button><button class="btn-danger" onclick="deleteRecord('documents','${d.id}')">Del</button></td></tr>`).join(''); }
+        }
+
+        function renderDashboard(revs, exps) {
+            const sQ = getVal('searchAct').toLowerCase();
+            let all = [...revs, ...exps].sort((a,b) => new Date(b.date) - new Date(a.date));
+            if(sQ) all = all.filter(a => (a.client||a.category).toLowerCase().includes(sQ) || a.venture.toLowerCase().includes(sQ));
+            
+            getEl('dashboardActivity').innerHTML = all.map(a => `<tr><td>${a.client||a.category} <span style="font-size:0.7rem;color:var(--text-muted);">(${a.venture})</span><br><span style="font-size:0.65rem;">${a.date}</span></td><td class="${a.client?'green':'red'}" style="text-align:right; font-weight:600;">${a.client?'+':'-'}${currency}${a.amount.toLocaleString()}</td></tr>`).join('') || '<tr><td>No logs found.</td></tr>';
+            
+            const dates = [...new Set([...revs, ...exps].map(x => x.date))].sort();
+            const rData = dates.map(d => revs.filter(r => r.date === d && r.status === 'Paid').reduce((s, r) => s + r.amount, 0));
+            const eData = dates.map(d => exps.filter(e => e.date === d).reduce((s, e) => s + e.amount, 0));
+
+            if (charts.dash) charts.dash.destroy();
+            charts.dash = new Chart(getEl('chartDashboardFlow').getContext('2d'), { type: 'line', data: { labels: dates, datasets: [{ label: 'Inflow', data: rData, borderColor: '#22c55e', tension: 0.3 }, { label: 'Outflow', data: eData, borderColor: '#ef4444', tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false } });
+        }
+
+        function renderAnalytics(revs, exps) {
+            const vStats = db.ventures.map(v => {
+                const vRev = revs.filter(r => r.venture === v.name && r.status === 'Paid').reduce((s, r) => s + r.amount, 0);
+                const vOps = exps.filter(e => e.venture === v.name && e.category !== 'Salary / Payout').reduce((s, e) => s + e.amount, 0);
+                const vPay = exps.filter(e => e.venture === v.name && e.category === 'Salary / Payout').reduce((s, e) => s + e.amount, 0);
+                const net = vRev - vOps - vPay;
+                return { name: v.name, rev: vRev, ops: vOps, pay: vPay, net, margin: vRev > 0 ? ((net / vRev) * 100).toFixed(1) : 0 };
+            });
+
+            getEl('tblAnalyticsVenture').innerHTML = vStats.map(s => `<tr><td><strong>${s.name}</strong></td><td style="color:var(--green);">+${currency}${s.rev.toLocaleString()}</td><td style="color:var(--red);">-${currency}${s.ops.toLocaleString()}</td><td style="color:var(--purple);">-${currency}${s.pay.toLocaleString()}</td><td style="font-weight:700;">${currency}${s.net.toLocaleString()}</td><td>${s.margin}%</td></tr>`).join('');
+
+            const teamPays = {}; exps.filter(e => e.category === 'Salary / Payout' && e.teamId).forEach(e => { const tName = db.team.find(x => x.id === e.teamId)?.name || 'Other'; teamPays[tName] = (teamPays[tName] || 0) + e.amount; });
+            if (charts.pay) charts.pay.destroy(); charts.pay = new Chart(getEl('chartTeamPayroll').getContext('2d'), { type: 'doughnut', data: { labels: Object.keys(teamPays), datasets: [{ data: Object.values(teamPays), backgroundColor: ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b'], borderWidth:0 }] }, options: { responsive: true, maintainAspectRatio: false } });
+            if (charts.vRev) charts.vRev.destroy(); charts.vRev = new Chart(getEl('chartVentureRev').getContext('2d'), { type: 'bar', data: { labels: vStats.map(s => s.name), datasets: [{ label: 'Gross Rev', data: vStats.map(s => s.rev), backgroundColor: '#ffffff' }] }, options: { responsive: true, maintainAspectRatio: false } });
+        }
+
+        function renderGoals(fRevs) {
+            const revTotal = fRevs.filter(p => p.status === 'Paid').reduce((a, b) => a + b.amount, 0);
+            const clientsAct = db.clients.filter(c => c.status === 'Active').length;
+            const nw = calculateNetWorth();
+            const savingsMF = db.investments.filter(i => i.type === 'Cash/Savings' || i.type === 'Mutual Funds').reduce((sum, i) => sum + i.current, 0);
+
+            getEl('goalsContainer').innerHTML = db.goals.map(g => {
+                let curr = 0; if(g.type==='Net Worth') curr = nw; else if(g.type==='Monthly Revenue') curr = revTotal; else if(g.type==='Active Clients') curr = clientsAct; else if(g.type==='Cash Savings') curr = savingsMF;
+                const pct = Math.min(Math.round((curr / g.val) * 100), 100);
+                return `<div class="card" style="margin-bottom:0;"><div style="display:flex; justify-content:space-between;"><strong>${g.name} <span style="font-size:0.6rem; font-weight:normal; color:var(--text-muted)">(${g.type})</span></strong><div><span class="btn-edit" onclick="editRecord('goal','${g.id}','goals')">Edit</span><span class="btn-danger" onclick="deleteRecord('goals','${g.id}')">Del</span></div></div><div style="font-size:1.5rem; font-weight:700; margin-top:0.5rem;">${pct}%</div><div class="progress-bg"><div class="progress-fill" style="width:${pct}%"></div></div><div style="font-size:0.75rem; color:var(--text-muted); display:flex; justify-content:space-between; margin-top:0.5rem;"><span>Current: ${curr.toLocaleString()}</span><span>Target: ${g.val.toLocaleString()}</span></div></div>`;
+            }).join('');
+        }
+
+        // --- SETTINGS UTILS ---
+        function handleLogoUpload(e) { const file = e.target.files[0]; if(file){ const reader = new FileReader(); reader.onload = function(evt) { localStorage.setItem('founder_os_logo', evt.target.result); window.applyLogo(evt.target.result); }; reader.readAsDataURL(file); } }
+        function updateCurrency() { currency = getVal('optCurrency'); localStorage.setItem('founder_os_cur', currency); window.renderAll(false); }
+        function exportData() { const a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db)); a.download = "founder_os_backup.json"; a.click(); }
+        function importData(e) { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = function(evt) { try { db = JSON.parse(evt.target.result); saveDB(); alert("Restored successfully."); } catch(err) { alert("Invalid backup file."); } }; reader.readAsText(file); }
+        function nukeStorage() { if(confirm("PERMANENTLY DELETE ALL DATA?")) { localStorage.clear(); window.location.reload(); } }
+
+        // Start App
+        initializeApp();
+    </script>
+</body>
+</html>
