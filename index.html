@@ -45,7 +45,7 @@
         .logo-container { margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; height: 40px; }
         .logo-text { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.03em; display: flex; align-items: center; gap: 0.5rem; }
         .logo-text span { background: var(--text); color: var(--bg); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem; }
-        #customLogoImg, #mobileCustomLogoImg { max-width: 100%; height: auto; max-height: 45px; object-fit: contain; border-radius: 4px; display: none; }
+        #customLogoImg, #mobileCustomLogoImg { max-width: 100%; height: auto; max-height: 40px; object-fit: contain; border-radius: 4px; display: none; }
         .close-menu-btn { display: none; background: none; border: none; color: var(--text); font-size: 1.5rem; cursor: pointer; }
         
         .nav-links { display: flex; flex-direction: column; gap: 0.25rem; list-style: none; flex-grow: 1; padding-bottom: 2rem; }
@@ -93,6 +93,7 @@
         .btn-sec:hover { background: var(--panel-border); }
         .btn-danger { background: transparent; color: var(--red); border: none; padding: 0; font-size: 0.8rem; text-decoration: underline;}
         .btn-edit { background: transparent; color: var(--text-muted); border: none; padding: 0; font-size: 0.8rem; text-decoration: underline; margin-right: 0.75rem;}
+        .status-badge { font-size:0.7rem; padding:0.2rem 0.5rem; border-radius:4px; background:var(--panel-border); color:var(--text); font-weight: 600;}
 
         .view-section { display: none; flex-direction: column; margin-top: 0.5rem; }
         .view-section.active { display: flex; animation: fadeIn 0.3s ease; }
@@ -103,7 +104,6 @@
         .progress-bg { background: var(--panel-border); height: 6px; border-radius: 3px; overflow: hidden; margin-top: 0.5rem; }
         .progress-fill { background: var(--text); height: 100%; transition: width 0.3s; }
         .toolbar { display: flex; gap: 0.5rem; align-items: center; width: 100%; max-width: 400px;}
-        .export-btn { font-size: 0.7rem; background: var(--panel-border); color: var(--text-muted); padding: 0.3rem 0.6rem; border-radius: 4px; cursor: pointer; display: inline-block; white-space: nowrap; }
 
         @media (max-width: 900px) {
             .two-col-grid { grid-template-columns: 1fr; }
@@ -111,7 +111,7 @@
             .inline-form .full { grid-column: span 1; }
         }
         @media (max-width: 768px) {
-            aside { transform: translateX(-100%); width: 280px; box-shadow: none; padding-bottom: 100px;}
+            aside { transform: translateX(-100%); width: 280px; box-shadow: none; }
             aside.open { transform: translateX(0); box-shadow: 0 0 0 10000px rgba(0,0,0,0.5), 5px 0 25px rgba(0,0,0,0.8); }
             .close-menu-btn { display: block; }
             main { margin-left: 0; width: 100%; padding: 1rem; padding-top: 80px; }
@@ -125,30 +125,21 @@
 <body>
 
     <audio id="moneySound" src="https://actions.google.com/sounds/v1/foley/cash_register.ogg" preload="auto"></audio>
+    <datalist id="clientDataList"></datalist>
 
     <div id="auth-overlay">
         <div class="card" style="width: 350px; text-align: center; border: 1px solid var(--panel-border);">
             <h2 id="authTitle" style="margin-bottom: 1rem;">Login to Founder OS</h2>
-            
             <input type="text" id="authName" placeholder="Full Name" style="display: none; margin-bottom: 0.5rem; padding: 0.5rem; width: 100%;">
             <input type="email" id="authEmail" placeholder="Email Address" style="margin-bottom: 0.5rem; padding: 0.5rem; width: 100%;">
-            
             <div style="position: relative; width: 100%; margin-bottom: 1rem;">
                 <input type="password" id="authPass" placeholder="Password" style="margin-bottom: 0; padding: 0.5rem; width: 100%; padding-right: 60px;">
                 <span id="togglePassBtn" onclick="togglePass()" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-muted); font-size: 0.8rem; font-weight: bold;">SHOW</span>
             </div>
-            
             <button id="mainAuthBtn" onclick="handleAuth()" style="width: 100%; margin-bottom: 0.5rem;">Secure Login</button>
-            
-            <button onclick="handleGoogleAuth()" style="width: 100%; background: #ffffff; color: #000000; display: flex; align-items: center; justify-content: center; gap: 10px;">
-                <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-                Continue with Google
-            </button>
-            
             <p id="toggleText" style="margin-top: 1rem; font-size: 0.8rem; color: var(--text-muted); cursor: pointer;" onclick="toggleAuthMode()">
                 Don't have an account? <u style="color: var(--accent);">Create one</u>
             </p>
-            
             <p id="authError" style="color: var(--red); font-size: 0.8rem; margin-top: 1rem;"></p>
         </div>
     </div>
@@ -162,8 +153,8 @@
     </div>
 
     <aside id="sidebar">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-            <div class="logo-container" style="margin-bottom: 0;">
+        <div class="logo-container">
+            <div style="font-weight: 700; display:flex; align-items:center; gap:0.5rem;">
                 <img id="customLogoImg" alt="Brand Logo">
                 <div class="logo-text" id="defaultLogoText">FOUNDER <span>OS</span></div>
             </div>
@@ -178,6 +169,7 @@
             <li class="nav-item" onclick="navigate('payments')">Revenue Ledger</li>
             <li class="nav-item" onclick="navigate('expenses')">Expenses & Payroll</li>
             <li class="nav-item" onclick="navigate('clients')">Clients Data</li>
+            <li class="nav-item" onclick="navigate('reminders')">Reminders & SIPs</li>
             
             <div class="nav-group-label">Ecosystem</div>
             <li class="nav-item" onclick="navigate('ventures')">Ventures</li>
@@ -214,6 +206,7 @@
             </div>
         </header>
 
+        <!-- DASHBOARD VIEW -->
         <section id="view-dashboard" class="view-section active">
             <div class="metrics-grid">
                 <div class="metric-card"><div class="metric-label">Gross Revenue</div><div class="metric-value green" id="m-rev">0</div><div class="growth-txt" id="g-rev">0%</div></div>
@@ -229,23 +222,52 @@
                 <div class="metric-card" style="grid-column: span 2;"><div class="metric-label">Total Net Worth (Inc. Equity)</div><div class="metric-value" id="m-nw" style="font-size: 1.8rem;">0</div></div>
             </div>
 
-            <div class="two-col-grid">
-                <div class="card">
+            <div class="two-col-grid" style="margin-bottom: 1.5rem;">
+                <!-- Auto-Billing Alerts -->
+                <div class="card" style="margin-bottom: 0;">
+                    <div class="card-title" style="color:var(--orange);">Pending Actions & Auto-Billing</div>
+                    <div class="data-table-wrapper scrollable-table-wrap">
+                        <table class="data-table">
+                            <thead><tr><th>Due/Pending Item</th><th>Amount</th><th>Status/Action</th></tr></thead>
+                            <tbody id="dashAlerts"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="card" style="margin-bottom: 0;">
+                    <div class="card-title">Client Portfolio Snapshot</div>
+                    <div class="data-table-wrapper scrollable-table-wrap">
+                        <table class="data-table">
+                            <thead><tr><th>Active Client</th><th>MRR & Cycle</th><th>Status</th></tr></thead>
+                            <tbody id="dashClients"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="two-col-grid" style="margin-bottom: 1.5rem;">
+                <div class="card" style="margin-bottom: 0;">
                     <div class="card-title">Cash Flow Trend</div>
                     <div style="height: 250px;"><canvas id="chartDashboardFlow"></canvas></div>
                 </div>
-                <div class="card">
-                    <div class="card-title">
-                        Recent Activity Logs
-                        <div class="toolbar"><input type="text" id="searchAct" placeholder="Search logs..." onkeyup="renderAll(true)" style="padding:0.3rem 0.6rem;"></div>
-                    </div>
-                    <div class="data-table-wrapper scrollable-table-wrap">
-                        <table class="data-table" id="dashboardActivity"></table>
-                    </div>
+                <div class="card" style="margin-bottom: 0;">
+                    <div class="card-title">Net Margin Trend <span style="font-size:0.7rem; font-weight:normal; color:var(--text-muted);">(Inflow - Outflow)</span></div>
+                    <div style="height: 250px;"><canvas id="chartNetMargin"></canvas></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    Recent Activity Logs
+                    <div class="toolbar"><input type="text" id="searchAct" placeholder="Search logs..." onkeyup="renderAll(true)" style="padding:0.3rem 0.6rem;"></div>
+                </div>
+                <div class="data-table-wrapper scrollable-table-wrap">
+                    <table class="data-table" id="dashboardActivity"></table>
                 </div>
             </div>
         </section>
 
+        <!-- ANALYTICS VIEW -->
         <section id="view-analytics" class="view-section">
             <div class="card">
                 <div class="card-title">Project Profitability Matrix</div>
@@ -262,13 +284,14 @@
             </div>
         </section>
 
+        <!-- REVENUE LEDGER -->
         <section id="view-payments" class="view-section">
             <div class="card">
                 <div class="card-title">
                     Revenue Ledger 
                     <div style="display:flex; gap:0.5rem; align-items:center;">
-                        <button class="export-btn" onclick="exportSectionData('payments')">Export Data</button>
-                        <button style="margin:0; padding:0.3rem 0.6rem;" onclick="openForm('payment')">+ Add Revenue</button>
+                        <button class="btn-sec" style="font-size:0.75rem; padding:0.3rem 0.6rem; margin:0;" onclick="exportSectionData('payments')">Export Data</button>
+                        <button style="margin:0;" onclick="openForm('payment')">+ Add Revenue</button>
                     </div>
                 </div>
                 
@@ -283,7 +306,7 @@
 
                 <div id="form-payment" class="inline-form" style="display: none;">
                     <input type="hidden" id="payId">
-                    <input type="text" id="payClient" placeholder="Client Name">
+                    <input list="clientDataList" id="payClient" placeholder="Select or Type Client Name..." onchange="autoFillRevenue()">
                     <select id="payVentureSelect"></select>
                     <input type="text" id="payService" placeholder="Service Rendered">
                     
@@ -299,7 +322,8 @@
                     <select id="payStatus"><option value="Paid">Paid</option><option value="Pending">Pending</option></select>
                     
                     <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--green); cursor: pointer;" class="full">
-                        <input type="checkbox" id="payAddSavings"> Auto-add Paid amount to "Cash Savings"
+                        <input type="checkbox" id="payAddSavings" onchange="localStorage.setItem('founder_os_auto_save', this.checked)"> 
+                        Auto-add Paid amount to "Cash Savings" (State Remembered)
                     </label>
 
                     <div class="full" style="display: flex; gap: 0.5rem;"><button onclick="savePayment()">Save Transaction</button><button class="btn-sec" onclick="closeForm('payment')">Cancel</button></div>
@@ -313,13 +337,14 @@
             </div>
         </section>
 
+        <!-- EXPENSES VIEW -->
         <section id="view-expenses" class="view-section">
             <div class="card">
                 <div class="card-title">
                     Expenses & Payouts 
                     <div style="display:flex; gap:0.5rem; align-items:center;">
-                        <button class="export-btn" onclick="exportSectionData('expenses')">Export Data</button>
-                        <button style="margin:0; padding:0.3rem 0.6rem;" onclick="openForm('expense')">+ Add Expense</button>
+                        <button class="btn-sec" style="font-size:0.75rem; padding:0.3rem 0.6rem; margin:0;" onclick="exportSectionData('expenses')">Export Data</button>
+                        <button style="margin:0;" onclick="openForm('expense')">+ Add Expense</button>
                     </div>
                 </div>
 
@@ -329,18 +354,22 @@
 
                 <div id="form-expense" class="inline-form" style="display: none;">
                     <input type="hidden" id="expId">
-                    <select id="expCategory" onchange="toggleTeamSelector()">
+                    <select id="expCategory" onchange="toggleExpenseFields()">
                         <option value="Operations">Operations / General</option>
-                        <option value="Software">Software & API</option>
+                        <option value="Software & API">Software & API</option>
                         <option value="Marketing">Marketing</option>
                         <option value="Personal / Lifestyle">Personal / Lifestyle</option>
                         <option value="Salary / Payout">Salary / Team Payout</option>
                     </select>
                     <select id="expVentureSelect"></select>
+                    
+                    <!-- Optional Client Tagging -->
+                    <select id="expClientId" style="display: none;"></select>
                     <select id="expTeamSelect" style="display: none;"></select>
+                    
                     <input type="number" id="expAmount" placeholder="Amount" step="0.01">
                     <input type="date" id="expDate">
-                    <input type="text" id="expNotes" placeholder="Notes / Description">
+                    <input type="text" id="expNotes" placeholder="Notes / Description" class="full">
                     <div class="full" style="display: flex; gap: 0.5rem;"><button onclick="saveExpense()">Save Expense</button><button class="btn-sec" onclick="closeForm('expense')">Cancel</button></div>
                 </div>
                 <div class="data-table-wrapper scrollable-table-wrap" style="max-height: 500px;">
@@ -352,39 +381,107 @@
             </div>
         </section>
 
+        <!-- CLIENTS VIEW (UPDATED FOR FULL AUTOMATION) -->
         <section id="view-clients" class="view-section">
             <div class="card">
-                <div class="card-title">Client Roster 
+                <div class="card-title">Client Roster & Portfolio 
                     <div style="display:flex; gap:0.5rem; align-items:center;">
-                        <button class="export-btn" onclick="exportSectionData('clients')">Export Data</button>
-                        <button style="margin:0; padding:0.3rem 0.6rem;" onclick="openForm('client')">+ Add Client</button>
+                        <button class="btn-sec" style="font-size:0.75rem; padding:0.3rem 0.6rem; margin:0;" onclick="exportSectionData('clients')">Export Data</button>
+                        <button style="margin:0;" onclick="openForm('client')">+ Add Client</button>
                     </div>
                 </div>
                 <div id="form-client" class="inline-form" style="display: none;">
                     <input type="hidden" id="cliId">
-                    <input type="text" id="cliName" placeholder="Client / Company Name">
+                    <input type="text" id="cliName" placeholder="Client / Company Name" class="full">
                     <input type="email" id="cliEmail" placeholder="Email Address">
                     <input type="text" id="cliService" placeholder="Core Service">
-                    <input type="number" id="cliFee" placeholder="Monthly Retainer / MRR (Optional)" step="0.01">
+                    <input type="number" id="cliFee" placeholder="Recurring Retainer / MRR Fee" step="0.01">
                     <input type="date" id="cliStart" placeholder="Start Date">
-                    <select id="cliStatus"><option value="Active">Active</option><option value="Completed">Completed / Inactive</option></select>
-                    <div class="full" style="display: flex; gap: 0.5rem;"><button onclick="saveClient()">Save Client</button><button class="btn-sec" onclick="closeForm('client')">Cancel</button></div>
+                    
+                    <select id="cliProjectStatus">
+                        <option value="Onboarding">Project Status: Onboarding</option>
+                        <option value="Active">Project Status: Active</option>
+                        <option value="Renewal Pending">Project Status: Renewal Pending</option>
+                        <option value="Paused">Project Status: Paused/Churned</option>
+                    </select>
+                    <select id="cliStatus"><option value="Active">Billing Status: Active</option><option value="Completed">Billing Status: Completed / Inactive</option></select>
+                    
+                    <!-- NEW: AUTOMATION SETTINGS -->
+                    <div class="full" style="font-weight:bold; margin-top:1rem; color:var(--text); border-top:1px solid var(--panel-border); padding-top:1rem;">Automated Billing Cycle & Expenses Setup</div>
+                    
+                    <div>
+                        <label style="font-size:0.75rem; color:var(--text-muted);">Billing Cycle (Duration in Months)</label>
+                        <input type="number" id="cliCycle" placeholder="e.g. 1 (Monthly), 3 (Quarterly), 6" min="1" value="1">
+                    </div>
+                    <div>
+                        <label style="font-size:0.75rem; color:var(--text-muted);">Next Billing / Due Date</label>
+                        <input type="date" id="cliNextBilling">
+                    </div>
+                    
+                    <!-- Dynamic Software Expenses -->
+                    <div class="full" style="border: 1px dashed var(--panel-border); padding: 0.75rem; border-radius: 6px;">
+                        <div style="font-size:0.8rem; font-weight:bold; margin-bottom:0.5rem; color:var(--text-muted);">Auto-Software & API Expenses</div>
+                        <div id="cliSoftRows"></div>
+                        <button type="button" class="btn-sec" style="font-size:0.7rem; padding:0.2rem 0.5rem;" onclick="addCliSoftRow()">+ Add Software Cost</button>
+                    </div>
+
+                    <!-- Dynamic Team Payouts -->
+                    <div class="full" style="border: 1px dashed var(--panel-border); padding: 0.75rem; border-radius: 6px;">
+                        <div style="font-size:0.8rem; font-weight:bold; margin-bottom:0.5rem; color:var(--text-muted);">Auto-Team Payouts</div>
+                        <div id="cliTeamRows"></div>
+                        <button type="button" class="btn-sec" style="font-size:0.7rem; padding:0.2rem 0.5rem;" onclick="addCliTeamRow()">+ Add Team Payout</button>
+                    </div>
+
+                    <div class="full" style="display: flex; gap: 0.5rem; margin-top:0.5rem;"><button onclick="saveClient()">Save Client Settings</button><button class="btn-sec" onclick="closeForm('client')">Cancel</button></div>
                 </div>
                 <div class="data-table-wrapper">
                     <table class="data-table">
-                        <thead><tr><th>Client Details</th><th>Service Focus</th><th>MRR Contribution</th><th>Status</th><th>Actions</th></tr></thead>
+                        <thead><tr><th>Client Details</th><th>Service Focus</th><th>MRR & Cycle</th><th>Project Status</th><th>Actions</th></tr></thead>
                         <tbody id="tblClients"></tbody>
                     </table>
                 </div>
             </div>
         </section>
 
+        <!-- REMINDERS SECTION -->
+        <section id="view-reminders" class="view-section">
+            <div class="card">
+                <div class="card-title">Monthly Reminders & SIPs 
+                    <div style="display:flex; gap:0.5rem; align-items:center;">
+                        <button class="btn-sec" style="font-size:0.75rem; padding:0.3rem 0.6rem; margin:0;" onclick="exportSectionData('reminders')">Export Data</button>
+                        <button style="margin:0;" onclick="openForm('reminder')">+ Add Reminder</button>
+                    </div>
+                </div>
+                <div id="form-reminder" class="inline-form" style="display: none;">
+                    <input type="hidden" id="remId">
+                    <input type="text" id="remTitle" placeholder="Reminder Title (e.g. HDFC SIP, Office Rent)">
+                    <select id="remType">
+                        <option value="Mutual Fund">Mutual Fund SIP</option>
+                        <option value="Rent">Rent / Lease</option>
+                        <option value="Software/Subscription">Software / Subscription</option>
+                        <option value="Loan/EMI">Loan / EMI</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <input type="number" id="remAmount" placeholder="Amount (Estimated)" step="0.01">
+                    <input type="number" id="remDay" placeholder="Day of the month due (1-31)" min="1" max="31">
+                    <div class="full" style="display: flex; gap: 0.5rem;"><button onclick="saveReminder()">Save Reminder</button><button class="btn-sec" onclick="closeForm('reminder')">Cancel</button></div>
+                </div>
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead><tr><th>Reminder Title</th><th>Category</th><th>Amount</th><th>Due Day</th><th>Actions</th></tr></thead>
+                        <tbody id="tblReminders"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- OTHER SECTIONS STAY SAME... -->
         <section id="view-ventures" class="view-section">
             <div class="card">
                 <div class="card-title">Active Ventures 
                     <div style="display:flex; gap:0.5rem; align-items:center;">
-                        <button class="export-btn" onclick="exportSectionData('ventures')">Export Data</button>
-                        <button style="margin:0; padding:0.3rem 0.6rem;" onclick="openForm('venture')">+ Add Venture</button>
+                        <button class="btn-sec" style="font-size:0.75rem; padding:0.3rem 0.6rem; margin:0;" onclick="exportSectionData('ventures')">Export Data</button>
+                        <button style="margin:0;" onclick="openForm('venture')">+ Add Venture</button>
                     </div>
                 </div>
                 <div id="form-venture" class="inline-form" style="display: none;">
@@ -406,8 +503,8 @@
             <div class="card">
                 <div class="card-title">Team Directory & Equity 
                     <div style="display:flex; gap:0.5rem; align-items:center;">
-                        <button class="export-btn" onclick="exportSectionData('team')">Export Data</button>
-                        <button style="margin:0; padding:0.3rem 0.6rem;" onclick="openForm('team')">+ Add Member</button>
+                        <button class="btn-sec" style="font-size:0.75rem; padding:0.3rem 0.6rem; margin:0;" onclick="exportSectionData('team')">Export Data</button>
+                        <button style="margin:0;" onclick="openForm('team')">+ Add Member</button>
                     </div>
                 </div>
                 <div id="form-team" class="inline-form" style="display: none;">
@@ -432,13 +529,13 @@
                 <div class="card">
                     <div class="card-title">Liquid Assets & Savings 
                         <div style="display:flex; gap:0.5rem; align-items:center;">
-                            <button class="export-btn" onclick="exportSectionData('investments')">Export Data</button>
-                            <button style="margin:0; padding:0.3rem 0.6rem;" onclick="openForm('investment')">+ Add Asset</button>
+                            <button class="btn-sec" style="font-size:0.75rem; padding:0.3rem 0.6rem; margin:0;" onclick="exportSectionData('investments')">Export Data</button>
+                            <button style="margin:0;" onclick="openForm('investment')">+ Add Asset</button>
                         </div>
                     </div>
                     <div id="form-investment" class="inline-form" style="display: none; grid-template-columns: 1fr;">
                         <input type="hidden" id="invId">
-                        <input type="text" id="invName" placeholder="Asset Name (e.g. HDFC Savings, BTC)">
+                        <input type="text" id="invName" placeholder="Asset Name (e.g. HDFC Savings, BMW Car)">
                         <select id="invType">
                             <option value="Cash/Savings">Cash & Savings</option>
                             <option value="Mutual Funds">Mutual Funds</option>
@@ -458,8 +555,8 @@
                 <div class="card">
                     <div class="card-title">Private Company Equities 
                         <div style="display:flex; gap:0.5rem; align-items:center;">
-                            <button class="export-btn" onclick="exportSectionData('equities')">Export Data</button>
-                            <button style="margin:0; padding:0.3rem 0.6rem;" onclick="openForm('equity')">+ Add Equity</button>
+                            <button class="btn-sec" style="font-size:0.75rem; padding:0.3rem 0.6rem; margin:0;" onclick="exportSectionData('equities')">Export Data</button>
+                            <button style="margin:0;" onclick="openForm('equity')">+ Add Equity</button>
                         </div>
                     </div>
                     <div id="form-equity" class="inline-form" style="display: none; grid-template-columns: 1fr;">
@@ -481,8 +578,8 @@
             <div class="card">
                 <div class="card-title">Personal Metrics Goals 
                     <div style="display:flex; gap:0.5rem; align-items:center;">
-                        <button class="export-btn" onclick="exportSectionData('goals')">Export Data</button>
-                        <button style="margin:0; padding:0.3rem 0.6rem;" onclick="openForm('goal')">+ Add Goal</button>
+                        <button class="btn-sec" style="font-size:0.75rem; padding:0.3rem 0.6rem; margin:0;" onclick="exportSectionData('goals')">Export Data</button>
+                        <button style="margin:0;" onclick="openForm('goal')">+ Add Goal</button>
                     </div>
                 </div>
                 <div id="form-goal" class="inline-form" style="display: none;">
@@ -505,8 +602,8 @@
             <div class="card">
                 <div class="card-title">Important Documents Locker 
                     <div style="display:flex; gap:0.5rem; align-items:center;">
-                        <button class="export-btn" onclick="exportSectionData('documents')">Export Data</button>
-                        <button style="margin:0; padding:0.3rem 0.6rem;" onclick="openForm('document')">+ Add Link</button>
+                        <button class="btn-sec" style="font-size:0.75rem; padding:0.3rem 0.6rem; margin:0;" onclick="exportSectionData('documents')">Export Data</button>
+                        <button style="margin:0;" onclick="openForm('document')">+ Add Link</button>
                     </div>
                 </div>
                 <div id="form-document" class="inline-form" style="display: none;">
@@ -543,7 +640,7 @@
                     <div class="card-title">Data Management</div>
                     <p style="font-size:0.8rem; color:var(--text-muted);">Your data is securely synced to the cloud.</p>
                     <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                        <button onclick="exportData()">Export Full JSON Backup</button>
+                        <button onclick="exportData()">Export Data Backup (JSON)</button>
                         <button class="btn-sec" onclick="document.getElementById('importFile').click()">Import Backup</button>
                         <input type="file" id="importFile" style="display: none;" onchange="importData(event)">
                     </div>
@@ -553,7 +650,7 @@
     </main>
 
     <script>
-        var db = { logo: null, payments: [], expenses: [], clients: [], ventures: [], team: [], investments: [], equities: [], goals: [], documents: [] };
+        var db = { logo: null, payments: [], expenses: [], clients: [], reminders: [], ventures: [], team: [], investments: [], equities: [], goals: [], documents: [] };
         var sys_filter = '30days';
         var activeView = 'dashboard';
         var currency = '₹';
@@ -566,15 +663,11 @@
         function toggleMenu() { getEl('sidebar').classList.toggle('open'); }
         function formatMoney(val) { return currency + Math.floor(val).toLocaleString(); }
         
-        // Input Sanitizer to prevent XSS attacks
         function sanitize(str) {
             if (!str) return '';
-            return String(str).replace(/[&<>'"]/g, match => ({
-                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
-            }[match]));
+            return String(str).replace(/[&<>'"]/g, match => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[match]));
         }
-        
-        // Password Visibility Toggle
+
         window.togglePass = function() {
             var p = document.getElementById('authPass');
             var b = document.getElementById('togglePassBtn');
@@ -582,21 +675,22 @@
             else { p.type = 'password'; b.innerText = 'SHOW'; }
         };
 
-        // Added saveDB call inside updateCurrency so it syncs to cloud correctly
-        window.updateCurrency = function() {
-            currency = getVal('optCurrency'); 
-            localStorage.setItem('founder_os_cur', currency); 
-            saveDB(); 
-        };
-        
-        // Export Specific Section Data
         window.exportSectionData = function(section) {
-            if(!db[section]) return;
+            const dataToExport = db[section];
             const a = document.createElement('a'); 
-            a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db[section], null, 2)); 
+            a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(dataToExport, null, 2)); 
             a.download = `founder_os_${section}_data.json`; 
             a.click(); 
         };
+
+        window.exportData = function() { 
+            const a = document.createElement('a'); 
+            a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2)); 
+            a.download = "founder_os_complete_backup.json"; 
+            a.click(); 
+        };
+
+        function importData(e) { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = function(evt) { try { db = JSON.parse(evt.target.result); saveDB(); alert("Restored successfully."); } catch(err) { alert("Invalid backup file."); } }; reader.readAsText(file); }
 
         function animateValue(id, start, end, duration) {
             const obj = getEl(id);
@@ -665,22 +759,34 @@
                 db.team = [{ id: 't1', name: 'Fidha Farzana', role: 'Partner', type: 'Partner', share: 50 }];
                 db.payments = [{ id: 'p1', client: 'Acme Corp', venture: 'Linkdify', service: 'Profile Optimization', stream: 'Service', amount: 85000, date: new Date().toISOString().split('T')[0], status: 'Paid' }];
                 db.expenses = [{ id: 'e1', category: 'Software & API', venture: 'Linkdify', amount: 5000, date: new Date().toISOString().split('T')[0], notes: 'API Cost', teamId: '' }];
-                db.clients = [{ id: 'c1', name: 'Acme Corp', email: 'hello@acme.co', service: 'Growth', fee: 40000, start: new Date().toISOString().split('T')[0], status: 'Active' }];
+                db.clients = [{ 
+                    id: 'c1', name: 'Acme Corp', email: 'hello@acme.co', service: 'Growth', fee: 40000, 
+                    nextBillingDate: new Date().toISOString().split('T')[0], cycle: 1, 
+                    softwares: [{name: 'LinkedIn Sales Nav', amt: 5000}], 
+                    teamPayouts: [{teamId: 't1', amt: 10000}], 
+                    start: new Date().toISOString().split('T')[0], status: 'Active', projectStatus: 'Active' 
+                }];
+                db.reminders = [{ id: 'r1', title: 'Nippon Mutual Fund SIP', type: 'Mutual Fund', amount: 15000, day: 10 }];
                 db.investments = [{ id: 'i1', name: 'Main Cash/Savings', type: 'Cash/Savings', current: 150000 }, { id: 'i2', name: 'Nippon India', type: 'Mutual Funds', current: 200000 }];
                 db.goals = [{ id:'g1', name:'Emergency Fund', type:'Cash Savings', val: 1000000 }];
                 saveDB();
             } else if (db.payments.length === 0) {
                 db = JSON.parse(localStorage.getItem('founder_os_v11'));
+                if(!db.reminders) db.reminders = [];
                 currency = localStorage.getItem('founder_os_cur') || '₹';
+                
+                // Backwards compatibility migration for old clients format
+                db.clients.forEach(c => {
+                    if(!c.nextBillingDate && c.billingDay) {
+                        let d = new Date(); d.setDate(c.billingDay); c.nextBillingDate = d.toISOString().split('T')[0];
+                        c.cycle = 1;
+                    }
+                });
             }
             if(getEl('optCurrency')) getEl('optCurrency').value = currency;
             
-            if (db.logo) {
-                window.applyLogo(db.logo);
-            } else {
-                const localLogo = localStorage.getItem('founder_os_logo');
-                if (localLogo) window.applyLogo(localLogo);
-            }
+            if (db.logo) window.applyLogo(db.logo);
+            else { const localLogo = localStorage.getItem('founder_os_logo'); if (localLogo) window.applyLogo(localLogo); }
             
             window.renderAll(false); 
         }
@@ -691,7 +797,6 @@
             window.renderAll(false);
         }
 
-        // --- NAVIGATION & FILTERS ---
         function navigate(view) {
             activeView = view;
             document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -699,7 +804,7 @@
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             getEl(`view-${view}`).classList.add('active');
             
-            const titles = { dashboard:'Overview Dashboard', analytics:'Analytics & Profitability', payments:'Revenue Ledger', expenses:'Expenses & Payouts', clients:'Client Roster', ventures:'Venture Management', team:'Team & Equity Directory', investments:'Investments & Equity', goals:'Milestone Goals', documents:'Secure Documents', settings:'System Settings' };
+            const titles = { dashboard:'Overview Dashboard', analytics:'Analytics & Profitability', payments:'Revenue Ledger', expenses:'Expenses & Payouts', clients:'Client Roster & Portfolio', reminders: 'Monthly Reminders & SIPs', ventures:'Venture Management', team:'Team & Equity Directory', investments:'Investments & Equity', goals:'Milestone Goals', documents:'Secure Documents', settings:'System Settings' };
             getEl('viewTitle').innerText = titles[view] || view;
             getEl('sidebar').classList.remove('open'); 
             
@@ -734,43 +839,91 @@
             });
         }
 
-        function toggleTeamSelector() { getEl('expTeamSelect').style.display = (getVal('expCategory') === 'Salary / Payout') ? 'block' : 'none'; }
+        // TOGGLE EXPENSE FIELDS LOGIC
+        window.toggleExpenseFields = function() { 
+            const cat = getVal('expCategory');
+            getEl('expTeamSelect').style.display = (cat === 'Salary / Payout') ? 'block' : 'none'; 
+            getEl('expClientId').style.display = (cat === 'Salary / Payout' || cat === 'Software & API') ? 'block' : 'none';
+        }
         
         function updateDropdowns() {
-            const vOpts = db.ventures.map(v => `<option value="${v.name}">${v.name}</option>`).join('');
+            const vOpts = db.ventures.map(v => `<option value="${sanitize(v.name)}">${sanitize(v.name)}</option>`).join('');
             if(getEl('payVentureSelect')) getEl('payVentureSelect').innerHTML = vOpts;
             if(getEl('expVentureSelect')) getEl('expVentureSelect').innerHTML = vOpts;
-            const tOpts = `<option value="">-- Select Team Member --</option>` + db.team.map(t => `<option value="${t.id}">${t.name} (${t.role})</option>`).join('');
+            
+            const tOpts = `<option value="">-- Select Team Member --</option>` + db.team.map(t => `<option value="${t.id}">${sanitize(t.name)} (${sanitize(t.role)})</option>`).join('');
             if(getEl('expTeamSelect')) getEl('expTeamSelect').innerHTML = tOpts;
+
+            const cOpts = `<option value="">-- Associate Client (Optional) --</option>` + db.clients.filter(c=>c.status==='Active').map(c => `<option value="${sanitize(c.name)}">${sanitize(c.name)}</option>`).join('');
+            if(getEl('expClientId')) getEl('expClientId').innerHTML = cOpts;
+
+            if(getEl('clientDataList')) {
+                getEl('clientDataList').innerHTML = db.clients.filter(c=>c.status==='Active').map(c => `<option value="${sanitize(c.name)}">`).join('');
+            }
+        }
+
+        // AUTO-FILL FOR REVENUE FORM
+        window.autoFillRevenue = function() {
+            const val = getVal('payClient');
+            const c = db.clients.find(x => x.name === val);
+            if (c) {
+                setVal('payAmount', c.fee);
+                setVal('payService', c.service);
+            }
+        };
+
+        // MULTI-ROW BUILDERS FOR CLIENT FORM
+        window.addCliSoftRow = function(name = '', amt = '') {
+            const div = document.createElement('div');
+            div.style = "display:grid; grid-template-columns: 2fr 1fr auto; gap:0.5rem; margin-bottom:0.5rem;";
+            div.innerHTML = `<input type="text" placeholder="Software Name" class="cli-soft-name" value="${sanitize(name)}"><input type="number" placeholder="Amt" class="cli-soft-amt" value="${amt}"><button type="button" class="btn-danger" style="padding:0 0.5rem;" onclick="this.parentElement.remove()">X</button>`;
+            getEl('cliSoftRows').appendChild(div);
+        }
+
+        window.addCliTeamRow = function(teamId = '', amt = '') {
+            const div = document.createElement('div');
+            div.style = "display:grid; grid-template-columns: 2fr 1fr auto; gap:0.5rem; margin-bottom:0.5rem;";
+            const tOpts = `<option value="">Select Member</option>` + db.team.map(t => `<option value="${t.id}" ${t.id === teamId ? 'selected' : ''}>${sanitize(t.name)}</option>`).join('');
+            div.innerHTML = `<select class="cli-team-id">${tOpts}</select><input type="number" placeholder="Amt" class="cli-team-amt" value="${amt}"><button type="button" class="btn-danger" style="padding:0 0.5rem;" onclick="this.parentElement.remove()">X</button>`;
+            getEl('cliTeamRows').appendChild(div);
         }
 
         function openForm(type) { 
             const form = getEl('form-' + type);
             form.querySelectorAll('input:not([type="date"]):not([type="checkbox"]), textarea').forEach(el => el.value = '');
             form.querySelectorAll('input[type="date"]').forEach(el => el.value = new Date().toISOString().split('T')[0]);
-            form.querySelectorAll('input[type="checkbox"]').forEach(el => el.checked = false);
+            
+            if(type === 'payment') {
+                setTimeout(() => { if(getEl('payAddSavings')) getEl('payAddSavings').checked = localStorage.getItem('founder_os_auto_save') === 'true'; }, 10);
+            } else if (type === 'client') {
+                getEl('cliSoftRows').innerHTML = '';
+                getEl('cliTeamRows').innerHTML = '';
+            } else {
+                form.querySelectorAll('input[type="checkbox"]').forEach(el => el.checked = false);
+            }
+            
             form.style.display = 'grid'; 
             form.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
         function closeForm(type) { getEl('form-'+type).style.display = 'none'; }
 
-        // --- CRUD OPERATIONS (Wrapped with Sanitize) ---
+        // --- CRUD OPERATIONS ---
         function savePayment() { 
             const id = getVal('payId'); 
             const amt = parseFloat(getVal('payAmount'));
             const status = getVal('payStatus');
             const addToSavings = getEl('payAddSavings') && getEl('payAddSavings').checked;
 
-            const obj = { 
-                id: id||'p'+Date.now(), 
-                client: sanitize(getVal('payClient')), 
-                venture: getVal('payVentureSelect'), 
-                service: sanitize(getVal('payService')), 
-                stream: getVal('payStream'), 
-                amount: amt, 
-                date: getVal('payDate'), 
-                status: status 
-            }; 
+            const obj = { id: id||'p'+Date.now(), client: getVal('payClient'), venture: getVal('payVentureSelect'), service: getVal('payService'), stream: getVal('payStream'), amount: amt, date: getVal('payDate'), status: status }; 
+            
+            if (id && !addToSavings) {
+                const oldRecord = db.payments.find(x => x.id === id);
+                if (oldRecord && oldRecord.status === 'Paid') {
+                    let savings = db.investments.find(i => i.type === 'Cash/Savings');
+                    if(savings) savings.current -= oldRecord.amount; 
+                }
+            }
+
             if(id) db.payments = db.payments.map(x=>x.id===id?obj:x); else db.payments.push(obj); 
 
             if(status === 'Paid' && addToSavings && amt > 0) {
@@ -778,6 +931,7 @@
                 if(savings) savings.current += amt;
                 else db.investments.push({ id: 'i'+Date.now(), name: 'Main Cash/Savings', type: 'Cash/Savings', current: amt });
             }
+
             saveDB(); closeForm('payment'); 
         }
 
@@ -787,112 +941,157 @@
                 id: id||'e'+Date.now(), 
                 category: getVal('expCategory'), 
                 venture: getVal('expVentureSelect'), 
+                clientId: getVal('expClientId'), // Store attached client
                 teamId: getVal('expTeamSelect'), 
                 amount: parseFloat(getVal('expAmount')), 
                 date: getVal('expDate'), 
-                notes: sanitize(getVal('expNotes')) 
+                notes: getVal('expNotes') 
             }; 
             if(id) db.expenses = db.expenses.map(x=>x.id===id?obj:x); else db.expenses.push(obj); 
             saveDB(); closeForm('expense'); 
         }
-
+        
         function saveClient() { 
             const id = getVal('cliId'); 
+            
+            // Gather dynamic arrays
+            const softwares = [];
+            document.querySelectorAll('#cliSoftRows > div').forEach(row => {
+                const name = row.querySelector('.cli-soft-name').value;
+                const amt = parseFloat(row.querySelector('.cli-soft-amt').value) || 0;
+                if(name || amt > 0) softwares.push({ name, amt });
+            });
+
+            const teamPayouts = [];
+            document.querySelectorAll('#cliTeamRows > div').forEach(row => {
+                const teamId = row.querySelector('.cli-team-id').value;
+                const amt = parseFloat(row.querySelector('.cli-team-amt').value) || 0;
+                if(teamId || amt > 0) teamPayouts.push({ teamId, amt });
+            });
+
             const obj = { 
                 id: id||'c'+Date.now(), 
-                name: sanitize(getVal('cliName')), 
-                email: sanitize(getVal('cliEmail')), 
-                service: sanitize(getVal('cliService')), 
+                name: getVal('cliName'), 
+                email: getVal('cliEmail'), 
+                service: getVal('cliService'), 
                 fee: parseFloat(getVal('cliFee'))||0, 
+                nextBillingDate: getVal('cliNextBilling'),
+                cycle: parseInt(getVal('cliCycle'))||1,
+                softwares: softwares,
+                teamPayouts: teamPayouts,
                 start: getVal('cliStart'), 
-                status: getVal('cliStatus') 
+                status: getVal('cliStatus'),
+                projectStatus: getVal('cliProjectStatus') || 'Active'
             }; 
             if(id) db.clients = db.clients.map(x=>x.id===id?obj:x); else db.clients.push(obj); 
             saveDB(); closeForm('client'); 
         }
 
-        function saveVenture() { 
-            const id = getVal('vId'); 
-            const obj = { 
-                id: id||'v'+Date.now(), 
-                name: sanitize(getVal('vName')), 
-                desc: sanitize(getVal('vDesc')) 
-            }; 
-            if(id) db.ventures = db.ventures.map(x=>x.id===id?obj:x); else db.ventures.push(obj); 
-            saveDB(); closeForm('venture'); 
-        }
+        // THE AUTO-BILLING ENGINE
+        window.processClientBilling = function(clientId) {
+            const c = db.clients.find(x => x.id === clientId);
+            if(!c) return;
 
-        function saveTeamMember() { 
-            const id = getVal('teamId'); 
-            const obj = { 
-                id: id||'team'+Date.now(), 
-                name: sanitize(getVal('teamName')), 
-                role: sanitize(getVal('teamRole')), 
-                type: getVal('teamType'), 
-                share: parseFloat(getVal('teamShare'))||0 
-            }; 
-            if(id) db.team = db.team.map(x=>x.id===id?obj:x); else db.team.push(obj); 
-            saveDB(); closeForm('team'); 
-        }
+            const today = new Date().toISOString().split('T')[0];
+            const addToSavings = localStorage.getItem('founder_os_auto_save') === 'true';
+            
+            // 1. Log Revenue automatically
+            let rAmt = parseFloat(c.fee) || 0;
+            if (rAmt > 0) {
+                db.payments.push({ id: 'p'+Date.now()+'_a', client: c.name, venture: 'Client Retainer', service: c.service, stream: 'Service', amount: rAmt, date: today, status: 'Paid' });
+                if (addToSavings) {
+                    let savings = db.investments.find(i => i.type === 'Cash/Savings');
+                    if(savings) savings.current += rAmt;
+                    else db.investments.push({ id: 'i'+Date.now(), name: 'Main Cash/Savings', type: 'Cash/Savings', current: rAmt });
+                }
+            }
 
-        function saveInvestment() { 
-            const id = getVal('invId'); 
-            const obj = { 
-                id: id||'i'+Date.now(), 
-                name: sanitize(getVal('invName')), 
-                type: getVal('invType'), 
-                current: parseFloat(getVal('invCurrent'))||0 
-            }; 
-            if(id) db.investments = db.investments.map(x=>x.id===id?obj:x); else db.investments.push(obj); 
-            saveDB(); closeForm('investment'); 
-        }
+            // 2. Log Multiple Auto-Expenses
+            if (c.softwares && c.softwares.length > 0) {
+                c.softwares.forEach((s, idx) => {
+                    if(s.amt > 0) db.expenses.push({ id: 'e'+Date.now()+'_s'+idx, category: 'Software & API', venture: 'Auto-Bill', clientId: c.name, teamId: '', amount: s.amt, date: today, notes: s.name });
+                });
+            } else if (c.expSoftAmt > 0) { // Fallback for old records
+                db.expenses.push({ id: 'e'+Date.now()+'_s', category: 'Software & API', venture: 'Auto-Bill', clientId: c.name, teamId: '', amount: c.expSoftAmt, date: today, notes: 'Auto-billed software' });
+            }
 
-        function saveEquity() { 
-            const id = getVal('eqId'); 
-            const obj = { 
-                id: id||'eq'+Date.now(), 
-                name: sanitize(getVal('eqName')), 
-                percent: parseFloat(getVal('eqPercent'))||0, 
-                companyVal: parseFloat(getVal('eqVal'))||0 
-            }; 
-            if(id) db.equities = db.equities.map(x=>x.id===id?obj:x); else db.equities.push(obj); 
-            saveDB(); closeForm('equity'); 
-        }
+            if (c.teamPayouts && c.teamPayouts.length > 0) {
+                c.teamPayouts.forEach((t, idx) => {
+                    if(t.amt > 0 && t.teamId) db.expenses.push({ id: 'e'+Date.now()+'_t'+idx, category: 'Salary / Payout', venture: 'Auto-Bill', clientId: c.name, teamId: t.teamId, amount: t.amt, date: today, notes: 'Auto-payout for ' + c.name });
+                });
+            } else if (c.expTeamAmt > 0 && c.expTeamId) { // Fallback
+                db.expenses.push({ id: 'e'+Date.now()+'_t', category: 'Salary / Payout', venture: 'Auto-Bill', clientId: c.name, teamId: c.expTeamId, amount: c.expTeamAmt, date: today, notes: 'Auto-payout' });
+            }
 
-        function saveGoal() { 
-            const id = getVal('goalId'); 
-            const obj = { 
-                id: id||'g'+Date.now(), 
-                name: sanitize(getVal('goalName')), 
-                type: getVal('goalType'), 
-                val: parseFloat(getVal('goalVal'))||0 
-            }; 
-            if(id) db.goals = db.goals.map(x=>x.id===id?obj:x); else db.goals.push(obj); 
-            saveDB(); closeForm('goal'); 
-        }
+            // 3. Advance Billing Date
+            if (c.nextBillingDate) {
+                let d = new Date(c.nextBillingDate);
+                d.setMonth(d.getMonth() + parseInt(c.cycle || 1));
+                c.nextBillingDate = d.toISOString().split('T')[0];
+            }
 
-        function saveDocument() { 
-            const id = getVal('docId'); 
-            const obj = { 
-                id: id||'d'+Date.now(), 
-                name: sanitize(getVal('docName')), 
-                category: getVal('docCategory'), 
-                link: sanitize(getVal('docLink')) 
-            }; 
-            if(id) db.documents = db.documents.map(x=>x.id===id?obj:x); else db.documents.push(obj); 
-            saveDB(); closeForm('document'); 
+            saveDB();
+            const audio = getEl('moneySound');
+            if(audio) audio.play().catch(e=>{});
+        };
+
+        function saveReminder() {
+            const id = getVal('remId'); 
+            const obj = { id: id||'rem'+Date.now(), title: getVal('remTitle'), type: getVal('remType'), amount: parseFloat(getVal('remAmount'))||0, day: parseInt(getVal('remDay'))||1 }; 
+            if(id) db.reminders = db.reminders.map(x=>x.id===id?obj:x); else db.reminders.push(obj); 
+            saveDB(); closeForm('reminder'); 
         }
+        
+        function saveVenture() { const id = getVal('vId'); const obj = { id: id||'v'+Date.now(), name: getVal('vName'), desc: getVal('vDesc') }; if(id) db.ventures = db.ventures.map(x=>x.id===id?obj:x); else db.ventures.push(obj); saveDB(); closeForm('venture'); }
+        function saveTeamMember() { const id = getVal('teamId'); const obj = { id: id||'team'+Date.now(), name: getVal('teamName'), role: getVal('teamRole'), type: getVal('teamType'), share: parseFloat(getVal('teamShare'))||0 }; if(id) db.team = db.team.map(x=>x.id===id?obj:x); else db.team.push(obj); saveDB(); closeForm('team'); }
+        function saveInvestment() { const id = getVal('invId'); const obj = { id: id||'i'+Date.now(), name: getVal('invName'), type: getVal('invType'), current: parseFloat(getVal('invCurrent'))||0 }; if(id) db.investments = db.investments.map(x=>x.id===id?obj:x); else db.investments.push(obj); saveDB(); closeForm('investment'); }
+        function saveEquity() { const id = getVal('eqId'); const obj = { id: id||'eq'+Date.now(), name: getVal('eqName'), percent: parseFloat(getVal('eqPercent'))||0, companyVal: parseFloat(getVal('eqVal'))||0 }; if(id) db.equities = db.equities.map(x=>x.id===id?obj:x); else db.equities.push(obj); saveDB(); closeForm('equity'); }
+        function saveGoal() { const id = getVal('goalId'); const obj = { id: id||'g'+Date.now(), name: getVal('goalName'), type: getVal('goalType'), val: parseFloat(getVal('goalVal'))||0 }; if(id) db.goals = db.goals.map(x=>x.id===id?obj:x); else db.goals.push(obj); saveDB(); closeForm('goal'); }
+        function saveDocument() { const id = getVal('docId'); const obj = { id: id||'d'+Date.now(), name: getVal('docName'), category: getVal('docCategory'), link: getVal('docLink') }; if(id) db.documents = db.documents.map(x=>x.id===id?obj:x); else db.documents.push(obj); saveDB(); closeForm('document'); }
 
         function editRecord(type, id, arrName) { 
             const obj = db[arrName].find(x=>x.id===id); 
             openForm(type);
-            Object.keys(obj).forEach(key => { const el = getEl(type === 'payment' ? 'pay'+key.charAt(0).toUpperCase()+key.slice(1) : type === 'expense' ? 'exp'+key.charAt(0).toUpperCase()+key.slice(1) : type === 'client' ? 'cli'+key.charAt(0).toUpperCase()+key.slice(1) : type === 'venture' ? 'v'+key.charAt(0).toUpperCase()+key.slice(1) : type === 'team' ? 'team'+key.charAt(0).toUpperCase()+key.slice(1) : type === 'investment' ? 'inv'+key.charAt(0).toUpperCase()+key.slice(1) : type === 'equity' ? 'eq'+(key==='companyVal'?'Val':key.charAt(0).toUpperCase()+key.slice(1)) : type === 'goal' ? 'goal'+key.charAt(0).toUpperCase()+key.slice(1) : 'doc'+key.charAt(0).toUpperCase()+key.slice(1)); if(el) el.value = obj[key]; }); 
-            if(type==='expense') toggleTeamSelector(); 
+            Object.keys(obj).forEach(key => { 
+                const el = getEl(type === 'payment' ? 'pay'+key.charAt(0).toUpperCase()+key.slice(1) : type === 'expense' ? 'exp'+key.charAt(0).toUpperCase()+key.slice(1) : type === 'client' ? 'cli'+key.charAt(0).toUpperCase()+key.slice(1) : type === 'reminder' ? 'rem'+key.charAt(0).toUpperCase()+key.slice(1) : type === 'venture' ? 'v'+key.charAt(0).toUpperCase()+key.slice(1) : type === 'team' ? 'team'+key.charAt(0).toUpperCase()+key.slice(1) : type === 'investment' ? 'inv'+key.charAt(0).toUpperCase()+key.slice(1) : type === 'equity' ? 'eq'+(key==='companyVal'?'Val':key.charAt(0).toUpperCase()+key.slice(1)) : type === 'goal' ? 'goal'+key.charAt(0).toUpperCase()+key.slice(1) : 'doc'+key.charAt(0).toUpperCase()+key.slice(1)); 
+                if(el) el.value = obj[key]; 
+            }); 
+            
+            if(type==='expense') {
+                if(getEl('expClientId')) getEl('expClientId').value = obj.clientId || '';
+                window.toggleExpenseFields(); 
+                getEl('expVentureSelect').value = obj.venture; 
+                getEl('expTeamSelect').value = obj.teamId;
+            }
             if(type==='payment') { getEl('payVentureSelect').value = obj.venture; if(obj.stream) getEl('payStream').value = obj.stream; } 
-            if(type==='expense'){getEl('expVentureSelect').value = obj.venture; getEl('expTeamSelect').value = obj.teamId;}
+            
+            if(type==='client') { 
+                if(getEl('cliProjectStatus')) getEl('cliProjectStatus').value = obj.projectStatus || 'Active'; 
+                if(getEl('cliCycle')) getEl('cliCycle').value = obj.cycle || 1;
+                if(getEl('cliNextBilling')) getEl('cliNextBilling').value = obj.nextBillingDate || '';
+                
+                getEl('cliSoftRows').innerHTML = '';
+                if(obj.softwares) obj.softwares.forEach(s => window.addCliSoftRow(s.name, s.amt));
+                else if(obj.expSoftAmt > 0) window.addCliSoftRow('Software License', obj.expSoftAmt);
+
+                getEl('cliTeamRows').innerHTML = '';
+                if(obj.teamPayouts) obj.teamPayouts.forEach(t => window.addCliTeamRow(t.teamId, t.amt));
+                else if(obj.expTeamAmt > 0) window.addCliTeamRow(obj.expTeamId, obj.expTeamAmt);
+            }
         }
         function deleteRecord(arrName, id) { if(confirm('Delete this record permanently?')) { db[arrName] = db[arrName].filter(x => x.id !== id); saveDB(); } }
-        function markPaid(id) { const p = db.payments.find(x => x.id === id); if(p){ p.status = 'Paid'; saveDB(); } }
+        
+        window.markPaid = function(id) { 
+            const p = db.payments.find(x => x.id === id); 
+            if(p){ 
+                p.status = 'Paid'; 
+                if(localStorage.getItem('founder_os_auto_save') === 'true') {
+                    let savings = db.investments.find(i => i.type === 'Cash/Savings');
+                    if(savings) savings.current += p.amount;
+                }
+                saveDB(); 
+            } 
+        };
 
         function calculateNetWorth() {
             const liquid = db.investments.reduce((sum, i) => sum + i.current, 0);
@@ -955,37 +1154,121 @@
             if (activeView === 'payments') { 
                 const sQ = getVal('searchRev').toLowerCase(); const sStat = getVal('filterRevStatus');
                 const list = fRevs.filter(p => (sStat==='All' || p.status===sStat) && (p.client.toLowerCase().includes(sQ) || p.venture.toLowerCase().includes(sQ) || p.service.toLowerCase().includes(sQ)));
-                getEl('tblPayments').innerHTML = list.map(p => `<tr><td>${p.date}</td><td><strong>${p.client}</strong><br><span style="font-size:0.7rem;color:var(--text-muted);">${p.venture}</span></td><td>${p.service}<br><span style="font-size:0.65rem;color:var(--text-muted);">${p.stream || ''}</span></td><td style="font-weight:600;">${currency}${p.amount.toLocaleString()}</td><td><span style="color:${p.status==='Paid'?'var(--green)':'var(--orange)'}">${p.status}</span><br>${p.status==='Pending'?`<button class="btn-sec" style="font-size:0.65rem; padding:0.15rem 0.4rem; margin-top:4px;" onclick="markPaid('${p.id}')">Mark Paid</button>`:''}</td><td><button class="btn-edit" onclick="editRecord('payment','${p.id}','payments')">Edit</button><button class="btn-danger" onclick="deleteRecord('payments','${p.id}')">Del</button></td></tr>`).join('') || '<tr><td colspan="6">No records found.</td></tr>'; 
+                getEl('tblPayments').innerHTML = list.map(p => `<tr><td>${p.date}</td><td><strong>${sanitize(p.client)}</strong><br><span style="font-size:0.7rem;color:var(--text-muted);">${sanitize(p.venture)}</span></td><td>${sanitize(p.service)}<br><span style="font-size:0.65rem;color:var(--text-muted);">${sanitize(p.stream) || ''}</span></td><td style="font-weight:600;">${currency}${p.amount.toLocaleString()}</td><td><span style="color:${p.status==='Paid'?'var(--green)':'var(--orange)'}">${p.status}</span><br>${p.status==='Pending'?`<button class="btn-sec" style="font-size:0.65rem; padding:0.15rem 0.4rem; margin-top:4px;" onclick="markPaid('${p.id}')">Mark Paid</button>`:''}</td><td><button class="btn-edit" onclick="editRecord('payment','${p.id}','payments')">Edit</button><button class="btn-danger" onclick="deleteRecord('payments','${p.id}')">Del</button></td></tr>`).join('') || '<tr><td colspan="6">No records found.</td></tr>'; 
             }
             if (activeView === 'expenses') { 
                 const sQ = getVal('searchExp').toLowerCase();
                 const list = fExps.filter(e => e.category.toLowerCase().includes(sQ) || e.notes.toLowerCase().includes(sQ) || e.venture.toLowerCase().includes(sQ));
-                getEl('tblExpenses').innerHTML = list.map(e => { let r = e.notes; if(e.category==='Salary / Payout'&&e.teamId){ const t=db.team.find(x=>x.id===e.teamId); if(t) r=`To: ${t.name} (${e.notes})`; } return `<tr><td>${e.date}</td><td><strong>${e.category}</strong><br><span style="font-size:0.7rem;color:var(--text-muted);">${e.venture}</span></td><td>${r}</td><td style="color:var(--red); font-weight:600;">${currency}${e.amount.toLocaleString()}</td><td><button class="btn-edit" onclick="editRecord('expense','${e.id}','expenses')">Edit</button><button class="btn-danger" onclick="deleteRecord('expenses','${e.id}')">Del</button></td></tr>`;}).join('') || '<tr><td colspan="5">No records found.</td></tr>'; 
+                getEl('tblExpenses').innerHTML = list.map(e => { 
+                    let r = sanitize(e.notes); 
+                    if(e.category==='Salary / Payout'&&e.teamId){ const t=db.team.find(x=>x.id===e.teamId); if(t) r=`To: ${sanitize(t.name)} (${sanitize(e.notes)})`; } 
+                    if(e.clientId) { r += `<br><span style="font-size:0.7rem; color:var(--blue);">Client: ${sanitize(e.clientId)}</span>`; }
+                    return `<tr><td>${e.date}</td><td><strong>${e.category}</strong><br><span style="font-size:0.7rem;color:var(--text-muted);">${sanitize(e.venture)}</span></td><td>${r}</td><td style="color:var(--red); font-weight:600;">${currency}${e.amount.toLocaleString()}</td><td><button class="btn-edit" onclick="editRecord('expense','${e.id}','expenses')">Edit</button><button class="btn-danger" onclick="deleteRecord('expenses','${e.id}')">Del</button></td></tr>`;
+                }).join('') || '<tr><td colspan="5">No records found.</td></tr>'; 
             }
-            if (activeView === 'clients') { getEl('tblClients').innerHTML = db.clients.map(c => `<tr><td><strong>${c.name}</strong><br><span style="font-size:0.7rem;color:var(--text-muted);">${c.email}</span></td><td>${c.service}</td><td>${currency}${c.fee.toLocaleString()} / mo</td><td><span style="color:${c.status==='Active'?'var(--green)':'var(--text-muted)'}">${c.status}</span></td><td><button class="btn-edit" onclick="editRecord('client','${c.id}','clients')">Edit</button><button class="btn-danger" onclick="deleteRecord('clients','${c.id}')">Del</button></td></tr>`).join(''); }
-            if (activeView === 'ventures') { getEl('tblVentures').innerHTML = db.ventures.map(v => `<tr><td><strong>${v.name}</strong></td><td>${v.desc}</td><td><button class="btn-edit" onclick="editRecord('venture','${v.id}','ventures')">Edit</button><button class="btn-danger" onclick="deleteRecord('ventures','${v.id}')">Del</button></td></tr>`).join(''); }
-            if (activeView === 'team') { getEl('tblTeam').innerHTML = db.team.map(t => { const pay = fExps.filter(e=>e.teamId===t.id).reduce((s,e)=>s+e.amount,0); return `<tr><td><strong>${t.name}</strong></td><td>${t.role} <span style="font-size:0.7rem;color:var(--text-muted)">(${t.type})</span></td><td>${t.share}%</td><td style="color:var(--purple);font-weight:600;">${currency}${pay.toLocaleString()}</td><td><button class="btn-edit" onclick="editRecord('team','${t.id}','team')">Edit</button><button class="btn-danger" onclick="deleteRecord('team','${t.id}')">Del</button></td></tr>`;}).join(''); }
+            if (activeView === 'clients') { 
+                getEl('tblClients').innerHTML = db.clients.map(c => {
+                    const cycleTxt = c.cycle == 1 ? 'Monthly' : c.cycle == 3 ? 'Quarterly' : c.cycle == 12 ? 'Annually' : `Every ${c.cycle}M`;
+                    return `<tr><td><strong>${sanitize(c.name)}</strong><br><span style="font-size:0.7rem;color:var(--text-muted);">${sanitize(c.email)}</span></td><td>${sanitize(c.service)}</td><td><span style="font-weight:600;">${currency}${c.fee.toLocaleString()}</span> <span style="font-size:0.7rem; font-weight:normal;">(${cycleTxt})</span> <br><span style="font-size:0.7rem; color:var(--text-muted);">Next Due: ${c.nextBillingDate || 'N/A'}</span></td><td><span class="status-badge">${c.projectStatus || 'Active'}</span></td><td><button class="btn-edit" onclick="editRecord('client','${c.id}','clients')">Edit</button><button class="btn-danger" onclick="deleteRecord('clients','${c.id}')">Del</button></td></tr>`;
+                }).join('') || '<tr><td colspan="5">No clients found.</td></tr>'; 
+            }
+            if (activeView === 'reminders') {
+                getEl('tblReminders').innerHTML = db.reminders.map(r => `<tr><td><strong>${sanitize(r.title)}</strong></td><td>${r.type}</td><td style="color:var(--red); font-weight:600;">${currency}${r.amount.toLocaleString()}</td><td>Day ${r.day}</td><td><button class="btn-edit" onclick="editRecord('reminder','${r.id}','reminders')">Edit</button><button class="btn-danger" onclick="deleteRecord('reminders','${r.id}')">Del</button></td></tr>`).join('') || '<tr><td colspan="5">No reminders found.</td></tr>'; 
+            }
+            if (activeView === 'ventures') { getEl('tblVentures').innerHTML = db.ventures.map(v => `<tr><td><strong>${sanitize(v.name)}</strong></td><td>${sanitize(v.desc)}</td><td><button class="btn-edit" onclick="editRecord('venture','${v.id}','ventures')">Edit</button><button class="btn-danger" onclick="deleteRecord('ventures','${v.id}')">Del</button></td></tr>`).join(''); }
+            if (activeView === 'team') { getEl('tblTeam').innerHTML = db.team.map(t => { const pay = fExps.filter(e=>e.teamId===t.id).reduce((s,e)=>s+e.amount,0); return `<tr><td><strong>${sanitize(t.name)}</strong></td><td>${t.role} <span style="font-size:0.7rem;color:var(--text-muted)">(${t.type})</span></td><td>${t.share}%</td><td style="color:var(--purple);font-weight:600;">${currency}${pay.toLocaleString()}</td><td><button class="btn-edit" onclick="editRecord('team','${t.id}','team')">Edit</button><button class="btn-danger" onclick="deleteRecord('team','${t.id}')">Del</button></td></tr>`;}).join(''); }
             if (activeView === 'investments') { 
-                getEl('tblInvestments').innerHTML = db.investments.map(i => `<tr><td><strong>${i.name}</strong><br><span style="font-size:0.7rem;color:var(--text-muted)">${i.type}</span></td><td style="font-weight:600;">${currency}${i.current.toLocaleString()}</td><td><button class="btn-edit" onclick="editRecord('investment','${i.id}','investments')">Edit</button><button class="btn-danger" onclick="deleteRecord('investments','${i.id}')">Del</button></td></tr>`).join('');
-                getEl('tblEquities').innerHTML = db.equities.map(e => `<tr><td><strong>${e.name}</strong></td><td>${e.percent}%</td><td style="font-weight:600;">${currency}${((e.percent/100)*e.companyVal).toLocaleString()}</td><td><button class="btn-edit" onclick="editRecord('equity','${e.id}','equities')">Edit</button><button class="btn-danger" onclick="deleteRecord('equities','${e.id}')">Del</button></td></tr>`).join('');
+                getEl('tblInvestments').innerHTML = db.investments.map(i => `<tr><td><strong>${sanitize(i.name)}</strong><br><span style="font-size:0.7rem;color:var(--text-muted)">${i.type}</span></td><td style="font-weight:600;">${currency}${i.current.toLocaleString()}</td><td><button class="btn-edit" onclick="editRecord('investment','${i.id}','investments')">Edit</button><button class="btn-danger" onclick="deleteRecord('investments','${i.id}')">Del</button></td></tr>`).join('');
+                getEl('tblEquities').innerHTML = db.equities.map(e => `<tr><td><strong>${sanitize(e.name)}</strong></td><td>${e.percent}%</td><td style="font-weight:600;">${currency}${((e.percent/100)*e.companyVal).toLocaleString()}</td><td><button class="btn-edit" onclick="editRecord('equity','${e.id}','equities')">Edit</button><button class="btn-danger" onclick="deleteRecord('equities','${e.id}')">Del</button></td></tr>`).join('');
             }
             if (activeView === 'goals') renderGoals(fRevs);
-            if (activeView === 'documents') { getEl('tblDocuments').innerHTML = db.documents.map(d => `<tr><td><strong>${d.name}</strong></td><td>${d.category}</td><td><a href="${d.link}" target="_blank" style="color:var(--text); text-decoration:underline;">Open</a></td><td><button class="btn-edit" onclick="editRecord('document','${d.id}','documents')">Edit</button><button class="btn-danger" onclick="deleteRecord('documents','${d.id}')">Del</button></td></tr>`).join(''); }
+            if (activeView === 'documents') { getEl('tblDocuments').innerHTML = db.documents.map(d => `<tr><td><strong>${sanitize(d.name)}</strong></td><td>${d.category}</td><td><a href="${sanitize(d.link)}" target="_blank" style="color:var(--text); text-decoration:underline;">Open</a></td><td><button class="btn-edit" onclick="editRecord('document','${d.id}','documents')">Edit</button><button class="btn-danger" onclick="deleteRecord('documents','${d.id}')">Del</button></td></tr>`).join(''); }
         }
 
         function renderDashboard(revs, exps) {
-            const sQ = getVal('searchAct').toLowerCase();
-            let all = [...revs, ...exps].sort((a,b) => new Date(b.date) - new Date(a.date));
-            if(sQ) all = all.filter(a => (a.client||a.category).toLowerCase().includes(sQ) || a.venture.toLowerCase().includes(sQ));
+            const actTable = getEl('dashboardActivity');
+            if (actTable) {
+                const searchEl = getEl('searchAct');
+                const sQ = searchEl ? searchEl.value.toLowerCase() : '';
+                let all = [...revs, ...exps].sort((a,b) => new Date(b.date) - new Date(a.date));
+                if(sQ) all = all.filter(a => (a.client||a.category||'').toLowerCase().includes(sQ) || (a.venture||'').toLowerCase().includes(sQ));
+                actTable.innerHTML = all.map(a => `<tr><td>${sanitize(a.client||a.category)} <span style="font-size:0.7rem;color:var(--text-muted);">(${sanitize(a.venture||'Unknown')})</span><br><span style="font-size:0.65rem;">${a.date}</span></td><td class="${a.client?'green':'red'}" style="text-align:right; font-weight:600;">${a.client?'+':'-'}${currency}${a.amount.toLocaleString()}</td></tr>`).join('') || '<tr><td>No logs found.</td></tr>';
+            }
             
-            getEl('dashboardActivity').innerHTML = all.map(a => `<tr><td>${a.client||a.category} <span style="font-size:0.7rem;color:var(--text-muted);">(${a.venture})</span><br><span style="font-size:0.65rem;">${a.date}</span></td><td class="${a.client?'green':'red'}" style="text-align:right; font-weight:600;">${a.client?'+':'-'}${currency}${a.amount.toLocaleString()}</td></tr>`).join('') || '<tr><td>No logs found.</td></tr>';
-            
+            const alertsTable = getEl('dashAlerts');
+            if (alertsTable) {
+                let alertsHtml = '';
+                const today = new Date();
+                today.setHours(0,0,0,0);
+                const dayNum = today.getDate();
+
+                // 1. Pending Invoice Payments
+                const pendingPayments = db.payments.filter(p => p.status === 'Pending').sort((a,b)=>new Date(a.date)-new Date(b.date));
+                pendingPayments.forEach(p => alertsHtml += `<tr><td><strong>${sanitize(p.client)}</strong> (Invoice)<br><span style="font-size:0.7rem;color:var(--text-muted);">${p.date}</span></td><td style="color:var(--orange); font-weight:600;">${currency}${p.amount.toLocaleString()}</td><td><button class="btn-sec" style="font-size:0.65rem; padding:0.2rem 0.4rem;" onclick="markPaid('${p.id}');">Mark Paid</button></td></tr>`);
+                
+                // 2. Client Auto-Billing Engine
+                db.clients.filter(c => c.status === 'Active' && c.nextBillingDate).forEach(c => {
+                    const nextD = new Date(c.nextBillingDate);
+                    nextD.setHours(0,0,0,0);
+                    const diffDays = Math.round((nextD - today) / (1000 * 60 * 60 * 24));
+                    
+                    if (diffDays >= -7 && diffDays <= 7) { 
+                        alertsHtml += `<tr><td><strong>${sanitize(c.name)}</strong> (Billing Cycle)<br><span style="font-size:0.7rem;color:var(--text-muted);">Due Date: ${c.nextBillingDate}</span></td><td style="color:var(--blue); font-weight:600;">${currency}${c.fee.toLocaleString()}</td><td><button class="btn-sec" style="font-size:0.65rem; padding:0.25rem 0.5rem; color:var(--blue); border-color:var(--blue);" onclick="processClientBilling('${c.id}')">Log Cycle & Add Expenses</button></td></tr>`;
+                    }
+                });
+
+                // 3. SIPs / Rent Reminders
+                (db.reminders || []).forEach(r => {
+                    let diff = r.day - dayNum;
+                    if (diff < -15) diff += 30;
+                    if (diff >= -3 && diff <= 5) { 
+                        alertsHtml += `<tr><td><strong>${sanitize(r.title)}</strong> (${r.type})<br><span style="font-size:0.7rem;color:var(--text-muted);">Due on day ${r.day}</span></td><td style="color:var(--red); font-weight:600;">${currency}${r.amount.toLocaleString()}</td><td><span class="status-badge" style="color:var(--red);">Reminder</span></td></tr>`;
+                    }
+                });
+
+                alertsTable.innerHTML = alertsHtml || '<tr><td colspan="3" style="text-align:center; padding:1.5rem;"><span style="color:var(--text-muted);">No pending actions! 🎉</span></td></tr>';
+            }
+
+            const snapTable = getEl('dashClients');
+            if (snapTable) {
+                const activeClients = db.clients.filter(c => c.status === 'Active');
+                snapTable.innerHTML = activeClients.map(c => {
+                    const cycleTxt = c.cycle == 1 ? 'Monthly' : c.cycle == 3 ? 'Quarterly' : c.cycle == 12 ? 'Annually' : `Every ${c.cycle}M`;
+                    return `<tr><td><strong>${sanitize(c.name)}</strong><br><span style="font-size:0.7rem;color:var(--text-muted);">${sanitize(c.service)}</span></td><td style="font-weight:600;">${currency}${c.fee.toLocaleString()} <span style="font-size:0.7rem; font-weight:normal;">(${cycleTxt})</span></td><td><span class="status-badge">${c.projectStatus || 'Active'}</span></td></tr>`;
+                }).join('') || '<tr><td colspan="3" style="text-align:center; padding:1.5rem;"><span style="color:var(--text-muted);">No active clients to display.</span></td></tr>';
+            }
+
+            // Charts Logic
             const dates = [...new Set([...revs, ...exps].map(x => x.date))].sort();
             const rData = dates.map(d => revs.filter(r => r.date === d && r.status === 'Paid').reduce((s, r) => s + r.amount, 0));
             const eData = dates.map(d => exps.filter(e => e.date === d).reduce((s, e) => s + e.amount, 0));
+            
+            const mData = dates.map(d => {
+                const dayRev = revs.filter(r => r.date === d && r.status === 'Paid').reduce((s, r) => s + r.amount, 0);
+                const dayExp = exps.filter(e => e.date === d).reduce((s, e) => s + e.amount, 0);
+                return dayRev - dayExp;
+            });
 
-            if (charts.dash) charts.dash.destroy();
-            charts.dash = new Chart(getEl('chartDashboardFlow').getContext('2d'), { type: 'line', data: { labels: dates, datasets: [{ label: 'Inflow', data: rData, borderColor: '#22c55e', tension: 0.3 }, { label: 'Outflow', data: eData, borderColor: '#ef4444', tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false } });
+            if (getEl('chartDashboardFlow')) {
+                if (charts.dash) charts.dash.destroy();
+                charts.dash = new Chart(getEl('chartDashboardFlow').getContext('2d'), { type: 'line', data: { labels: dates, datasets: [{ label: 'Inflow', data: rData, borderColor: '#22c55e', tension: 0.3 }, { label: 'Outflow', data: eData, borderColor: '#ef4444', tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false } });
+            }
+            
+            if (getEl('chartNetMargin')) {
+                if (charts.netMarg) charts.netMarg.destroy();
+                charts.netMarg = new Chart(getEl('chartNetMargin').getContext('2d'), { 
+                    type: 'bar', 
+                    data: { 
+                        labels: dates, 
+                        datasets: [{ 
+                            label: 'Net Margin', 
+                            data: mData, 
+                            backgroundColor: mData.map(v => v >= 0 ? '#22c55e' : '#ef4444') 
+                        }] 
+                    }, 
+                    options: { responsive: true, maintainAspectRatio: false } 
+                });
+            }
         }
 
         function renderAnalytics(revs, exps) {
@@ -994,7 +1277,7 @@
                 const vOps = exps.filter(e => e.venture === v.name && e.category !== 'Salary / Payout').reduce((s, e) => s + e.amount, 0);
                 const vPay = exps.filter(e => e.venture === v.name && e.category === 'Salary / Payout').reduce((s, e) => s + e.amount, 0);
                 const net = vRev - vOps - vPay;
-                return { name: v.name, rev: vRev, ops: vOps, pay: vPay, net, margin: vRev > 0 ? ((net / vRev) * 100).toFixed(1) : 0 };
+                return { name: sanitize(v.name), rev: vRev, ops: vOps, pay: vPay, net, margin: vRev > 0 ? ((net / vRev) * 100).toFixed(1) : 0 };
             });
 
             getEl('tblAnalyticsVenture').innerHTML = vStats.map(s => `<tr><td><strong>${s.name}</strong></td><td style="color:var(--green);">+${currency}${s.rev.toLocaleString()}</td><td style="color:var(--red);">-${currency}${s.ops.toLocaleString()}</td><td style="color:var(--purple);">-${currency}${s.pay.toLocaleString()}</td><td style="font-weight:700;">${currency}${s.net.toLocaleString()}</td><td>${s.margin}%</td></tr>`).join('');
@@ -1004,17 +1287,24 @@
             if (charts.vRev) charts.vRev.destroy(); charts.vRev = new Chart(getEl('chartVentureRev').getContext('2d'), { type: 'bar', data: { labels: vStats.map(s => s.name), datasets: [{ label: 'Gross Rev', data: vStats.map(s => s.rev), backgroundColor: '#ffffff' }] }, options: { responsive: true, maintainAspectRatio: false } });
         }
 
-        function exportData() { const a = document.createElement('a'); a.href = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db, null, 2)); a.download = "founder_os_backup.json"; a.click(); }
-        function importData(e) { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = function(evt) { try { db = JSON.parse(evt.target.result); saveDB(); alert("Restored successfully."); } catch(err) { alert("Invalid backup file."); } }; reader.readAsText(file); }
+        function renderGoals(fRevs) {
+            const revTotal = fRevs.filter(p => p.status === 'Paid').reduce((a, b) => a + b.amount, 0);
+            const clientsAct = db.clients.filter(c => c.status === 'Active').length;
+            const nw = calculateNetWorth();
+            const savingsMF = db.investments.filter(i => i.type === 'Cash/Savings' || i.type === 'Mutual Funds').reduce((sum, i) => sum + i.current, 0);
+
+            getEl('goalsContainer').innerHTML = db.goals.map(g => {
+                let curr = 0; if(g.type==='Net Worth') curr = nw; else if(g.type==='Monthly Revenue') curr = revTotal; else if(g.type==='Active Clients') curr = clientsAct; else if(g.type==='Cash Savings') curr = savingsMF;
+                const pct = Math.min(Math.round((curr / g.val) * 100), 100);
+                return `<div class="card" style="margin-bottom:0;"><div style="display:flex; justify-content:space-between;"><strong>${sanitize(g.name)} <span style="font-size:0.6rem; font-weight:normal; color:var(--text-muted)">(${g.type})</span></strong><div><span class="btn-edit" onclick="editRecord('goal','${g.id}','goals')">Edit</span><span class="btn-danger" onclick="deleteRecord('goals','${g.id}')">Del</span></div></div><div style="font-size:1.5rem; font-weight:700; margin-top:0.5rem;">${pct}%</div><div class="progress-bg"><div class="progress-fill" style="width:${pct}%"></div></div><div style="font-size:0.75rem; color:var(--text-muted); display:flex; justify-content:space-between; margin-top:0.5rem;"><span>Current: ${curr.toLocaleString()}</span><span>Target: ${g.val.toLocaleString()}</span></div></div>`;
+            }).join('');
+        }
     </script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore.js";
-        
-        // Added Firebase App Check logic based on your uploaded Site Key
-        import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app-check.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCzVh0thAt9v42FFWTTNKCT662ogNi60X4",
@@ -1027,13 +1317,6 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        
-        // Initialize App Check with the Site Key provided
-        const appCheck = initializeAppCheck(app, {
-            provider: new ReCaptchaV3Provider('6LfGQIctAAAAACYL9S44DsgrsYiNeHvu9lmarUsd'),
-            isTokenAutoRefreshEnabled: true
-        });
-
         const auth = getAuth(app);
         const firestoreDb = getFirestore(app);
         const googleProvider = new GoogleAuthProvider();
@@ -1064,11 +1347,10 @@
                     if (!name) { errorEl.innerText = "Please enter your name."; return; }
                     const userCred = await createUserWithEmailAndPassword(auth, email, pass);
                     
-                    // Immediately initialize a blank DB for the new user, tagging it with their name
-                    let initialDb = { logo: null, payments: [], expenses: [], clients: [], ventures: [], team: [], investments: [], equities: [], goals: [], documents: [] };
+                    let initialDb = { logo: null, payments: [], expenses: [], clients: [], reminders: [], ventures: [], team: [], investments: [], equities: [], goals: [], documents: [] };
                     await setDoc(doc(firestoreDb, "users", userCred.user.uid), {
-                        name: sanitize(name), // Sanitized name for security
-                        email: sanitize(email),
+                        name: name,
+                        email: email,
                         os_data: initialDb,
                         currency: '₹',
                         updatedAt: new Date().toISOString()
@@ -1098,7 +1380,15 @@
             window.location.reload();
         };
 
-        // REAL-TIME SAVE FUNCTION
+        window.updateCurrency = async function() {
+            currency = getVal('optCurrency'); 
+            localStorage.setItem('founder_os_cur', currency);
+            if (window.currentUser) {
+                await setDoc(doc(firestoreDb, "users", window.currentUser.uid), { currency: currency }, { merge: true });
+            }
+            window.renderAll(); 
+        };
+
         window.syncToCloud = async function(databaseData, cur) {
             if (!window.currentUser) return;
             try {
@@ -1112,7 +1402,6 @@
             }
         }
 
-        // AUTH LISTENER
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 document.getElementById('auth-overlay').style.display = 'none';
@@ -1121,6 +1410,16 @@
                 onSnapshot(doc(firestoreDb, "users", user.uid), (docSnap) => {
                     if (docSnap.exists() && docSnap.data().os_data) {
                         window.db = docSnap.data().os_data;
+                        if (!window.db.reminders) window.db.reminders = []; 
+                        
+                        // Safety Check for old Client Data format migration
+                        window.db.clients.forEach(c => {
+                            if(!c.nextBillingDate && c.billingDay) {
+                                let d = new Date(); d.setDate(c.billingDay); c.nextBillingDate = d.toISOString().split('T')[0];
+                                c.cycle = 1;
+                            }
+                        });
+
                         window.currency = docSnap.data().currency || '₹';
                         if(document.getElementById('optCurrency')) document.getElementById('optCurrency').value = window.currency;
                         
@@ -1142,7 +1441,6 @@
                 document.getElementById('auth-overlay').style.display = 'flex';
             }
         });
-
     </script>
 </body>
 </html>
