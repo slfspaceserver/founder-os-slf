@@ -23,14 +23,10 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font); }
         body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; transition: background 0.3s, color 0.3s; overflow-x: hidden; max-width: 100vw; }
 
-        /* Login Overlay */
         #auth-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 9999; display: none; align-items: center; justify-content: center; }
-
-        /* Mobile Header */
         .mobile-header { display: none; width: 100%; background: var(--panel); border-bottom: 1px solid var(--panel-border); padding: 1rem; align-items: center; justify-content: space-between; position: fixed; top: 0; left: 0; z-index: 40; }
         .menu-btn { background: none; border: none; color: var(--text); font-size: 1.5rem; cursor: pointer; }
 
-        /* Navigation & Sidebar */
         aside { width: 240px; background: var(--panel); border-right: 1px solid var(--panel-border); display: flex; flex-direction: column; padding: 1.5rem; position: fixed; top: 0; bottom: 0; left: 0; z-index: 100; overflow-y: auto; -webkit-overflow-scrolling: touch; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .logo-container { margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; height: 40px; }
         #sidebarLogo, #mobileLogo { max-width: 100%; height: auto; max-height: 40px; object-fit: contain; }
@@ -41,17 +37,14 @@
         .nav-item:hover, .nav-item.active { background: var(--panel-border); color: var(--text); }
         .nav-group-label { font-size: 0.65rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; margin: 1rem 0 0.25rem 0.5rem; font-weight: 600; }
         
-        /* Main Workspace */
         main { margin-left: 240px; flex-grow: 1; padding: 2rem; width: calc(100% - 240px); overflow-x: hidden; }
         header { display: flex; justify-content: space-between; align-items: flex-start; margin-top: 1rem; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
-        
         .header-controls { display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem; }
         .time-filters { display: flex; gap: 0.5rem; flex-wrap: wrap; }
         .btn-filter { background: var(--panel); border: 1px solid var(--panel-border); color: var(--text); padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.8rem; cursor: pointer; }
         .btn-filter.active { background: var(--text); color: var(--bg); border-color: var(--text); }
         #customDateWrap { background: var(--panel); padding: 0.5rem; border-radius: 6px; border: 1px solid var(--panel-border); }
 
-        /* Grid & Cards */
         .card { background: var(--panel); border: 1px solid var(--panel-border); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem; width: 100%; overflow: hidden; }
         .card-title { font-size: 0.9rem; font-weight: 600; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;}
         .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
@@ -64,14 +57,13 @@
         .growth-txt.neg { color: var(--red); background: rgba(239, 68, 68, 0.1); }
         .two-col-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; min-width: 0; }
 
-        /* Tables & Forms */
         .data-table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; display: block; padding-bottom: 0.5rem; }
         .scrollable-table-wrap { max-height: 350px; overflow-y: auto; }
-        .data-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; min-width: 500px; /* Force minimum width to trigger internal scroll on mobile, saving main layout */ }
+        .data-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; min-width: 500px; }
         .data-table th, .data-table td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--panel-border); }
         .data-table th { color: var(--text-muted); font-weight: 500; text-transform: uppercase; font-size: 0.7rem; position: sticky; top: 0; background: var(--panel); z-index: 2;}
         .data-table tr:hover { background: rgba(255,255,255,0.02); }
-        .data-table td:last-child, .data-table th:last-child { white-space: nowrap; } /* Prevent action buttons from wrapping */
+        .data-table td:last-child, .data-table th:last-child { white-space: nowrap; } 
 
         input, select, textarea { background: var(--bg); border: 1px solid var(--panel-border); color: var(--text); padding: 0.5rem 0.75rem; border-radius: 6px; font-size: 0.875rem; outline: none; width: 100%; }
         input[type="checkbox"] { width: auto; transform: scale(1.2); cursor: pointer; }
@@ -97,7 +89,6 @@
         .progress-fill { background: var(--text); height: 100%; transition: width 0.3s; }
         .toolbar { display: flex; gap: 0.5rem; align-items: center; width: 100%; max-width: 400px;}
 
-        /* Fully Responsive Mobile Adjustments */
         @media (max-width: 900px) {
             .two-col-grid { grid-template-columns: 1fr; }
             .inline-form { grid-template-columns: 1fr; }
@@ -112,7 +103,7 @@
             header { flex-direction: column; align-items: flex-start; margin-top: 0.5rem; }
             .header-controls { align-items: flex-start; width: 100%; margin-top: 0.5rem; }
             .toolbar { max-width: 100%; }
-            .card { padding: 1rem; } /* Tighter padding on mobile */
+            .card { padding: 1rem; } 
             .data-table th, .data-table td { padding: 0.6rem 0.5rem; font-size: 0.8rem; }
             .metric-value { font-size: 1.2rem; }
         }
@@ -699,6 +690,12 @@
         var charts = {};
         const DEFAULT_LOGO = "https://founderos.slfspace.com/img/logo-founder-os-slf.png";
 
+        // TIMEZONE FIX: GET LOCAL DATE IN YYYY-MM-DD
+        function getLocalDate(dateObj = new Date()) {
+            const offset = dateObj.getTimezoneOffset() * 60000;
+            return new Date(dateObj.getTime() - offset).toISOString().split('T')[0];
+        }
+
         function getEl(id) { return document.getElementById(id); }
         function getVal(id) { return getEl(id) ? getEl(id).value : ''; }
         function setVal(id, val) { if(getEl(id)) getEl(id).value = val; }
@@ -792,17 +789,17 @@
             if (!localStorage.getItem('founder_os_v11') && db.payments.length === 0) {
                 db.ventures = [{ id: 'v1', name: 'Linkdify', desc: 'LinkedIn positioning agency.' }];
                 db.team = [{ id: 't1', name: 'Fidha Farzana', role: 'Partner', type: 'Partner', share: 50 }];
-                db.payments = [{ id: 'p1', client: 'Acme Corp', venture: 'Linkdify', service: 'Profile Optimization', stream: 'Service', amount: 85000, date: new Date().toISOString().split('T')[0], status: 'Paid' }];
-                db.expenses = [{ id: 'e1', category: 'Software & API', venture: 'Linkdify', amount: 5000, date: new Date().toISOString().split('T')[0], notes: 'API Cost', teamId: '' }];
+                db.payments = [{ id: 'p1', client: 'Acme Corp', venture: 'Linkdify', service: 'Profile Optimization', stream: 'Service', amount: 85000, date: getLocalDate(), status: 'Paid' }];
+                db.expenses = [{ id: 'e1', category: 'Software & API', venture: 'Linkdify', amount: 5000, date: getLocalDate(), notes: 'API Cost', teamId: '' }];
                 db.clients = [{ 
                     id: 'c1', name: 'Acme Corp', email: 'hello@acme.co', service: 'Growth', fee: 40000, 
-                    nextBillingDate: new Date().toISOString().split('T')[0], cycle: 1, 
+                    nextBillingDate: getLocalDate(), cycle: 1, 
                     softwares: [{name: 'LinkedIn Sales Nav', amt: 5000}], 
                     teamPayouts: [{teamId: 't1', amt: 10000}], 
-                    start: new Date().toISOString().split('T')[0], status: 'Active', projectStatus: 'Active' 
+                    start: getLocalDate(), status: 'Active', projectStatus: 'Active' 
                 }];
                 db.reminders = [{ id: 'r1', title: 'Nippon Mutual Fund SIP', type: 'Mutual Fund', amount: 15000, day: 10 }];
-                db.tasks = [{ id: 't1', title: 'Review Client Outreach Scripts', status: 'Pending', priority: 'High', date: new Date().toISOString().split('T')[0], client: 'Acme Corp' }];
+                db.tasks = [{ id: 't1', title: 'Review Client Outreach Scripts', status: 'Pending', priority: 'High', date: getLocalDate(), client: 'Acme Corp' }];
                 db.investments = [{ id: 'i1', name: 'Main Cash/Savings', type: 'Cash/Savings', current: 150000 }, { id: 'i2', name: 'Nippon India', type: 'Mutual Funds', current: 200000 }];
                 db.goals = [{ id:'g1', name:'Emergency Fund', type:'Cash Savings', val: 1000000 }];
                 saveDB();
@@ -814,7 +811,7 @@
                 
                 db.clients.forEach(c => {
                     if(!c.nextBillingDate && c.billingDay) {
-                        let d = new Date(); d.setDate(c.billingDay); c.nextBillingDate = d.toISOString().split('T')[0];
+                        let d = new Date(); d.setDate(c.billingDay); c.nextBillingDate = getLocalDate(d);
                         c.cycle = 1;
                     }
                 });
@@ -925,7 +922,7 @@
         function openForm(type) { 
             const form = getEl('form-' + type);
             form.querySelectorAll('input:not([type="date"]):not([type="checkbox"]), textarea').forEach(el => el.value = '');
-            form.querySelectorAll('input[type="date"]').forEach(el => el.value = new Date().toISOString().split('T')[0]);
+            form.querySelectorAll('input[type="date"]').forEach(el => el.value = getLocalDate());
             
             if(type === 'payment') {
                 setTimeout(() => { if(getEl('payAddSavings')) getEl('payAddSavings').checked = localStorage.getItem('founder_os_auto_save') === 'true'; }, 10);
@@ -1023,7 +1020,7 @@
             const c = db.clients.find(x => x.id === clientId);
             if(!c) return;
 
-            const today = new Date().toISOString().split('T')[0];
+            const today = getLocalDate();
             const addToSavings = localStorage.getItem('founder_os_auto_save') === 'true';
             
             let rAmt = parseFloat(c.fee) || 0;
@@ -1055,7 +1052,7 @@
             if (c.nextBillingDate) {
                 let d = new Date(c.nextBillingDate);
                 d.setMonth(d.getMonth() + parseInt(c.cycle || 1));
-                c.nextBillingDate = d.toISOString().split('T')[0];
+                c.nextBillingDate = getLocalDate(d);
             }
 
             saveDB();
@@ -1263,7 +1260,7 @@
 
             const dashTasksTable = getEl('dashTasks');
             if(dashTasksTable) {
-                const todayStr = new Date().toISOString().split('T')[0];
+                const todayStr = getLocalDate();
                 let todaysTasks = db.tasks.filter(t => t.date === todayStr);
                 
                 todaysTasks.sort((a,b) => (a.status==='Completed'?1:0) - (b.status==='Completed'?1:0));
@@ -1418,7 +1415,8 @@
             const errorEl = document.getElementById('authError');
             errorEl.innerText = "Processing Google Login...";
             try {
-                await signInWithPopup(auth, googleProvider);
+                const result = await signInWithPopup(auth, googleProvider);
+                const userRef = doc(firestoreDb, "users", result.user.uid);
             } catch (error) {
                 console.error("Google Auth Error:", error);
                 errorEl.innerText = "Error: " + error.message;
@@ -1465,7 +1463,7 @@
                         
                         window.db.clients.forEach(c => {
                             if(!c.nextBillingDate && c.billingDay) {
-                                let d = new Date(); d.setDate(c.billingDay); c.nextBillingDate = d.toISOString().split('T')[0];
+                                let d = new Date(); d.setDate(c.billingDay); c.nextBillingDate = getLocalDate(d);
                                 c.cycle = 1;
                             }
                         });
