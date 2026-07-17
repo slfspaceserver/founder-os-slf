@@ -21,31 +21,19 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font); }
-        body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; transition: background 0.3s, color 0.3s; overflow-x: hidden; }
+        body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; transition: background 0.3s, color 0.3s; overflow-x: hidden; max-width: 100vw; }
 
         /* Login Overlay */
-        #auth-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg); z-index: 9999; display: none; 
-            align-items: center; justify-content: center;
-        }
+        #auth-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 9999; display: none; align-items: center; justify-content: center; }
 
         /* Mobile Header */
         .mobile-header { display: none; width: 100%; background: var(--panel); border-bottom: 1px solid var(--panel-border); padding: 1rem; align-items: center; justify-content: space-between; position: fixed; top: 0; left: 0; z-index: 40; }
         .menu-btn { background: none; border: none; color: var(--text); font-size: 1.5rem; cursor: pointer; }
 
         /* Navigation & Sidebar */
-        aside { 
-            width: 240px; background: var(--panel); border-right: 1px solid var(--panel-border); 
-            display: flex; flex-direction: column; padding: 1.5rem; position: fixed; 
-            top: 0; bottom: 0; left: 0; z-index: 100; overflow-y: auto; 
-            -webkit-overflow-scrolling: touch; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-        }
-
+        aside { width: 240px; background: var(--panel); border-right: 1px solid var(--panel-border); display: flex; flex-direction: column; padding: 1.5rem; position: fixed; top: 0; bottom: 0; left: 0; z-index: 100; overflow-y: auto; -webkit-overflow-scrolling: touch; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .logo-container { margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; height: 40px; }
-        .logo-text { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.03em; display: flex; align-items: center; gap: 0.5rem; }
-        .logo-text span { background: var(--text); color: var(--bg); padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem; }
-        #customLogoImg, #mobileCustomLogoImg { max-width: 100%; height: auto; max-height: 40px; object-fit: contain; border-radius: 4px; display: none; }
+        #sidebarLogo, #mobileLogo { max-width: 100%; height: auto; max-height: 40px; object-fit: contain; }
         .close-menu-btn { display: none; background: none; border: none; color: var(--text); font-size: 1.5rem; cursor: pointer; }
         
         .nav-links { display: flex; flex-direction: column; gap: 0.25rem; list-style: none; flex-grow: 1; padding-bottom: 2rem; }
@@ -54,7 +42,7 @@
         .nav-group-label { font-size: 0.65rem; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.05em; margin: 1rem 0 0.25rem 0.5rem; font-weight: 600; }
         
         /* Main Workspace */
-        main { margin-left: 240px; flex-grow: 1; padding: 2rem; width: calc(100% - 240px); }
+        main { margin-left: 240px; flex-grow: 1; padding: 2rem; width: calc(100% - 240px); overflow-x: hidden; }
         header { display: flex; justify-content: space-between; align-items: flex-start; margin-top: 1rem; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
         
         .header-controls { display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem; }
@@ -64,7 +52,7 @@
         #customDateWrap { background: var(--panel); padding: 0.5rem; border-radius: 6px; border: 1px solid var(--panel-border); }
 
         /* Grid & Cards */
-        .card { background: var(--panel); border: 1px solid var(--panel-border); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem; }
+        .card { background: var(--panel); border: 1px solid var(--panel-border); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem; width: 100%; overflow: hidden; }
         .card-title { font-size: 0.9rem; font-weight: 600; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;}
         .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
         .metric-card { background: var(--bg); border: 1px solid var(--panel-border); padding: 1rem; border-radius: 8px; position: relative;}
@@ -74,15 +62,16 @@
         .growth-txt { font-size: 0.7rem; font-weight: 500; margin-top: 0.4rem; display: inline-block; padding: 0.15rem 0.4rem; border-radius: 4px; background: var(--panel-border); }
         .growth-txt.pos { color: var(--green); background: rgba(34, 197, 94, 0.1); }
         .growth-txt.neg { color: var(--red); background: rgba(239, 68, 68, 0.1); }
-        .two-col-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .two-col-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; min-width: 0; }
 
         /* Tables & Forms */
-        .data-table-wrapper { width: 100%; overflow-x: auto; }
+        .data-table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; display: block; padding-bottom: 0.5rem; }
         .scrollable-table-wrap { max-height: 350px; overflow-y: auto; }
-        .data-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; }
+        .data-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; min-width: 500px; /* Force minimum width to trigger internal scroll on mobile, saving main layout */ }
         .data-table th, .data-table td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--panel-border); }
         .data-table th { color: var(--text-muted); font-weight: 500; text-transform: uppercase; font-size: 0.7rem; position: sticky; top: 0; background: var(--panel); z-index: 2;}
         .data-table tr:hover { background: rgba(255,255,255,0.02); }
+        .data-table td:last-child, .data-table th:last-child { white-space: nowrap; } /* Prevent action buttons from wrapping */
 
         input, select, textarea { background: var(--bg); border: 1px solid var(--panel-border); color: var(--text); padding: 0.5rem 0.75rem; border-radius: 6px; font-size: 0.875rem; outline: none; width: 100%; }
         input[type="checkbox"] { width: auto; transform: scale(1.2); cursor: pointer; }
@@ -93,9 +82,12 @@
         .btn-sec:hover { background: var(--panel-border); }
         .btn-danger { background: transparent; color: var(--red); border: none; padding: 0; font-size: 0.8rem; text-decoration: underline;}
         .btn-edit { background: transparent; color: var(--text-muted); border: none; padding: 0; font-size: 0.8rem; text-decoration: underline; margin-right: 0.75rem;}
-        .status-badge { font-size:0.7rem; padding:0.2rem 0.5rem; border-radius:4px; background:var(--panel-border); color:var(--text); font-weight: 600;}
+        .status-badge { font-size:0.7rem; padding:0.2rem 0.5rem; border-radius:4px; background:var(--panel-border); color:var(--text); font-weight: 600; cursor:pointer;}
+        .status-badge.pending { color: var(--orange); }
+        .status-badge.progress { color: var(--blue); }
+        .status-badge.completed { color: var(--green); text-decoration: line-through; }
 
-        .view-section { display: none; flex-direction: column; margin-top: 0.5rem; }
+        .view-section { display: none; flex-direction: column; margin-top: 0.5rem; width: 100%; }
         .view-section.active { display: flex; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         
@@ -105,6 +97,7 @@
         .progress-fill { background: var(--text); height: 100%; transition: width 0.3s; }
         .toolbar { display: flex; gap: 0.5rem; align-items: center; width: 100%; max-width: 400px;}
 
+        /* Fully Responsive Mobile Adjustments */
         @media (max-width: 900px) {
             .two-col-grid { grid-template-columns: 1fr; }
             .inline-form { grid-template-columns: 1fr; }
@@ -114,11 +107,14 @@
             aside { transform: translateX(-100%); width: 280px; box-shadow: none; }
             aside.open { transform: translateX(0); box-shadow: 0 0 0 10000px rgba(0,0,0,0.5), 5px 0 25px rgba(0,0,0,0.8); }
             .close-menu-btn { display: block; }
-            main { margin-left: 0; width: 100%; padding: 1rem; padding-top: 80px; }
+            main { margin-left: 0; width: 100vw; padding: 1rem; padding-top: 80px; }
             .mobile-header { display: flex; }
             header { flex-direction: column; align-items: flex-start; margin-top: 0.5rem; }
             .header-controls { align-items: flex-start; width: 100%; margin-top: 0.5rem; }
             .toolbar { max-width: 100%; }
+            .card { padding: 1rem; } /* Tighter padding on mobile */
+            .data-table th, .data-table td { padding: 0.6rem 0.5rem; font-size: 0.8rem; }
+            .metric-value { font-size: 1.2rem; }
         }
     </style>
 </head>
@@ -127,47 +123,35 @@
     <audio id="moneySound" src="https://actions.google.com/sounds/v1/foley/cash_register.ogg" preload="auto"></audio>
     <datalist id="clientDataList"></datalist>
 
-   <div id="auth-overlay">
-        <div class="card" style="width: 350px; text-align: center; border: 1px solid var(--panel-border);">
+    <div id="auth-overlay">
+        <div class="card" style="width: 350px; text-align: center; border: 1px solid var(--panel-border); margin: 0 1rem;">
             <h2 id="authTitle" style="margin-bottom: 1rem;">Login to Founder OS</h2>
-            
             <input type="text" id="authName" placeholder="Full Name" style="display: none; margin-bottom: 0.5rem; padding: 0.5rem; width: 100%;">
             <input type="email" id="authEmail" placeholder="Email Address" style="margin-bottom: 0.5rem; padding: 0.5rem; width: 100%;">
-            
             <div style="position: relative; width: 100%; margin-bottom: 1rem;">
                 <input type="password" id="authPass" placeholder="Password" style="margin-bottom: 0; padding: 0.5rem; width: 100%; padding-right: 60px;">
                 <span id="togglePassBtn" onclick="togglePass()" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-muted); font-size: 0.8rem; font-weight: bold;">SHOW</span>
             </div>
-            
             <button id="mainAuthBtn" onclick="handleAuth()" style="width: 100%; margin-bottom: 0.5rem;">Secure Login</button>
-            
             <button onclick="handleGoogleAuth()" style="width: 100%; background: #ffffff; color: #000000; display: flex; align-items: center; justify-content: center; gap: 10px;">
                 <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
                 Continue with Google
             </button>
-            
             <p id="toggleText" style="margin-top: 1rem; font-size: 0.8rem; color: var(--text-muted); cursor: pointer;" onclick="toggleAuthMode()">
                 Don't have an account? <u style="color: var(--accent);">Create one</u>
             </p>
-            
             <p id="authError" style="color: var(--red); font-size: 0.8rem; margin-top: 1rem;"></p>
         </div>
     </div>
 
     <div class="mobile-header">
-        <div style="display: flex; align-items: center; gap:0.5rem;">
-            <img id="mobileCustomLogoImg" alt="Brand Logo">
-            <div id="mobileDefaultLogoText" style="font-weight: 700; display:flex; align-items:center; gap:0.5rem;">FOUNDER <span style="background:var(--text); color:var(--bg); padding:0.1rem 0.4rem; border-radius:4px; font-size:0.7rem;">OS</span></div>
-        </div>
+        <img id="mobileLogo" src="https://founderos.slfspace.com/img/logo-founder-os-slf.png" alt="Founder OS Logo">
         <button class="menu-btn" onclick="toggleMenu()">☰</button>
     </div>
 
     <aside id="sidebar">
         <div class="logo-container">
-            <div style="font-weight: 700; display:flex; align-items:center; gap:0.5rem;">
-                <img id="customLogoImg" alt="Brand Logo">
-                <div class="logo-text" id="defaultLogoText">FOUNDER <span>OS</span></div>
-            </div>
+            <img id="sidebarLogo" src="https://founderos.slfspace.com/img/logo-founder-os-slf.png" alt="Founder OS Logo">
             <button class="close-menu-btn" onclick="toggleMenu()">✕</button>
         </div>
         <ul class="nav-links">
@@ -176,6 +160,7 @@
             <li class="nav-item" onclick="navigate('analytics')">Analytics Hub</li>
             
             <div class="nav-group-label">Operations</div>
+            <li class="nav-item" onclick="navigate('tasks')">Tasks & Workflow</li>
             <li class="nav-item" onclick="navigate('payments')">Revenue Ledger</li>
             <li class="nav-item" onclick="navigate('expenses')">Expenses & Payroll</li>
             <li class="nav-item" onclick="navigate('clients')">Clients Data</li>
@@ -232,8 +217,8 @@
                 <div class="metric-card" style="grid-column: span 2;"><div class="metric-label">Total Net Worth (Inc. Equity)</div><div class="metric-value" id="m-nw" style="font-size: 1.8rem;">0</div></div>
             </div>
 
+            <!-- ROW 2: Alerts & Today's Tasks -->
             <div class="two-col-grid" style="margin-bottom: 1.5rem;">
-                <!-- Auto-Billing Alerts -->
                 <div class="card" style="margin-bottom: 0;">
                     <div class="card-title" style="color:var(--orange);">Pending Actions & Auto-Billing</div>
                     <div class="data-table-wrapper scrollable-table-wrap">
@@ -245,6 +230,21 @@
                 </div>
                 
                 <div class="card" style="margin-bottom: 0;">
+                    <div class="card-title">Today's Action Plan 
+                        <div style="font-size:0.7rem; font-weight:normal; color:var(--text-muted);"><span id="taskProgressTxt">0%</span> Completed</div>
+                    </div>
+                    <div class="progress-bg" style="margin-top:0; margin-bottom:1rem;"><div class="progress-fill" id="taskProgressBar" style="width:0%; background:var(--blue);"></div></div>
+                    <div class="data-table-wrapper scrollable-table-wrap">
+                        <table class="data-table">
+                            <tbody id="dashTasks"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ROW 3: Portfolio Snapshot & Logs -->
+            <div class="two-col-grid" style="margin-bottom: 1.5rem;">
+                <div class="card" style="margin-bottom: 0;">
                     <div class="card-title">Client Portfolio Snapshot</div>
                     <div class="data-table-wrapper scrollable-table-wrap">
                         <table class="data-table">
@@ -253,8 +253,19 @@
                         </table>
                     </div>
                 </div>
+
+                <div class="card" style="margin-bottom: 0;">
+                    <div class="card-title">
+                        Recent Activity Logs
+                        <div class="toolbar"><input type="text" id="searchAct" placeholder="Search logs..." onkeyup="renderAll(true)" style="padding:0.3rem 0.6rem;"></div>
+                    </div>
+                    <div class="data-table-wrapper scrollable-table-wrap">
+                        <table class="data-table" id="dashboardActivity"></table>
+                    </div>
+                </div>
             </div>
 
+            <!-- ROW 4: Charts -->
             <div class="two-col-grid" style="margin-bottom: 1.5rem;">
                 <div class="card" style="margin-bottom: 0;">
                     <div class="card-title">Cash Flow Trend</div>
@@ -263,16 +274,6 @@
                 <div class="card" style="margin-bottom: 0;">
                     <div class="card-title">Net Margin Trend <span style="font-size:0.7rem; font-weight:normal; color:var(--text-muted);">(Inflow - Outflow)</span></div>
                     <div style="height: 250px;"><canvas id="chartNetMargin"></canvas></div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-title">
-                    Recent Activity Logs
-                    <div class="toolbar"><input type="text" id="searchAct" placeholder="Search logs..." onkeyup="renderAll(true)" style="padding:0.3rem 0.6rem;"></div>
-                </div>
-                <div class="data-table-wrapper scrollable-table-wrap">
-                    <table class="data-table" id="dashboardActivity"></table>
                 </div>
             </div>
         </section>
@@ -291,6 +292,41 @@
             <div class="two-col-grid">
                 <div class="card"><div class="card-title">Team Payroll Distribution</div><div style="height: 250px;"><canvas id="chartTeamPayroll"></canvas></div></div>
                 <div class="card"><div class="card-title">Venture Revenue Contribution</div><div style="height: 250px;"><canvas id="chartVentureRev"></canvas></div></div>
+            </div>
+        </section>
+
+        <!-- TASKS & WORKFLOW VIEW -->
+        <section id="view-tasks" class="view-section">
+            <div class="card">
+                <div class="card-title">Tasks & Workflow 
+                    <div style="display:flex; gap:0.5rem; align-items:center;">
+                        <button class="btn-sec" style="font-size:0.75rem; padding:0.3rem 0.6rem; margin:0;" onclick="exportSectionData('tasks')">Export Data</button>
+                        <button style="margin:0;" onclick="openForm('task')">+ Add Task</button>
+                    </div>
+                </div>
+                <div id="form-task" class="inline-form" style="display: none;">
+                    <input type="hidden" id="taskId">
+                    <input type="text" id="taskTitle" placeholder="Task Description / Title" class="full">
+                    <select id="taskStatus">
+                        <option value="Pending">Status: Pending</option>
+                        <option value="In Progress">Status: In Progress</option>
+                        <option value="Completed">Status: Completed</option>
+                    </select>
+                    <select id="taskPriority">
+                        <option value="High">Priority: High</option>
+                        <option value="Medium">Priority: Medium</option>
+                        <option value="Low">Priority: Low</option>
+                    </select>
+                    <input type="date" id="taskDate" placeholder="Due Date">
+                    <select id="taskClient"><option value="">-- Associate Client/Venture (Optional) --</option></select>
+                    <div class="full" style="display: flex; gap: 0.5rem;"><button onclick="saveTask()">Save Task</button><button class="btn-sec" onclick="closeForm('task')">Cancel</button></div>
+                </div>
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead><tr><th>Task Description</th><th>Client / Venture</th><th>Due Date & Priority</th><th>Status</th><th>Actions</th></tr></thead>
+                        <tbody id="tblTasks"></tbody>
+                    </table>
+                </div>
             </div>
         </section>
 
@@ -372,8 +408,6 @@
                         <option value="Salary / Payout">Salary / Team Payout</option>
                     </select>
                     <select id="expVentureSelect"></select>
-                    
-                    <!-- Optional Client Tagging -->
                     <select id="expClientId" style="display: none;"></select>
                     <select id="expTeamSelect" style="display: none;"></select>
                     
@@ -391,7 +425,7 @@
             </div>
         </section>
 
-        <!-- CLIENTS VIEW (UPDATED FOR FULL AUTOMATION) -->
+        <!-- CLIENTS VIEW -->
         <section id="view-clients" class="view-section">
             <div class="card">
                 <div class="card-title">Client Roster & Portfolio 
@@ -416,7 +450,7 @@
                     </select>
                     <select id="cliStatus"><option value="Active">Billing Status: Active</option><option value="Completed">Billing Status: Completed / Inactive</option></select>
                     
-                    <!-- NEW: AUTOMATION SETTINGS -->
+                    <!-- AUTOMATION SETTINGS -->
                     <div class="full" style="font-weight:bold; margin-top:1rem; color:var(--text); border-top:1px solid var(--panel-border); padding-top:1rem;">Automated Billing Cycle & Expenses Setup</div>
                     
                     <div>
@@ -428,14 +462,12 @@
                         <input type="date" id="cliNextBilling">
                     </div>
                     
-                    <!-- Dynamic Software Expenses -->
                     <div class="full" style="border: 1px dashed var(--panel-border); padding: 0.75rem; border-radius: 6px;">
                         <div style="font-size:0.8rem; font-weight:bold; margin-bottom:0.5rem; color:var(--text-muted);">Auto-Software & API Expenses</div>
                         <div id="cliSoftRows"></div>
                         <button type="button" class="btn-sec" style="font-size:0.7rem; padding:0.2rem 0.5rem;" onclick="addCliSoftRow()">+ Add Software Cost</button>
                     </div>
 
-                    <!-- Dynamic Team Payouts -->
                     <div class="full" style="border: 1px dashed var(--panel-border); padding: 0.75rem; border-radius: 6px;">
                         <div style="font-size:0.8rem; font-weight:bold; margin-bottom:0.5rem; color:var(--text-muted);">Auto-Team Payouts</div>
                         <div id="cliTeamRows"></div>
@@ -485,7 +517,7 @@
             </div>
         </section>
 
-        <!-- OTHER SECTIONS STAY SAME... -->
+        <!-- OTHER SECTIONS -->
         <section id="view-ventures" class="view-section">
             <div class="card">
                 <div class="card-title">Active Ventures 
@@ -660,11 +692,12 @@
     </main>
 
     <script>
-        var db = { logo: null, payments: [], expenses: [], clients: [], reminders: [], ventures: [], team: [], investments: [], equities: [], goals: [], documents: [] };
+        var db = { logo: null, payments: [], expenses: [], clients: [], reminders: [], tasks: [], ventures: [], team: [], investments: [], equities: [], goals: [], documents: [] };
         var sys_filter = '30days';
         var activeView = 'dashboard';
         var currency = '₹';
         var charts = {};
+        const DEFAULT_LOGO = "https://founderos.slfspace.com/img/logo-founder-os-slf.png";
 
         function getEl(id) { return document.getElementById(id); }
         function getVal(id) { return getEl(id) ? getEl(id).value : ''; }
@@ -727,17 +760,9 @@
         }
 
         window.applyLogo = function(base64) {
-            if (!base64) {
-                getEl('defaultLogoText').style.display = 'flex';
-                getEl('customLogoImg').style.display = 'none';
-                getEl('mobileDefaultLogoText').style.display = 'flex';
-                getEl('mobileCustomLogoImg').style.display = 'none';
-                return;
-            } 
-            getEl('defaultLogoText').style.display = 'none'; 
-            const img = getEl('customLogoImg'); img.src = base64; img.style.display = 'block'; 
-            const mText = getEl('mobileDefaultLogoText'); if(mText) mText.style.display = 'none';
-            const mImg = getEl('mobileCustomLogoImg'); if(mImg) { mImg.src = base64; mImg.style.display = 'block'; }
+            const srcToUse = base64 || DEFAULT_LOGO;
+            if(getEl('sidebarLogo')) getEl('sidebarLogo').src = srcToUse;
+            if(getEl('mobileLogo')) getEl('mobileLogo').src = srcToUse;
         }
 
         function handleLogoUpload(e) { 
@@ -777,15 +802,16 @@
                     start: new Date().toISOString().split('T')[0], status: 'Active', projectStatus: 'Active' 
                 }];
                 db.reminders = [{ id: 'r1', title: 'Nippon Mutual Fund SIP', type: 'Mutual Fund', amount: 15000, day: 10 }];
+                db.tasks = [{ id: 't1', title: 'Review Client Outreach Scripts', status: 'Pending', priority: 'High', date: new Date().toISOString().split('T')[0], client: 'Acme Corp' }];
                 db.investments = [{ id: 'i1', name: 'Main Cash/Savings', type: 'Cash/Savings', current: 150000 }, { id: 'i2', name: 'Nippon India', type: 'Mutual Funds', current: 200000 }];
                 db.goals = [{ id:'g1', name:'Emergency Fund', type:'Cash Savings', val: 1000000 }];
                 saveDB();
             } else if (db.payments.length === 0) {
                 db = JSON.parse(localStorage.getItem('founder_os_v11'));
                 if(!db.reminders) db.reminders = [];
+                if(!db.tasks) db.tasks = [];
                 currency = localStorage.getItem('founder_os_cur') || '₹';
                 
-                // Backwards compatibility migration for old clients format
                 db.clients.forEach(c => {
                     if(!c.nextBillingDate && c.billingDay) {
                         let d = new Date(); d.setDate(c.billingDay); c.nextBillingDate = d.toISOString().split('T')[0];
@@ -796,7 +822,7 @@
             if(getEl('optCurrency')) getEl('optCurrency').value = currency;
             
             if (db.logo) window.applyLogo(db.logo);
-            else { const localLogo = localStorage.getItem('founder_os_logo'); if (localLogo) window.applyLogo(localLogo); }
+            else { const localLogo = localStorage.getItem('founder_os_logo'); window.applyLogo(localLogo || null); }
             
             window.renderAll(false); 
         }
@@ -814,7 +840,7 @@
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             getEl(`view-${view}`).classList.add('active');
             
-            const titles = { dashboard:'Overview Dashboard', analytics:'Analytics & Profitability', payments:'Revenue Ledger', expenses:'Expenses & Payouts', clients:'Client Roster & Portfolio', reminders: 'Monthly Reminders & SIPs', ventures:'Venture Management', team:'Team & Equity Directory', investments:'Investments & Equity', goals:'Milestone Goals', documents:'Secure Documents', settings:'System Settings' };
+            const titles = { dashboard:'Overview Dashboard', analytics:'Analytics & Profitability', tasks: 'Tasks & Workflow', payments:'Revenue Ledger', expenses:'Expenses & Payouts', clients:'Client Roster & Portfolio', reminders: 'Monthly Reminders & SIPs', ventures:'Venture Management', team:'Team & Equity Directory', investments:'Investments & Equity', goals:'Milestone Goals', documents:'Secure Documents', settings:'System Settings' };
             getEl('viewTitle').innerText = titles[view] || view;
             getEl('sidebar').classList.remove('open'); 
             
@@ -849,7 +875,6 @@
             });
         }
 
-        // TOGGLE EXPENSE FIELDS LOGIC
         window.toggleExpenseFields = function() { 
             const cat = getVal('expCategory');
             getEl('expTeamSelect').style.display = (cat === 'Salary / Payout') ? 'block' : 'none'; 
@@ -866,13 +891,13 @@
 
             const cOpts = `<option value="">-- Associate Client (Optional) --</option>` + db.clients.filter(c=>c.status==='Active').map(c => `<option value="${sanitize(c.name)}">${sanitize(c.name)}</option>`).join('');
             if(getEl('expClientId')) getEl('expClientId').innerHTML = cOpts;
+            if(getEl('taskClient')) getEl('taskClient').innerHTML = cOpts;
 
             if(getEl('clientDataList')) {
                 getEl('clientDataList').innerHTML = db.clients.filter(c=>c.status==='Active').map(c => `<option value="${sanitize(c.name)}">`).join('');
             }
         }
 
-        // AUTO-FILL FOR REVENUE FORM
         window.autoFillRevenue = function() {
             const val = getVal('payClient');
             const c = db.clients.find(x => x.name === val);
@@ -882,7 +907,6 @@
             }
         };
 
-        // MULTI-ROW BUILDERS FOR CLIENT FORM
         window.addCliSoftRow = function(name = '', amt = '') {
             const div = document.createElement('div');
             div.style = "display:grid; grid-template-columns: 2fr 1fr auto; gap:0.5rem; margin-bottom:0.5rem;";
@@ -947,24 +971,31 @@
 
         function saveExpense() { 
             const id = getVal('expId'); 
-            const obj = { 
-                id: id||'e'+Date.now(), 
-                category: getVal('expCategory'), 
-                venture: getVal('expVentureSelect'), 
-                clientId: getVal('expClientId'), // Store attached client
-                teamId: getVal('expTeamSelect'), 
-                amount: parseFloat(getVal('expAmount')), 
-                date: getVal('expDate'), 
-                notes: getVal('expNotes') 
-            }; 
+            const obj = { id: id||'e'+Date.now(), category: getVal('expCategory'), venture: getVal('expVentureSelect'), clientId: getVal('expClientId'), teamId: getVal('expTeamSelect'), amount: parseFloat(getVal('expAmount')), date: getVal('expDate'), notes: getVal('expNotes') }; 
             if(id) db.expenses = db.expenses.map(x=>x.id===id?obj:x); else db.expenses.push(obj); 
             saveDB(); closeForm('expense'); 
+        }
+
+        function saveTask() {
+            const id = getVal('taskId');
+            const obj = { id: id||'t'+Date.now(), title: getVal('taskTitle'), status: getVal('taskStatus'), priority: getVal('taskPriority'), date: getVal('taskDate'), client: getVal('taskClient') };
+            if(id) db.tasks = db.tasks.map(x=>x.id===id?obj:x); else db.tasks.push(obj);
+            saveDB(); closeForm('task');
+        }
+
+        window.toggleTaskStatus = function(id) {
+            const t = db.tasks.find(x => x.id === id);
+            if(t) {
+                if(t.status === 'Pending') t.status = 'In Progress';
+                else if(t.status === 'In Progress') t.status = 'Completed';
+                else t.status = 'Pending';
+                saveDB();
+            }
         }
         
         function saveClient() { 
             const id = getVal('cliId'); 
             
-            // Gather dynamic arrays
             const softwares = [];
             document.querySelectorAll('#cliSoftRows > div').forEach(row => {
                 const name = row.querySelector('.cli-soft-name').value;
@@ -980,24 +1011,14 @@
             });
 
             const obj = { 
-                id: id||'c'+Date.now(), 
-                name: getVal('cliName'), 
-                email: getVal('cliEmail'), 
-                service: getVal('cliService'), 
-                fee: parseFloat(getVal('cliFee'))||0, 
-                nextBillingDate: getVal('cliNextBilling'),
-                cycle: parseInt(getVal('cliCycle'))||1,
-                softwares: softwares,
-                teamPayouts: teamPayouts,
-                start: getVal('cliStart'), 
-                status: getVal('cliStatus'),
-                projectStatus: getVal('cliProjectStatus') || 'Active'
+                id: id||'c'+Date.now(), name: getVal('cliName'), email: getVal('cliEmail'), service: getVal('cliService'), fee: parseFloat(getVal('cliFee'))||0, 
+                nextBillingDate: getVal('cliNextBilling'), cycle: parseInt(getVal('cliCycle'))||1, softwares: softwares, teamPayouts: teamPayouts,
+                start: getVal('cliStart'), status: getVal('cliStatus'), projectStatus: getVal('cliProjectStatus') || 'Active'
             }; 
             if(id) db.clients = db.clients.map(x=>x.id===id?obj:x); else db.clients.push(obj); 
             saveDB(); closeForm('client'); 
         }
 
-        // THE AUTO-BILLING ENGINE
         window.processClientBilling = function(clientId) {
             const c = db.clients.find(x => x.id === clientId);
             if(!c) return;
@@ -1005,7 +1026,6 @@
             const today = new Date().toISOString().split('T')[0];
             const addToSavings = localStorage.getItem('founder_os_auto_save') === 'true';
             
-            // 1. Log Revenue automatically
             let rAmt = parseFloat(c.fee) || 0;
             if (rAmt > 0) {
                 db.payments.push({ id: 'p'+Date.now()+'_a', client: c.name, venture: 'Client Retainer', service: c.service, stream: 'Service', amount: rAmt, date: today, status: 'Paid' });
@@ -1016,12 +1036,11 @@
                 }
             }
 
-            // 2. Log Multiple Auto-Expenses
             if (c.softwares && c.softwares.length > 0) {
                 c.softwares.forEach((s, idx) => {
                     if(s.amt > 0) db.expenses.push({ id: 'e'+Date.now()+'_s'+idx, category: 'Software & API', venture: 'Auto-Bill', clientId: c.name, teamId: '', amount: s.amt, date: today, notes: s.name });
                 });
-            } else if (c.expSoftAmt > 0) { // Fallback for old records
+            } else if (c.expSoftAmt > 0) { 
                 db.expenses.push({ id: 'e'+Date.now()+'_s', category: 'Software & API', venture: 'Auto-Bill', clientId: c.name, teamId: '', amount: c.expSoftAmt, date: today, notes: 'Auto-billed software' });
             }
 
@@ -1029,11 +1048,10 @@
                 c.teamPayouts.forEach((t, idx) => {
                     if(t.amt > 0 && t.teamId) db.expenses.push({ id: 'e'+Date.now()+'_t'+idx, category: 'Salary / Payout', venture: 'Auto-Bill', clientId: c.name, teamId: t.teamId, amount: t.amt, date: today, notes: 'Auto-payout for ' + c.name });
                 });
-            } else if (c.expTeamAmt > 0 && c.expTeamId) { // Fallback
+            } else if (c.expTeamAmt > 0 && c.expTeamId) { 
                 db.expenses.push({ id: 'e'+Date.now()+'_t', category: 'Salary / Payout', venture: 'Auto-Bill', clientId: c.name, teamId: c.expTeamId, amount: c.expTeamAmt, date: today, notes: 'Auto-payout' });
             }
 
-            // 3. Advance Billing Date
             if (c.nextBillingDate) {
                 let d = new Date(c.nextBillingDate);
                 d.setMonth(d.getMonth() + parseInt(c.cycle || 1));
@@ -1063,7 +1081,7 @@
             const obj = db[arrName].find(x=>x.id===id); 
             openForm(type);
             Object.keys(obj).forEach(key => { 
-                const el = getEl(type === 'payment' ? 'pay'+key.charAt(0).toUpperCase()+key.slice(1) : type === 'expense' ? 'exp'+key.charAt(0).toUpperCase()+key.slice(1) : type === 'client' ? 'cli'+key.charAt(0).toUpperCase()+key.slice(1) : type === 'reminder' ? 'rem'+key.charAt(0).toUpperCase()+key.slice(1) : type === 'venture' ? 'v'+key.charAt(0).toUpperCase()+key.slice(1) : type === 'team' ? 'team'+key.charAt(0).toUpperCase()+key.slice(1) : type === 'investment' ? 'inv'+key.charAt(0).toUpperCase()+key.slice(1) : type === 'equity' ? 'eq'+(key==='companyVal'?'Val':key.charAt(0).toUpperCase()+key.slice(1)) : type === 'goal' ? 'goal'+key.charAt(0).toUpperCase()+key.slice(1) : 'doc'+key.charAt(0).toUpperCase()+key.slice(1)); 
+                const el = getEl(type === 'payment' ? 'pay'+key.charAt(0).toUpperCase()+key.slice(1) : type === 'expense' ? 'exp'+key.charAt(0).toUpperCase()+key.slice(1) : type === 'client' ? 'cli'+key.charAt(0).toUpperCase()+key.slice(1) : type === 'reminder' ? 'rem'+key.charAt(0).toUpperCase()+key.slice(1) : type === 'task' ? 'task'+key.charAt(0).toUpperCase()+key.slice(1) : type === 'venture' ? 'v'+key.charAt(0).toUpperCase()+key.slice(1) : type === 'team' ? 'team'+key.charAt(0).toUpperCase()+key.slice(1) : type === 'investment' ? 'inv'+key.charAt(0).toUpperCase()+key.slice(1) : type === 'equity' ? 'eq'+(key==='companyVal'?'Val':key.charAt(0).toUpperCase()+key.slice(1)) : type === 'goal' ? 'goal'+key.charAt(0).toUpperCase()+key.slice(1) : 'doc'+key.charAt(0).toUpperCase()+key.slice(1)); 
                 if(el) el.value = obj[key]; 
             }); 
             
@@ -1161,6 +1179,14 @@
             if (activeView === 'dashboard') renderDashboard(fRevs, fExps);
             if (activeView === 'analytics') renderAnalytics(fRevs, fExps);
             
+            if (activeView === 'tasks') {
+                const fTasks = filterData(db.tasks).sort((a,b)=>new Date(a.date)-new Date(b.date));
+                getEl('tblTasks').innerHTML = fTasks.map(t => {
+                    let badgeCls = t.status === 'Completed' ? 'completed' : t.status === 'In Progress' ? 'progress' : 'pending';
+                    return `<tr><td><strong>${sanitize(t.title)}</strong></td><td>${sanitize(t.client) || '--'}</td><td>${t.date} <br><span style="font-size:0.7rem; color:${t.priority==='High'?'var(--red)':t.priority==='Medium'?'var(--orange)':'var(--text-muted)'}">${t.priority} Priority</span></td><td><span class="status-badge ${badgeCls}" onclick="toggleTaskStatus('${t.id}')">${t.status}</span></td><td><button class="btn-edit" onclick="editRecord('task','${t.id}','tasks')">Edit</button><button class="btn-danger" onclick="deleteRecord('tasks','${t.id}')">Del</button></td></tr>`;
+                }).join('') || '<tr><td colspan="5">No tasks found.</td></tr>';
+            }
+
             if (activeView === 'payments') { 
                 const sQ = getVal('searchRev').toLowerCase(); const sStat = getVal('filterRevStatus');
                 const list = fRevs.filter(p => (sStat==='All' || p.status===sStat) && (p.client.toLowerCase().includes(sQ) || p.venture.toLowerCase().includes(sQ) || p.service.toLowerCase().includes(sQ)));
@@ -1212,22 +1238,18 @@
                 today.setHours(0,0,0,0);
                 const dayNum = today.getDate();
 
-                // 1. Pending Invoice Payments
                 const pendingPayments = db.payments.filter(p => p.status === 'Pending').sort((a,b)=>new Date(a.date)-new Date(b.date));
                 pendingPayments.forEach(p => alertsHtml += `<tr><td><strong>${sanitize(p.client)}</strong> (Invoice)<br><span style="font-size:0.7rem;color:var(--text-muted);">${p.date}</span></td><td style="color:var(--orange); font-weight:600;">${currency}${p.amount.toLocaleString()}</td><td><button class="btn-sec" style="font-size:0.65rem; padding:0.2rem 0.4rem;" onclick="markPaid('${p.id}');">Mark Paid</button></td></tr>`);
                 
-                // 2. Client Auto-Billing Engine
                 db.clients.filter(c => c.status === 'Active' && c.nextBillingDate).forEach(c => {
                     const nextD = new Date(c.nextBillingDate);
                     nextD.setHours(0,0,0,0);
                     const diffDays = Math.round((nextD - today) / (1000 * 60 * 60 * 24));
-                    
                     if (diffDays >= -7 && diffDays <= 7) { 
                         alertsHtml += `<tr><td><strong>${sanitize(c.name)}</strong> (Billing Cycle)<br><span style="font-size:0.7rem;color:var(--text-muted);">Due Date: ${c.nextBillingDate}</span></td><td style="color:var(--blue); font-weight:600;">${currency}${c.fee.toLocaleString()}</td><td><button class="btn-sec" style="font-size:0.65rem; padding:0.25rem 0.5rem; color:var(--blue); border-color:var(--blue);" onclick="processClientBilling('${c.id}')">Log Cycle & Add Expenses</button></td></tr>`;
                     }
                 });
 
-                // 3. SIPs / Rent Reminders
                 (db.reminders || []).forEach(r => {
                     let diff = r.day - dayNum;
                     if (diff < -15) diff += 30;
@@ -1239,6 +1261,25 @@
                 alertsTable.innerHTML = alertsHtml || '<tr><td colspan="3" style="text-align:center; padding:1.5rem;"><span style="color:var(--text-muted);">No pending actions! 🎉</span></td></tr>';
             }
 
+            const dashTasksTable = getEl('dashTasks');
+            if(dashTasksTable) {
+                const todayStr = new Date().toISOString().split('T')[0];
+                let todaysTasks = db.tasks.filter(t => t.date === todayStr);
+                
+                todaysTasks.sort((a,b) => (a.status==='Completed'?1:0) - (b.status==='Completed'?1:0));
+
+                const completed = todaysTasks.filter(t => t.status === 'Completed').length;
+                const progressPct = todaysTasks.length > 0 ? Math.round((completed / todaysTasks.length) * 100) : 0;
+                
+                getEl('taskProgressTxt').innerText = progressPct + '%';
+                getEl('taskProgressBar').style.width = progressPct + '%';
+
+                dashTasksTable.innerHTML = todaysTasks.map(t => {
+                    let badgeCls = t.status === 'Completed' ? 'completed' : t.status === 'In Progress' ? 'progress' : 'pending';
+                    return `<tr><td><strong>${sanitize(t.title)}</strong><br><span style="font-size:0.7rem; color:var(--text-muted);">${sanitize(t.client) || 'Internal'}</span></td><td style="text-align:right;"><span class="status-badge ${badgeCls}" onclick="toggleTaskStatus('${t.id}')">${t.status}</span></td></tr>`;
+                }).join('') || '<tr><td colspan="2" style="text-align:center; padding:1.5rem;"><span style="color:var(--text-muted);">No tasks scheduled for today. Take a break! ☕</span></td></tr>';
+            }
+
             const snapTable = getEl('dashClients');
             if (snapTable) {
                 const activeClients = db.clients.filter(c => c.status === 'Active');
@@ -1248,7 +1289,6 @@
                 }).join('') || '<tr><td colspan="3" style="text-align:center; padding:1.5rem;"><span style="color:var(--text-muted);">No active clients to display.</span></td></tr>';
             }
 
-            // Charts Logic
             const dates = [...new Set([...revs, ...exps].map(x => x.date))].sort();
             const rData = dates.map(d => revs.filter(r => r.date === d && r.status === 'Paid').reduce((s, r) => s + r.amount, 0));
             const eData = dates.map(d => exps.filter(e => e.date === d).reduce((s, e) => s + e.amount, 0));
@@ -1357,7 +1397,7 @@
                     if (!name) { errorEl.innerText = "Please enter your name."; return; }
                     const userCred = await createUserWithEmailAndPassword(auth, email, pass);
                     
-                    let initialDb = { logo: null, payments: [], expenses: [], clients: [], reminders: [], ventures: [], team: [], investments: [], equities: [], goals: [], documents: [] };
+                    let initialDb = { logo: null, payments: [], expenses: [], clients: [], reminders: [], tasks: [], ventures: [], team: [], investments: [], equities: [], goals: [], documents: [] };
                     await setDoc(doc(firestoreDb, "users", userCred.user.uid), {
                         name: name,
                         email: email,
@@ -1421,8 +1461,8 @@
                     if (docSnap.exists() && docSnap.data().os_data) {
                         window.db = docSnap.data().os_data;
                         if (!window.db.reminders) window.db.reminders = []; 
+                        if (!window.db.tasks) window.db.tasks = []; 
                         
-                        // Safety Check for old Client Data format migration
                         window.db.clients.forEach(c => {
                             if(!c.nextBillingDate && c.billingDay) {
                                 let d = new Date(); d.setDate(c.billingDay); c.nextBillingDate = d.toISOString().split('T')[0];
@@ -1437,7 +1477,7 @@
                             window.applyLogo(window.db.logo);
                         } else {
                             const localLogo = localStorage.getItem('founder_os_logo');
-                            if (localLogo) window.applyLogo(localLogo);
+                            window.applyLogo(localLogo || null);
                         }
                         
                         window.renderAll(false);
