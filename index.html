@@ -280,6 +280,21 @@
                     </table>
                 </div>
             </div>
+            
+            <div class="card">
+                <div class="card-title">Tasks & Productivity Overview</div>
+                <div class="two-col-grid">
+                    <div>
+                        <div style="font-size:0.8rem; text-align:center; margin-bottom:0.5rem; color:var(--text-muted);">Tasks by Status</div>
+                        <div style="height: 200px;"><canvas id="chartTaskStatus"></canvas></div>
+                    </div>
+                    <div>
+                        <div style="font-size:0.8rem; text-align:center; margin-bottom:0.5rem; color:var(--text-muted);">Tasks by Priority</div>
+                        <div style="height: 200px;"><canvas id="chartTaskPriority"></canvas></div>
+                    </div>
+                </div>
+            </div>
+
             <div class="two-col-grid">
                 <div class="card"><div class="card-title">Team Payroll Distribution</div><div style="height: 250px;"><canvas id="chartTeamPayroll"></canvas></div></div>
                 <div class="card"><div class="card-title">Venture Revenue Contribution</div><div style="height: 250px;"><canvas id="chartVentureRev"></canvas></div></div>
@@ -324,20 +339,6 @@
                         <thead><tr><th>Task Description</th><th>Client / Venture</th><th>Due Date & Priority</th><th>Status</th><th>Actions</th></tr></thead>
                         <tbody id="tblTasks"></tbody>
                     </table>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="card-title">Tasks & Productivity Analytics</div>
-                <div class="two-col-grid">
-                    <div>
-                        <div style="font-size:0.8rem; text-align:center; margin-bottom:0.5rem; color:var(--text-muted);">Overall Tasks by Status</div>
-                        <div style="height: 200px;"><canvas id="chartTaskStatus"></canvas></div>
-                    </div>
-                    <div>
-                        <div style="font-size:0.8rem; text-align:center; margin-bottom:0.5rem; color:var(--text-muted);">Overall Tasks by Priority</div>
-                        <div style="height: 200px;"><canvas id="chartTaskPriority"></canvas></div>
-                    </div>
                 </div>
             </div>
         </section>
@@ -717,7 +718,6 @@
         var charts = {};
         const DEFAULT_LOGO = "https://founderos.slfspace.com/img/logo-founder-os-slf.png";
 
-        // TIMEZONE FIX: GET LOCAL DATE IN YYYY-MM-DD
         function getLocalDate(dateObj = new Date()) {
             const tzOffset = dateObj.getTimezoneOffset() * 60000;
             return new Date(dateObj.getTime() - tzOffset).toISOString().split('T')[0];
@@ -811,12 +811,11 @@
             saveDB();
         }
 
-        // --- SYSTEM INITIALIZATION ---
         window.initializeAppUI = function() {
             if (!localStorage.getItem('founder_os_v11') && db.payments.length === 0) {
                 db.ventures = [{ id: 'v1', name: 'Linkdify', desc: 'LinkedIn positioning agency.' }];
                 db.team = [{ id: 't1', name: 'Fidha Farzana', role: 'Partner', type: 'Partner', share: 50 }];
-                db.payments = [{ id: 'p1', client: 'Acme Corp', venture: 'Linkdify', service: 'Profile Optimization', stream: 'Service', amount: 85000, date: getLocalDate(), status: 'Paid', addedToSavings: true }];
+                db.payments = [{ id: 'p1', client: 'Acme Corp', venture: 'Linkdify', service: 'Profile Optimization', stream: 'Service', amount: 85000, date: getLocalDate(), status: 'Paid', addedToSavings: true, savingsImpact: 85000 }];
                 db.expenses = [{ id: 'e1', category: 'Software & API', venture: 'Linkdify', amount: 5000, date: getLocalDate(), notes: 'API Cost', teamId: '', deductedFromSavings: false }];
                 db.clients = [{ 
                     id: 'c1', name: 'Acme Corp', email: 'hello@acme.co', service: 'Growth', fee: 40000, 
@@ -881,7 +880,7 @@
 
         function filterData(array) {
             if(sys_filter === 'all') return array;
-            const now = new Date(getLocalDate()); // Localized Today
+            const now = new Date(getLocalDate());
             return array.filter(item => {
                 if(!item.date) return true; 
                 const d = new Date(item.date);
@@ -902,13 +901,8 @@
             const cat = getVal('expCategory');
             getEl('expTeamSelect').style.display = (cat === 'Salary / Payout') ? 'block' : 'none'; 
             getEl('expClientId').style.display = (cat === 'Salary / Payout' || cat === 'Software & API') ? 'block' : 'none';
-            
-            // ISOLATE PERSONAL EXPENSES
-            if (cat === 'Personal / Lifestyle') {
-                getEl('expVentureWrap').style.display = 'none';
-            } else {
-                getEl('expVentureWrap').style.display = 'block';
-            }
+            if (cat === 'Personal / Lifestyle') getEl('expVentureWrap').style.display = 'none';
+            else getEl('expVentureWrap').style.display = 'block';
         }
         
         function updateDropdowns() {
@@ -923,18 +917,13 @@
             if(getEl('expClientId')) getEl('expClientId').innerHTML = cOpts;
             if(getEl('taskClient')) getEl('taskClient').innerHTML = cOpts;
 
-            if(getEl('clientDataList')) {
-                getEl('clientDataList').innerHTML = db.clients.filter(c=>c.status==='Active').map(c => `<option value="${sanitize(c.name)}">`).join('');
-            }
+            if(getEl('clientDataList')) getEl('clientDataList').innerHTML = db.clients.filter(c=>c.status==='Active').map(c => `<option value="${sanitize(c.name)}">`).join('');
         }
 
         window.autoFillRevenue = function() {
             const val = getVal('payClient');
             const c = db.clients.find(x => x.name === val);
-            if (c) {
-                setVal('payAmount', c.fee);
-                setVal('payService', c.service);
-            }
+            if (c) { setVal('payAmount', c.fee); setVal('payService', c.service); }
         };
 
         window.addCliSoftRow = function(name = '', amt = '') {
@@ -973,62 +962,113 @@
         }
         function closeForm(type) { getEl('form-'+type).style.display = 'none'; }
 
-        // --- CRUD OPERATIONS WITH PRECISE SAVINGS IMPACT ---
+        // --- CORE SMART LINKAGE ENGINE ---
+        function applyClientAutoExpenses(clientName, ventureName, baseDate, linkedPaymentId) {
+            let c = db.clients.find(x => x.name === clientName);
+            if (!c) return 0;
+            
+            let expTotal = 0;
+            const deductSavings = localStorage.getItem('founder_os_auto_deduct') === 'true';
+            
+            const applyExp = (cat, teamId, expAmt, notes) => {
+                db.expenses.push({ 
+                    id: 'e'+Date.now()+Math.random().toString(36).substr(2,5), category: cat, venture: ventureName, 
+                    clientId: c.name, teamId: teamId, amount: expAmt, date: baseDate, notes: notes, 
+                    deductedFromSavings: false, // Managed strictly via the parent payment's net impact
+                    linkedPaymentId: linkedPaymentId 
+                });
+                if (deductSavings) expTotal += expAmt;
+            };
+
+            if (c.softwares && c.softwares.length > 0) c.softwares.forEach((s) => { if(s.amt > 0) applyExp('Software & API', '', s.amt, s.name); });
+            else if (c.expSoftAmt > 0) applyExp('Software & API', '', c.expSoftAmt, 'Auto-billed software');
+
+            if (c.teamPayouts && c.teamPayouts.length > 0) c.teamPayouts.forEach((t) => { if(t.amt > 0 && t.teamId) applyExp('Salary / Payout', t.teamId, t.amt, 'Auto-payout for ' + c.name); });
+            else if (c.expTeamAmt > 0 && c.expTeamId) applyExp('Salary / Payout', c.expTeamId, c.expTeamAmt, 'Auto-payout');
+            
+            return expTotal;
+        }
+
         function savePayment() { 
             const id = getVal('payId'); 
             const amt = parseFloat(getVal('payAmount')) || 0;
             const status = getVal('payStatus');
             const addToSavings = getEl('payAddSavings') && getEl('payAddSavings').checked;
+            const clientName = getVal('payClient');
 
             const oldRecord = id ? db.payments.find(x => x.id === id) : null;
+            const targetId = id || 'p'+Date.now();
             
-            // REVERSE OLD IMPACT: If it was previously in savings, take it out
-            if (oldRecord && oldRecord.addedToSavings) {
-                let savings = db.investments.find(i => i.type === 'Cash/Savings');
-                if(savings) savings.current -= oldRecord.amount; 
+            // 1. REVERSE PREVIOUS IMPACT FIRST (If editing)
+            if (oldRecord && oldRecord.status === 'Paid') {
+                if (oldRecord.addedToSavings) {
+                    let savings = db.investments.find(i => i.type === 'Cash/Savings');
+                    if(savings) savings.current -= (oldRecord.savingsImpact !== undefined ? oldRecord.savingsImpact : oldRecord.amount); 
+                }
+                
+                // If it is being changed to Pending, we MUST completely destroy linked expenses
+                if (status === 'Pending') {
+                    let linkedExps = db.expenses.filter(e => e.linkedPaymentId === targetId);
+                    linkedExps.forEach(e => {
+                        if (e.deductedFromSavings) {
+                            let savings = db.investments.find(i => i.type === 'Cash/Savings');
+                            if(savings) savings.current += e.amount;
+                        }
+                    });
+                    db.expenses = db.expenses.filter(e => e.linkedPaymentId !== targetId);
+                }
             }
 
-            const obj = { id: id||'p'+Date.now(), client: getVal('payClient'), venture: getVal('payVentureSelect'), service: getVal('payService'), stream: getVal('payStream'), amount: amt, date: getVal('payDate'), status: status, addedToSavings: false }; 
+            const obj = { 
+                id: targetId, client: clientName, venture: getVal('payVentureSelect'), 
+                service: getVal('payService'), stream: getVal('payStream'), amount: amt, 
+                date: getVal('payDate'), status: status, addedToSavings: false, savingsImpact: 0 
+            }; 
             
-            // APPLY NEW IMPACT
+            // 2. APPLY NEW IMPACT
             if(status === 'Paid' && addToSavings && amt > 0) {
+                let expDeductions = 0;
+                
+                // If brand new OR if it was previously Pending and now moving to Paid -> Trigger Auto Expenses
+                if ((!oldRecord || oldRecord.status === 'Pending') && clientName) {
+                    expDeductions = applyClientAutoExpenses(clientName, getVal('payVentureSelect'), getVal('payDate'), targetId);
+                } else if (oldRecord && oldRecord.status === 'Paid') {
+                    // It was already Paid and stays Paid. Read existing linked expenses for net calculation.
+                    let linkedExps = db.expenses.filter(e => e.linkedPaymentId === targetId);
+                    expDeductions = linkedExps.reduce((sum, e) => sum + e.amount, 0);
+                }
+                
+                let netImpact = amt - expDeductions;
                 let savings = db.investments.find(i => i.type === 'Cash/Savings');
-                if(savings) savings.current += amt;
-                else db.investments.push({ id: 'i'+Date.now(), name: 'Main Cash/Savings', type: 'Cash/Savings', current: amt });
+                if(savings) savings.current += netImpact;
+                else db.investments.push({ id: 'i'+Date.now(), name: 'Main Cash/Savings', type: 'Cash/Savings', current: netImpact });
+                
                 obj.addedToSavings = true;
+                obj.savingsImpact = netImpact;
             }
 
             if(id) db.payments = db.payments.map(x=>x.id===id?obj:x); else db.payments.push(obj); 
             saveDB(); closeForm('payment'); 
         }
 
-            function saveExpense() { 
+        function saveExpense() { 
             const id = getVal('expId'); 
             const amt = parseFloat(getVal('expAmount')) || 0;
             const deductSavings = getEl('expDeductSavings') && getEl('expDeductSavings').checked;
             const cat = getVal('expCategory');
 
             const oldRecord = id ? db.expenses.find(x => x.id === id) : null;
-            
-            // REVERSE OLD IMPACT
             if (oldRecord && oldRecord.deductedFromSavings) {
                 let savings = db.investments.find(i => i.type === 'Cash/Savings');
                 if(savings) savings.current += oldRecord.amount; 
             }
 
             const obj = { 
-                id: id||'e'+Date.now(), 
-                category: cat, 
-                venture: cat === 'Personal / Lifestyle' ? 'Personal' : getVal('expVentureSelect'), 
-                clientId: getVal('expClientId'), 
-                teamId: getVal('expTeamSelect'), 
-                amount: amt, 
-                date: getVal('expDate'), 
-                notes: getVal('expNotes'), 
-                deductedFromSavings: false 
+                id: id||'e'+Date.now(), category: cat, venture: cat === 'Personal / Lifestyle' ? 'Personal' : getVal('expVentureSelect'), 
+                clientId: getVal('expClientId'), teamId: getVal('expTeamSelect'), amount: amt, 
+                date: getVal('expDate'), notes: getVal('expNotes'), deductedFromSavings: false 
             }; 
             
-            // APPLY NEW IMPACT
             if(deductSavings && amt > 0) {
                 let savings = db.investments.find(i => i.type === 'Cash/Savings');
                 if(savings) savings.current -= amt;
@@ -1044,9 +1084,20 @@
             if(confirm('Delete this record permanently?')) { 
                 const record = db[arrName].find(x => x.id === id);
                 if (record) {
-                    if (arrName === 'payments' && record.addedToSavings) {
-                        let savings = db.investments.find(i => i.type === 'Cash/Savings');
-                        if(savings) savings.current -= record.amount;
+                    if (arrName === 'payments') {
+                        if (record.addedToSavings) {
+                            let savings = db.investments.find(i => i.type === 'Cash/Savings');
+                            if(savings) savings.current -= (record.savingsImpact !== undefined ? record.savingsImpact : record.amount);
+                        }
+                        // DELETE LINKED EXPENSES ALSO!
+                        let linkedExps = db.expenses.filter(e => e.linkedPaymentId === id);
+                        linkedExps.forEach(e => {
+                            if (e.deductedFromSavings) {
+                                let savings = db.investments.find(i => i.type === 'Cash/Savings');
+                                if(savings) savings.current += e.amount;
+                            }
+                        });
+                        db.expenses = db.expenses.filter(e => e.linkedPaymentId !== id);
                     }
                     if (arrName === 'expenses' && record.deductedFromSavings) {
                         let savings = db.investments.find(i => i.type === 'Cash/Savings');
@@ -1057,6 +1108,65 @@
                 saveDB(); 
             } 
         }
+
+        window.markPaid = function(id) { 
+            const p = db.payments.find(x => x.id === id); 
+            if(p && p.status !== 'Paid'){ 
+                p.status = 'Paid'; 
+                const addToSavings = localStorage.getItem('founder_os_auto_save') === 'true';
+                
+                if(addToSavings && !p.addedToSavings) {
+                    let expDeductions = applyClientAutoExpenses(p.client, p.venture, getLocalDate(), p.id);
+                    let netImpact = p.amount - expDeductions;
+
+                    let savings = db.investments.find(i => i.type === 'Cash/Savings');
+                    if(savings) savings.current += netImpact;
+                    else db.investments.push({ id: 'i'+Date.now(), name: 'Main Cash/Savings', type: 'Cash/Savings', current: netImpact });
+                    
+                    p.addedToSavings = true;
+                    p.savingsImpact = netImpact;
+                }
+                saveDB(); 
+            } 
+        };
+
+        window.processClientBilling = function(clientId) {
+            const c = db.clients.find(x => x.id === clientId);
+            if(!c) return;
+
+            const today = getLocalDate();
+            const addToSavings = localStorage.getItem('founder_os_auto_save') === 'true';
+            
+            let rAmt = parseFloat(c.fee) || 0;
+            const newPayId = 'p'+Date.now()+'_a';
+            let expDeductions = applyClientAutoExpenses(c.name, 'Client Retainer', today, newPayId);
+            let netProfit = rAmt - expDeductions;
+
+            if (rAmt > 0) {
+                db.payments.push({ 
+                    id: newPayId, client: c.name, venture: 'Client Retainer', service: c.service, stream: 'Service', 
+                    amount: rAmt, date: today, status: 'Paid', addedToSavings: addToSavings, savingsImpact: addToSavings ? netProfit : 0 
+                });
+                
+                if (addToSavings && netProfit !== 0) {
+                    let savings = db.investments.find(i => i.type === 'Cash/Savings');
+                    if(savings) savings.current += netProfit;
+                    else db.investments.push({ id: 'i'+Date.now(), name: 'Main Cash/Savings', type: 'Cash/Savings', current: netProfit });
+                }
+            }
+
+            if (c.nextBillingDate) {
+                let d = new Date(c.nextBillingDate);
+                d.setMonth(d.getMonth() + parseInt(c.cycle || 1));
+                c.nextBillingDate = getLocalDate(d);
+            }
+
+            saveDB();
+            const audio = getEl('moneySound');
+            if(audio) audio.play().catch(e=>{});
+        };
+
+        // --- OTHER FUNCTIONS ---
         function saveTask() {
             const id = getVal('taskId');
             const obj = { id: id||'t'+Date.now(), title: getVal('taskTitle'), status: getVal('taskStatus'), priority: getVal('taskPriority'), date: getVal('taskDate'), client: getVal('taskClient') };
@@ -1076,7 +1186,6 @@
         
         function saveClient() { 
             const id = getVal('cliId'); 
-            
             const softwares = [];
             document.querySelectorAll('#cliSoftRows > div').forEach(row => {
                 const name = row.querySelector('.cli-soft-name').value;
@@ -1099,75 +1208,6 @@
             if(id) db.clients = db.clients.map(x=>x.id===id?obj:x); else db.clients.push(obj); 
             saveDB(); closeForm('client'); 
         }
-
-      window.processClientBilling = function(clientId) {
-    const c = db.clients.find(x => x.id === clientId);
-    if(!c) return;
-
-    const today = getLocalDate();
-    const addToSavings = localStorage.getItem('founder_os_auto_save') === 'true';
-    const deductSavings = localStorage.getItem('founder_os_auto_deduct') === 'true';
-    
-    // 1. Log Revenue
-    let rAmt = parseFloat(c.fee) || 0;
-    if (rAmt > 0) {
-        db.payments.push({ 
-            id: 'p'+Date.now()+'_a', client: c.name, venture: 'Client Retainer', service: c.service, 
-            stream: 'Service', amount: rAmt, date: today, status: 'Paid', addedToSavings: addToSavings 
-        });
-        if (addToSavings) {
-            let savings = db.investments.find(i => i.type === 'Cash/Savings');
-            if(savings) savings.current += rAmt;
-            else db.investments.push({ id: 'i'+Date.now(), name: 'Main Cash/Savings', type: 'Cash/Savings', current: rAmt });
-        }
-    }
-
-    // 2. Loop through and log each Software Expense
-    if (c.softwares && c.softwares.length > 0) {
-        c.softwares.forEach((s, idx) => {
-            if(s.amt > 0) {
-                db.expenses.push({ 
-                    id: 'e'+Date.now()+'_s'+idx, category: 'Software & API', venture: 'Auto-Bill', 
-                    clientId: c.name, teamId: '', amount: s.amt, date: today, notes: s.name, 
-                    deductedFromSavings: deductSavings 
-                });
-                if (deductSavings) {
-                    let savings = db.investments.find(i => i.type === 'Cash/Savings');
-                    if(savings) savings.current -= s.amt;
-                }
-            }
-        });
-    }
-
-    // 3. Loop through and log each Team Payout Expense
-    if (c.teamPayouts && c.teamPayouts.length > 0) {
-        c.teamPayouts.forEach((t, idx) => {
-            if(t.amt > 0 && t.teamId) {
-                db.expenses.push({ 
-                    id: 'e'+Date.now()+'_t'+idx, category: 'Salary / Payout', venture: 'Auto-Bill', 
-                    clientId: c.name, teamId: t.teamId, amount: t.amt, date: today, notes: 'Payout for ' + c.name, 
-                    deductedFromSavings: deductSavings 
-                });
-                if (deductSavings) {
-                    let savings = db.investments.find(i => i.type === 'Cash/Savings');
-                    if(savings) savings.current -= t.amt;
-                }
-            }
-        });
-    }
-
-    // 4. Advance Billing Date
-    if (c.nextBillingDate) {
-        let d = new Date(c.nextBillingDate);
-        d.setMonth(d.getMonth() + parseInt(c.cycle || 1));
-        c.nextBillingDate = getLocalDate(d);
-    }
-
-    saveDB();
-    alert(`Billing logged for ${c.name}.`);
-    const audio = getEl('moneySound');
-    if(audio) audio.play().catch(e=>{});
-};
 
         window.processReminder = function(id) {
             const r = db.reminders.find(x => x.id === id);
@@ -1244,20 +1284,6 @@
             }
         }
         
-        window.markPaid = function(id) { 
-            const p = db.payments.find(x => x.id === id); 
-            if(p && p.status !== 'Paid'){ 
-                p.status = 'Paid'; 
-                if(localStorage.getItem('founder_os_auto_save') === 'true' && !p.addedToSavings) {
-                    let savings = db.investments.find(i => i.type === 'Cash/Savings');
-                    if(savings) savings.current += p.amount;
-                    else db.investments.push({ id: 'i'+Date.now(), name: 'Main Cash/Savings', type: 'Cash/Savings', current: p.amount });
-                    p.addedToSavings = true;
-                }
-                saveDB(); 
-            } 
-        };
-
         function calculateNetWorth() {
             const liquid = db.investments.reduce((sum, i) => sum + i.current, 0);
             const equity = db.equities.reduce((sum, e) => sum + ((e.percent/100)*e.companyVal), 0);
