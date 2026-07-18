@@ -51,7 +51,7 @@
         .metric-card { background: var(--bg); border: 1px solid var(--panel-border); padding: 1rem; border-radius: 8px; position: relative;}
         .metric-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
         .metric-value { font-size: 1.4rem; font-weight: 600; letter-spacing: -0.02em; }
-        .metric-value.green { color: var(--green); } .metric-value.red { color: var(--red); } .metric-value.purple { color: var(--purple); } .metric-value.blue { color: var(--blue); }
+        .metric-value.green { color: var(--green); } .metric-value.red { color: var(--red); } .metric-value.purple { color: var(--purple); } .metric-value.blue { color: var(--blue); } .metric-value.orange { color: var(--orange); }
         .growth-txt { font-size: 0.7rem; font-weight: 500; margin-top: 0.4rem; display: inline-block; padding: 0.15rem 0.4rem; border-radius: 4px; background: var(--panel-border); }
         .growth-txt.pos { color: var(--green); background: rgba(34, 197, 94, 0.1); }
         .growth-txt.neg { color: var(--red); background: rgba(239, 68, 68, 0.1); }
@@ -106,8 +106,6 @@
             .card { padding: 1rem; } 
             .data-table th, .data-table td { padding: 0.6rem 0.5rem; font-size: 0.8rem; }
             .metric-value { font-size: 1.2rem; }
-            
-            /* Enhanced Mobile Titles to prevent giant wrapping text */
             .card-title { flex-direction: column; align-items: flex-start; font-size: 0.85rem; gap: 0.5rem; }
             .card-title > div { width: 100%; display: flex; justify-content: space-between; align-items: center; }
         }
@@ -200,19 +198,18 @@
         <section id="view-dashboard" class="view-section active">
             <div class="metrics-grid">
                 <div class="metric-card"><div class="metric-label">Gross Revenue</div><div class="metric-value green" id="m-rev">0</div><div class="growth-txt" id="g-rev">0%</div></div>
-                <div class="metric-card"><div class="metric-label">Operating Expenses</div><div class="metric-value red" id="m-exp">0</div><div class="growth-txt" id="g-exp">0%</div></div>
+                <div class="metric-card"><div class="metric-label">Company Ops Exp</div><div class="metric-value red" id="m-exp">0</div><div class="growth-txt" id="g-exp">0%</div></div>
                 <div class="metric-card"><div class="metric-label">Team Payouts</div><div class="metric-value purple" id="m-pay">0</div><div class="growth-txt" id="g-pay">0%</div></div>
-                <div class="metric-card"><div class="metric-label">Net Margin</div><div class="metric-value" id="m-net">0</div><div class="growth-txt" id="g-net">0%</div></div>
+                <div class="metric-card"><div class="metric-label">Net Margin (Profit)</div><div class="metric-value" id="m-net">0</div><div class="growth-txt" id="g-net">0%</div></div>
                 
                 <div class="metric-card" style="border-top: 2px solid var(--green);"><div class="metric-label">Cash Savings</div><div class="metric-value green" id="m-sav-cash">0</div></div>
                 <div class="metric-card" style="border-top: 2px solid var(--blue);"><div class="metric-label">Mutual Funds</div><div class="metric-value blue" id="m-sav-mf">0</div></div>
-                <div class="metric-card" style="border-top: 2px solid var(--orange);"><div class="metric-label">Other Assets</div><div class="metric-value orange" id="m-sav-oth">0</div></div>
+                <div class="metric-card" style="border-top: 2px solid var(--red);"><div class="metric-label">Personal Exp</div><div class="metric-value red" id="m-pers">0</div><div class="growth-txt" id="g-pers">0%</div></div>
                 
                 <div class="metric-card" style="grid-column: span 2; background: rgba(255,255,255,0.02);"><div class="metric-label">Total Liquid Full Amount</div><div class="metric-value" id="m-sav-total" style="font-size: 1.8rem;">0</div></div>
                 <div class="metric-card" style="grid-column: span 2;"><div class="metric-label">Total Net Worth (Inc. Equity)</div><div class="metric-value" id="m-nw" style="font-size: 1.8rem;">0</div></div>
             </div>
 
-            <!-- ROW 2: Alerts & Today's Tasks -->
             <div class="two-col-grid" style="margin-bottom: 1.5rem;">
                 <div class="card" style="margin-bottom: 0;">
                     <div class="card-title" style="color:var(--orange);">Pending Actions & Auto-Billing</div>
@@ -226,7 +223,7 @@
                 
                 <div class="card" style="margin-bottom: 0;">
                     <div class="card-title">
-                        Today's Action Plan 
+                        <div>Today's Action Plan</div>
                         <div style="font-size:0.7rem; font-weight:normal; color:var(--text-muted);"><span id="taskProgressTxt">0%</span> Completed</div>
                     </div>
                     <div class="progress-bg" style="margin-top:0; margin-bottom:1rem;"><div class="progress-fill" id="taskProgressBar" style="width:0%; background:var(--blue);"></div></div>
@@ -238,7 +235,6 @@
                 </div>
             </div>
 
-            <!-- ROW 3: Portfolio Snapshot & Logs -->
             <div class="two-col-grid" style="margin-bottom: 1.5rem;">
                 <div class="card" style="margin-bottom: 0;">
                     <div class="card-title">Client Portfolio Snapshot</div>
@@ -261,7 +257,6 @@
                 </div>
             </div>
 
-            <!-- ROW 4: Charts -->
             <div class="two-col-grid" style="margin-bottom: 1.5rem;">
                 <div class="card" style="margin-bottom: 0;">
                     <div class="card-title">Cash Flow Trend</div>
@@ -285,22 +280,6 @@
                     </table>
                 </div>
             </div>
-            
-            <!-- NEW: Task Analytics -->
-            <div class="card">
-                <div class="card-title">Tasks & Productivity Overview</div>
-                <div class="two-col-grid">
-                    <div>
-                        <div style="font-size:0.8rem; text-align:center; margin-bottom:0.5rem; color:var(--text-muted);">Tasks by Status</div>
-                        <div style="height: 200px;"><canvas id="chartTaskStatus"></canvas></div>
-                    </div>
-                    <div>
-                        <div style="font-size:0.8rem; text-align:center; margin-bottom:0.5rem; color:var(--text-muted);">Tasks by Priority</div>
-                        <div style="height: 200px;"><canvas id="chartTaskPriority"></canvas></div>
-                    </div>
-                </div>
-            </div>
-
             <div class="two-col-grid">
                 <div class="card"><div class="card-title">Team Payroll Distribution</div><div style="height: 250px;"><canvas id="chartTeamPayroll"></canvas></div></div>
                 <div class="card"><div class="card-title">Venture Revenue Contribution</div><div style="height: 250px;"><canvas id="chartVentureRev"></canvas></div></div>
@@ -309,6 +288,13 @@
 
         <!-- TASKS & WORKFLOW VIEW -->
         <section id="view-tasks" class="view-section">
+            <div class="metrics-grid">
+                <div class="metric-card"><div class="metric-label">Today's Tasks</div><div class="metric-value blue" id="tk-total">0</div></div>
+                <div class="metric-card"><div class="metric-label">Completed</div><div class="metric-value green" id="tk-done">0</div></div>
+                <div class="metric-card"><div class="metric-label">Pending</div><div class="metric-value orange" id="tk-pend">0</div></div>
+                <div class="metric-card"><div class="metric-label">Daily Score</div><div class="metric-value purple" id="tk-score">0%</div></div>
+            </div>
+
             <div class="card">
                 <div class="card-title">Tasks & Workflow 
                     <div style="display:flex; gap:0.5rem; align-items:center;">
@@ -338,6 +324,20 @@
                         <thead><tr><th>Task Description</th><th>Client / Venture</th><th>Due Date & Priority</th><th>Status</th><th>Actions</th></tr></thead>
                         <tbody id="tblTasks"></tbody>
                     </table>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-title">Tasks & Productivity Analytics</div>
+                <div class="two-col-grid">
+                    <div>
+                        <div style="font-size:0.8rem; text-align:center; margin-bottom:0.5rem; color:var(--text-muted);">Overall Tasks by Status</div>
+                        <div style="height: 200px;"><canvas id="chartTaskStatus"></canvas></div>
+                    </div>
+                    <div>
+                        <div style="font-size:0.8rem; text-align:center; margin-bottom:0.5rem; color:var(--text-muted);">Overall Tasks by Priority</div>
+                        <div style="height: 200px;"><canvas id="chartTaskPriority"></canvas></div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -381,7 +381,7 @@
                     
                     <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--green); cursor: pointer;" class="full">
                         <input type="checkbox" id="payAddSavings" onchange="localStorage.setItem('founder_os_auto_save', this.checked)"> 
-                        Auto-add Paid amount to "Cash Savings" (State Remembered)
+                        Auto-add Paid amount to "Cash Savings"
                     </label>
 
                     <div class="full" style="display: flex; gap: 0.5rem;"><button onclick="savePayment()">Save Transaction</button><button class="btn-sec" onclick="closeForm('payment')">Cancel</button></div>
@@ -416,16 +416,22 @@
                         <option value="Operations">Operations / General</option>
                         <option value="Software & API">Software & API</option>
                         <option value="Marketing">Marketing</option>
-                        <option value="Personal / Lifestyle">Personal / Lifestyle</option>
                         <option value="Salary / Payout">Salary / Team Payout</option>
+                        <option value="Personal / Lifestyle">Personal / Lifestyle (Isolated)</option>
                     </select>
-                    <select id="expVentureSelect"></select>
+                    <div id="expVentureWrap" style="width:100%;"><select id="expVentureSelect"></select></div>
                     <select id="expClientId" style="display: none;"></select>
                     <select id="expTeamSelect" style="display: none;"></select>
                     
                     <input type="number" id="expAmount" placeholder="Amount" step="0.01">
                     <input type="date" id="expDate">
                     <input type="text" id="expNotes" placeholder="Notes / Description" class="full">
+
+                    <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--red); cursor: pointer;" class="full">
+                        <input type="checkbox" id="expDeductSavings" onchange="localStorage.setItem('founder_os_auto_deduct', this.checked)"> 
+                        Auto-deduct amount from "Cash Savings"
+                    </label>
+
                     <div class="full" style="display: flex; gap: 0.5rem;"><button onclick="saveExpense()">Save Expense</button><button class="btn-sec" onclick="closeForm('expense')">Cancel</button></div>
                 </div>
                 <div class="data-table-wrapper scrollable-table-wrap" style="max-height: 500px;">
@@ -713,8 +719,8 @@
 
         // TIMEZONE FIX: GET LOCAL DATE IN YYYY-MM-DD
         function getLocalDate(dateObj = new Date()) {
-            const offset = dateObj.getTimezoneOffset() * 60000;
-            return new Date(dateObj.getTime() - offset).toISOString().split('T')[0];
+            const tzOffset = dateObj.getTimezoneOffset() * 60000;
+            return new Date(dateObj.getTime() - tzOffset).toISOString().split('T')[0];
         }
 
         function getEl(id) { return document.getElementById(id); }
@@ -810,8 +816,8 @@
             if (!localStorage.getItem('founder_os_v11') && db.payments.length === 0) {
                 db.ventures = [{ id: 'v1', name: 'Linkdify', desc: 'LinkedIn positioning agency.' }];
                 db.team = [{ id: 't1', name: 'Fidha Farzana', role: 'Partner', type: 'Partner', share: 50 }];
-                db.payments = [{ id: 'p1', client: 'Acme Corp', venture: 'Linkdify', service: 'Profile Optimization', stream: 'Service', amount: 85000, date: getLocalDate(), status: 'Paid' }];
-                db.expenses = [{ id: 'e1', category: 'Software & API', venture: 'Linkdify', amount: 5000, date: getLocalDate(), notes: 'API Cost', teamId: '' }];
+                db.payments = [{ id: 'p1', client: 'Acme Corp', venture: 'Linkdify', service: 'Profile Optimization', stream: 'Service', amount: 85000, date: getLocalDate(), status: 'Paid', addedToSavings: true }];
+                db.expenses = [{ id: 'e1', category: 'Software & API', venture: 'Linkdify', amount: 5000, date: getLocalDate(), notes: 'API Cost', teamId: '', deductedFromSavings: false }];
                 db.clients = [{ 
                     id: 'c1', name: 'Acme Corp', email: 'hello@acme.co', service: 'Growth', fee: 40000, 
                     nextBillingDate: getLocalDate(), cycle: 1, 
@@ -896,6 +902,13 @@
             const cat = getVal('expCategory');
             getEl('expTeamSelect').style.display = (cat === 'Salary / Payout') ? 'block' : 'none'; 
             getEl('expClientId').style.display = (cat === 'Salary / Payout' || cat === 'Software & API') ? 'block' : 'none';
+            
+            // ISOLATE PERSONAL EXPENSES
+            if (cat === 'Personal / Lifestyle') {
+                getEl('expVentureWrap').style.display = 'none';
+            } else {
+                getEl('expVentureWrap').style.display = 'block';
+            }
         }
         
         function updateDropdowns() {
@@ -946,6 +959,8 @@
             
             if(type === 'payment') {
                 setTimeout(() => { if(getEl('payAddSavings')) getEl('payAddSavings').checked = localStorage.getItem('founder_os_auto_save') === 'true'; }, 10);
+            } else if (type === 'expense') {
+                setTimeout(() => { if(getEl('expDeductSavings')) getEl('expDeductSavings').checked = localStorage.getItem('founder_os_auto_deduct') === 'true'; }, 10);
             } else if (type === 'client') {
                 getEl('cliSoftRows').innerHTML = '';
                 getEl('cliTeamRows').innerHTML = '';
@@ -958,41 +973,90 @@
         }
         function closeForm(type) { getEl('form-'+type).style.display = 'none'; }
 
-        // --- CRUD OPERATIONS ---
+        // --- CRUD OPERATIONS WITH PRECISE SAVINGS IMPACT ---
         function savePayment() { 
             const id = getVal('payId'); 
-            const amt = parseFloat(getVal('payAmount'));
+            const amt = parseFloat(getVal('payAmount')) || 0;
             const status = getVal('payStatus');
             const addToSavings = getEl('payAddSavings') && getEl('payAddSavings').checked;
 
-            const obj = { id: id||'p'+Date.now(), client: getVal('payClient'), venture: getVal('payVentureSelect'), service: getVal('payService'), stream: getVal('payStream'), amount: amt, date: getVal('payDate'), status: status }; 
+            const oldRecord = id ? db.payments.find(x => x.id === id) : null;
             
-            if (id && !addToSavings) {
-                const oldRecord = db.payments.find(x => x.id === id);
-                if (oldRecord && oldRecord.status === 'Paid') {
-                    let savings = db.investments.find(i => i.type === 'Cash/Savings');
-                    if(savings) savings.current -= oldRecord.amount; 
-                }
+            // REVERSE OLD IMPACT: If it was previously in savings, take it out
+            if (oldRecord && oldRecord.addedToSavings) {
+                let savings = db.investments.find(i => i.type === 'Cash/Savings');
+                if(savings) savings.current -= oldRecord.amount; 
             }
 
-            if(id) db.payments = db.payments.map(x=>x.id===id?obj:x); else db.payments.push(obj); 
-
+            const obj = { id: id||'p'+Date.now(), client: getVal('payClient'), venture: getVal('payVentureSelect'), service: getVal('payService'), stream: getVal('payStream'), amount: amt, date: getVal('payDate'), status: status, addedToSavings: false }; 
+            
+            // APPLY NEW IMPACT
             if(status === 'Paid' && addToSavings && amt > 0) {
                 let savings = db.investments.find(i => i.type === 'Cash/Savings');
                 if(savings) savings.current += amt;
                 else db.investments.push({ id: 'i'+Date.now(), name: 'Main Cash/Savings', type: 'Cash/Savings', current: amt });
+                obj.addedToSavings = true;
             }
 
+            if(id) db.payments = db.payments.map(x=>x.id===id?obj:x); else db.payments.push(obj); 
             saveDB(); closeForm('payment'); 
         }
 
-        function saveExpense() { 
+            function saveExpense() { 
             const id = getVal('expId'); 
-            const obj = { id: id||'e'+Date.now(), category: getVal('expCategory'), venture: getVal('expVentureSelect'), clientId: getVal('expClientId'), teamId: getVal('expTeamSelect'), amount: parseFloat(getVal('expAmount')), date: getVal('expDate'), notes: getVal('expNotes') }; 
+            const amt = parseFloat(getVal('expAmount')) || 0;
+            const deductSavings = getEl('expDeductSavings') && getEl('expDeductSavings').checked;
+            const cat = getVal('expCategory');
+
+            const oldRecord = id ? db.expenses.find(x => x.id === id) : null;
+            
+            // REVERSE OLD IMPACT
+            if (oldRecord && oldRecord.deductedFromSavings) {
+                let savings = db.investments.find(i => i.type === 'Cash/Savings');
+                if(savings) savings.current += oldRecord.amount; 
+            }
+
+            const obj = { 
+                id: id||'e'+Date.now(), 
+                category: cat, 
+                venture: cat === 'Personal / Lifestyle' ? 'Personal' : getVal('expVentureSelect'), 
+                clientId: getVal('expClientId'), 
+                teamId: getVal('expTeamSelect'), 
+                amount: amt, 
+                date: getVal('expDate'), 
+                notes: getVal('expNotes'), 
+                deductedFromSavings: false 
+            }; 
+            
+            // APPLY NEW IMPACT
+            if(deductSavings && amt > 0) {
+                let savings = db.investments.find(i => i.type === 'Cash/Savings');
+                if(savings) savings.current -= amt;
+                else db.investments.push({ id: 'i'+Date.now(), name: 'Main Cash/Savings', type: 'Cash/Savings', current: -amt });
+                obj.deductedFromSavings = true;
+            }
+
             if(id) db.expenses = db.expenses.map(x=>x.id===id?obj:x); else db.expenses.push(obj); 
             saveDB(); closeForm('expense'); 
         }
 
+        function deleteRecord(arrName, id) { 
+            if(confirm('Delete this record permanently?')) { 
+                const record = db[arrName].find(x => x.id === id);
+                if (record) {
+                    if (arrName === 'payments' && record.addedToSavings) {
+                        let savings = db.investments.find(i => i.type === 'Cash/Savings');
+                        if(savings) savings.current -= record.amount;
+                    }
+                    if (arrName === 'expenses' && record.deductedFromSavings) {
+                        let savings = db.investments.find(i => i.type === 'Cash/Savings');
+                        if(savings) savings.current += record.amount;
+                    }
+                }
+                db[arrName] = db[arrName].filter(x => x.id !== id); 
+                saveDB(); 
+            } 
+        }
         function saveTask() {
             const id = getVal('taskId');
             const obj = { id: id||'t'+Date.now(), title: getVal('taskTitle'), status: getVal('taskStatus'), priority: getVal('taskPriority'), date: getVal('taskDate'), client: getVal('taskClient') };
@@ -1036,53 +1100,80 @@
             saveDB(); closeForm('client'); 
         }
 
-        window.processClientBilling = function(clientId) {
-            const c = db.clients.find(x => x.id === clientId);
-            if(!c) return;
+      window.processClientBilling = function(clientId) {
+    const c = db.clients.find(x => x.id === clientId);
+    if(!c) return;
 
-            const today = getLocalDate();
-            const addToSavings = localStorage.getItem('founder_os_auto_save') === 'true';
-            
-            let rAmt = parseFloat(c.fee) || 0;
-            if (rAmt > 0) {
-                db.payments.push({ id: 'p'+Date.now()+'_a', client: c.name, venture: 'Client Retainer', service: c.service, stream: 'Service', amount: rAmt, date: today, status: 'Paid' });
-                if (addToSavings) {
+    const today = getLocalDate();
+    const addToSavings = localStorage.getItem('founder_os_auto_save') === 'true';
+    const deductSavings = localStorage.getItem('founder_os_auto_deduct') === 'true';
+    
+    // 1. Log Revenue
+    let rAmt = parseFloat(c.fee) || 0;
+    if (rAmt > 0) {
+        db.payments.push({ 
+            id: 'p'+Date.now()+'_a', client: c.name, venture: 'Client Retainer', service: c.service, 
+            stream: 'Service', amount: rAmt, date: today, status: 'Paid', addedToSavings: addToSavings 
+        });
+        if (addToSavings) {
+            let savings = db.investments.find(i => i.type === 'Cash/Savings');
+            if(savings) savings.current += rAmt;
+            else db.investments.push({ id: 'i'+Date.now(), name: 'Main Cash/Savings', type: 'Cash/Savings', current: rAmt });
+        }
+    }
+
+    // 2. Loop through and log each Software Expense
+    if (c.softwares && c.softwares.length > 0) {
+        c.softwares.forEach((s, idx) => {
+            if(s.amt > 0) {
+                db.expenses.push({ 
+                    id: 'e'+Date.now()+'_s'+idx, category: 'Software & API', venture: 'Auto-Bill', 
+                    clientId: c.name, teamId: '', amount: s.amt, date: today, notes: s.name, 
+                    deductedFromSavings: deductSavings 
+                });
+                if (deductSavings) {
                     let savings = db.investments.find(i => i.type === 'Cash/Savings');
-                    if(savings) savings.current += rAmt;
-                    else db.investments.push({ id: 'i'+Date.now(), name: 'Main Cash/Savings', type: 'Cash/Savings', current: rAmt });
+                    if(savings) savings.current -= s.amt;
                 }
             }
+        });
+    }
 
-            if (c.softwares && c.softwares.length > 0) {
-                c.softwares.forEach((s, idx) => {
-                    if(s.amt > 0) db.expenses.push({ id: 'e'+Date.now()+'_s'+idx, category: 'Software & API', venture: 'Auto-Bill', clientId: c.name, teamId: '', amount: s.amt, date: today, notes: s.name });
+    // 3. Loop through and log each Team Payout Expense
+    if (c.teamPayouts && c.teamPayouts.length > 0) {
+        c.teamPayouts.forEach((t, idx) => {
+            if(t.amt > 0 && t.teamId) {
+                db.expenses.push({ 
+                    id: 'e'+Date.now()+'_t'+idx, category: 'Salary / Payout', venture: 'Auto-Bill', 
+                    clientId: c.name, teamId: t.teamId, amount: t.amt, date: today, notes: 'Payout for ' + c.name, 
+                    deductedFromSavings: deductSavings 
                 });
-            } else if (c.expSoftAmt > 0) { 
-                db.expenses.push({ id: 'e'+Date.now()+'_s', category: 'Software & API', venture: 'Auto-Bill', clientId: c.name, teamId: '', amount: c.expSoftAmt, date: today, notes: 'Auto-billed software' });
+                if (deductSavings) {
+                    let savings = db.investments.find(i => i.type === 'Cash/Savings');
+                    if(savings) savings.current -= t.amt;
+                }
             }
+        });
+    }
 
-            if (c.teamPayouts && c.teamPayouts.length > 0) {
-                c.teamPayouts.forEach((t, idx) => {
-                    if(t.amt > 0 && t.teamId) db.expenses.push({ id: 'e'+Date.now()+'_t'+idx, category: 'Salary / Payout', venture: 'Auto-Bill', clientId: c.name, teamId: t.teamId, amount: t.amt, date: today, notes: 'Auto-payout for ' + c.name });
-                });
-            } else if (c.expTeamAmt > 0 && c.expTeamId) { 
-                db.expenses.push({ id: 'e'+Date.now()+'_t', category: 'Salary / Payout', venture: 'Auto-Bill', clientId: c.name, teamId: c.expTeamId, amount: c.expTeamAmt, date: today, notes: 'Auto-payout' });
-            }
+    // 4. Advance Billing Date
+    if (c.nextBillingDate) {
+        let d = new Date(c.nextBillingDate);
+        d.setMonth(d.getMonth() + parseInt(c.cycle || 1));
+        c.nextBillingDate = getLocalDate(d);
+    }
 
-            if (c.nextBillingDate) {
-                let d = new Date(c.nextBillingDate);
-                d.setMonth(d.getMonth() + parseInt(c.cycle || 1));
-                c.nextBillingDate = getLocalDate(d);
-            }
-
-            saveDB();
-            const audio = getEl('moneySound');
-            if(audio) audio.play().catch(e=>{});
-        };
+    saveDB();
+    alert(`Billing logged for ${c.name}.`);
+    const audio = getEl('moneySound');
+    if(audio) audio.play().catch(e=>{});
+};
 
         window.processReminder = function(id) {
             const r = db.reminders.find(x => x.id === id);
             if(!r) return;
+
+            const deductSavings = localStorage.getItem('founder_os_auto_deduct') === 'true';
 
             db.expenses.push({
                 id: 'e'+Date.now(),
@@ -1092,8 +1183,15 @@
                 teamId: '',
                 amount: r.amount,
                 date: getLocalDate(),
-                notes: r.title
+                notes: r.title,
+                deductedFromSavings: deductSavings
             });
+
+            if (deductSavings && r.amount > 0) {
+                let savings = db.investments.find(i => i.type === 'Cash/Savings');
+                if(savings) savings.current -= r.amount;
+                else db.investments.push({ id: 'i'+Date.now(), name: 'Main Cash/Savings', type: 'Cash/Savings', current: -r.amount });
+            }
 
             r.lastPaidMonth = getLocalDate().slice(0, 7); // Set to current YYYY-MM
             saveDB();
@@ -1145,15 +1243,16 @@
                 else if(obj.expTeamAmt > 0) window.addCliTeamRow(obj.expTeamId, obj.expTeamAmt);
             }
         }
-        function deleteRecord(arrName, id) { if(confirm('Delete this record permanently?')) { db[arrName] = db[arrName].filter(x => x.id !== id); saveDB(); } }
         
         window.markPaid = function(id) { 
             const p = db.payments.find(x => x.id === id); 
-            if(p){ 
+            if(p && p.status !== 'Paid'){ 
                 p.status = 'Paid'; 
-                if(localStorage.getItem('founder_os_auto_save') === 'true') {
+                if(localStorage.getItem('founder_os_auto_save') === 'true' && !p.addedToSavings) {
                     let savings = db.investments.find(i => i.type === 'Cash/Savings');
                     if(savings) savings.current += p.amount;
+                    else db.investments.push({ id: 'i'+Date.now(), name: 'Main Cash/Savings', type: 'Cash/Savings', current: p.amount });
+                    p.addedToSavings = true;
                 }
                 saveDB(); 
             } 
@@ -1172,13 +1271,18 @@
             let fExps = filterData(db.expenses).sort((a,b)=>new Date(b.date)-new Date(a.date));
 
             const revTotal = fRevs.filter(p => p.status === 'Paid').reduce((a, b) => a + b.amount, 0);
-            const opsExp = fExps.filter(e => e.category !== 'Salary / Payout').reduce((a, b) => a + b.amount, 0);
+            
+            // ISOLATE PERSONAL EXPENSES
+            const opsExp = fExps.filter(e => e.category !== 'Salary / Payout' && e.category !== 'Personal / Lifestyle').reduce((a, b) => a + b.amount, 0);
             const payExp = fExps.filter(e => e.category === 'Salary / Payout').reduce((a, b) => a + b.amount, 0);
-            const netMargin = revTotal - opsExp - payExp;
+            const persExp = fExps.filter(e => e.category === 'Personal / Lifestyle').reduce((a, b) => a + b.amount, 0);
+            
+            const netMargin = revTotal - opsExp - payExp; // Company Profit Only
 
             const globalRev = db.payments.filter(p => p.status === 'Paid').reduce((a, b) => a + b.amount, 0);
-            const globalOps = db.expenses.filter(e => e.category !== 'Salary / Payout').reduce((a, b) => a + b.amount, 0);
+            const globalOps = db.expenses.filter(e => e.category !== 'Salary / Payout' && e.category !== 'Personal / Lifestyle').reduce((a, b) => a + b.amount, 0);
             const globalPay = db.expenses.filter(e => e.category === 'Salary / Payout').reduce((a, b) => a + b.amount, 0);
+            const globalPers = db.expenses.filter(e => e.category === 'Personal / Lifestyle').reduce((a, b) => a + b.amount, 0);
             const globalNet = globalRev - globalOps - globalPay;
 
             const savCash = db.investments.filter(i => i.type === 'Cash/Savings').reduce((sum, i) => sum + i.current, 0);
@@ -1194,7 +1298,7 @@
                 animateValue('m-net', 0, netMargin, 800);
                 animateValue('m-sav-cash', 0, savCash, 800);
                 animateValue('m-sav-mf', 0, savMf, 800);
-                animateValue('m-sav-oth', 0, savOth, 800);
+                if(getEl('m-pers')) animateValue('m-pers', 0, persExp, 800);
                 animateValue('m-sav-total', 0, savTotal, 800);
                 animateValue('m-nw', 0, netWorth, 800);
             } else {
@@ -1204,7 +1308,7 @@
                 getEl('m-net').innerText = formatMoney(netMargin);
                 getEl('m-sav-cash').innerText = formatMoney(savCash);
                 getEl('m-sav-mf').innerText = formatMoney(savMf);
-                getEl('m-sav-oth').innerText = formatMoney(savOth);
+                if(getEl('m-pers')) getEl('m-pers').innerText = formatMoney(persExp);
                 getEl('m-sav-total').innerText = formatMoney(savTotal);
                 getEl('m-nw').innerText = formatMoney(netWorth);
             }
@@ -1213,11 +1317,23 @@
             if(getEl('g-exp')) getEl('g-exp').outerHTML = calculateGrowth(opsExp, globalOps).replace('class="', 'id="g-exp" class="');
             if(getEl('g-pay')) getEl('g-pay').outerHTML = calculateGrowth(payExp, globalPay).replace('class="', 'id="g-pay" class="');
             if(getEl('g-net')) getEl('g-net').outerHTML = calculateGrowth(netMargin, globalNet).replace('class="', 'id="g-net" class="');
+            if(getEl('g-pers')) getEl('g-pers').outerHTML = calculateGrowth(persExp, globalPers).replace('class="', 'id="g-pers" class="');
 
             if (activeView === 'dashboard') renderDashboard(fRevs, fExps);
             if (activeView === 'analytics') renderAnalytics(fRevs, fExps);
             
             if (activeView === 'tasks') {
+                const todayStr = getLocalDate();
+                let todaysTasks = db.tasks.filter(t => t.date === todayStr);
+                const tDone = todaysTasks.filter(t => t.status === 'Completed').length;
+                const tPend = todaysTasks.length - tDone;
+                const tScore = todaysTasks.length > 0 ? Math.round((tDone / todaysTasks.length) * 100) : 0;
+                
+                if(getEl('tk-total')) getEl('tk-total').innerText = todaysTasks.length;
+                if(getEl('tk-done')) getEl('tk-done').innerText = tDone;
+                if(getEl('tk-pend')) getEl('tk-pend').innerText = tPend;
+                if(getEl('tk-score')) getEl('tk-score').innerText = tScore + '%';
+
                 const fTasks = filterData(db.tasks).sort((a,b)=>new Date(a.date)-new Date(b.date));
                 getEl('tblTasks').innerHTML = fTasks.map(t => {
                     let badgeCls = t.status === 'Completed' ? 'completed' : t.status === 'In Progress' ? 'progress' : 'pending';
@@ -1275,7 +1391,7 @@
                 const todayStr = getLocalDate();
                 const today = new Date(todayStr);
                 const dayNum = today.getDate();
-                const currentMonthStr = todayStr.slice(0, 7); // e.g. "2026-07"
+                const currentMonthStr = todayStr.slice(0, 7); 
 
                 const pendingPayments = db.payments.filter(p => p.status === 'Pending').sort((a,b)=>new Date(a.date)-new Date(b.date));
                 pendingPayments.forEach(p => alertsHtml += `<tr><td><strong>${sanitize(p.client)}</strong> (Invoice)<br><span style="font-size:0.7rem;color:var(--text-muted);">${p.date}</span></td><td style="color:var(--orange); font-weight:600;">${currency}${p.amount.toLocaleString()}</td><td><button class="btn-sec" style="font-size:0.65rem; padding:0.2rem 0.4rem;" onclick="markPaid('${p.id}');">Mark Paid</button></td></tr>`);
@@ -1289,7 +1405,7 @@
                 });
 
                 (db.reminders || []).forEach(r => {
-                    if(r.lastPaidMonth === currentMonthStr) return; // Prevent double trigger
+                    if(r.lastPaidMonth === currentMonthStr) return; 
                     let diff = r.day - dayNum;
                     if (diff < -15) diff += 30;
                     if (diff >= -3 && diff <= 5) { 
@@ -1330,17 +1446,18 @@
 
             const dates = [...new Set([...revs, ...exps].map(x => x.date))].sort();
             const rData = dates.map(d => revs.filter(r => r.date === d && r.status === 'Paid').reduce((s, r) => s + r.amount, 0));
-            const eData = dates.map(d => exps.filter(e => e.date === d).reduce((s, e) => s + e.amount, 0));
+            // Ensure cash flow chart doesn't consider personal expenses to skew business net
+            const eData = dates.map(d => exps.filter(e => e.date === d && e.category !== 'Personal / Lifestyle').reduce((s, e) => s + e.amount, 0));
             
             const mData = dates.map(d => {
                 const dayRev = revs.filter(r => r.date === d && r.status === 'Paid').reduce((s, r) => s + r.amount, 0);
-                const dayExp = exps.filter(e => e.date === d).reduce((s, e) => s + e.amount, 0);
+                const dayExp = exps.filter(e => e.date === d && e.category !== 'Personal / Lifestyle').reduce((s, e) => s + e.amount, 0);
                 return dayRev - dayExp;
             });
 
             if (getEl('chartDashboardFlow')) {
                 if (charts.dash) charts.dash.destroy();
-                charts.dash = new Chart(getEl('chartDashboardFlow').getContext('2d'), { type: 'line', data: { labels: dates, datasets: [{ label: 'Inflow', data: rData, borderColor: '#22c55e', tension: 0.3 }, { label: 'Outflow', data: eData, borderColor: '#ef4444', tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false } });
+                charts.dash = new Chart(getEl('chartDashboardFlow').getContext('2d'), { type: 'line', data: { labels: dates, datasets: [{ label: 'Inflow', data: rData, borderColor: '#22c55e', tension: 0.3 }, { label: 'Outflow (Business)', data: eData, borderColor: '#ef4444', tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: false } });
             }
             
             if (getEl('chartNetMargin')) {
@@ -1363,7 +1480,7 @@
         function renderAnalytics(revs, exps) {
             const vStats = db.ventures.map(v => {
                 const vRev = revs.filter(r => r.venture === v.name && r.status === 'Paid').reduce((s, r) => s + r.amount, 0);
-                const vOps = exps.filter(e => e.venture === v.name && e.category !== 'Salary / Payout').reduce((s, e) => s + e.amount, 0);
+                const vOps = exps.filter(e => e.venture === v.name && e.category !== 'Salary / Payout' && e.category !== 'Personal / Lifestyle').reduce((s, e) => s + e.amount, 0);
                 const vPay = exps.filter(e => e.venture === v.name && e.category === 'Salary / Payout').reduce((s, e) => s + e.amount, 0);
                 const net = vRev - vOps - vPay;
                 return { name: sanitize(v.name), rev: vRev, ops: vOps, pay: vPay, net, margin: vRev > 0 ? ((net / vRev) * 100).toFixed(1) : 0 };
