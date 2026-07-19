@@ -88,7 +88,7 @@
         .inline-form .full { grid-column: span 2; }
         .progress-bg { background: var(--panel-border); height: 6px; border-radius: 3px; overflow: hidden; margin-top: 0.5rem; width: 100%; }
         .progress-fill { background: var(--text); height: 100%; transition: width 0.3s; }
-        .toolbar { display: flex; gap: 0.5rem; align-items: center; width: 100%; max-width: 400px;}
+        .toolbar { display: flex; gap: 0.5rem; align-items: center; width: 100%; max-width: 100%; flex-wrap: wrap;}
 
         @media (max-width: 900px) {
             .two-col-grid { grid-template-columns: 1fr; }
@@ -103,7 +103,6 @@
             .mobile-header { display: flex; }
             header { flex-direction: column; align-items: flex-start; margin-top: 0.5rem; }
             .header-controls { align-items: flex-start; width: 100%; margin-top: 0.5rem; }
-            .toolbar { max-width: 100%; }
             .card { padding: 1rem; } 
             .data-table th, .data-table td { padding: 0.6rem 0.5rem; font-size: 0.8rem; }
             .metric-value { font-size: 1.2rem; }
@@ -197,9 +196,9 @@
 
         <!-- DASHBOARD VIEW -->
         <section id="view-dashboard" class="view-section active">
-           <div class="metrics-grid">
+            <div class="metrics-grid">
                 <div class="metric-card" style="border-top: 2px solid var(--green);"><div class="metric-label">Gross Revenue</div><div class="metric-value green" id="m-rev">0</div><div class="growth-txt" id="g-rev">0%</div></div>
-                <div class="metric-card"style="border-top: 2px solid var(--red);"><div class="metric-label">Company Ops Exp</div><div class="metric-value red" id="m-exp">0</div><div class="growth-txt" id="g-exp">0%</div></div>
+                <div class="metric-card" style="border-top: 2px solid var(--red);"><div class="metric-label">Company Ops Exp</div><div class="metric-value red" id="m-exp">0</div><div class="growth-txt" id="g-exp">0%</div></div>
                 <div class="metric-card" style="border-top: 2px solid var(--purple);"><div class="metric-label">Team Payouts</div><div class="metric-value purple" id="m-pay">0</div><div class="growth-txt" id="g-pay">0%</div></div>
                 <div class="metric-card" style="border-top: 2px solid var(--green);"><div class="metric-label">Net Margin (Profit)</div><div class="metric-value" id="m-net">0</div><div class="growth-txt" id="g-net">0%</div></div>
                 
@@ -318,6 +317,20 @@
                         <button style="margin:0;" onclick="openForm('task')">+ Add Task</button>
                     </div>
                 </div>
+                
+                <!-- NEW TASKS TOOLBAR -->
+                <div class="toolbar" style="margin-bottom: 1rem; flex-wrap: wrap; max-width: 100%;">
+                    <input type="text" id="searchTask" placeholder="Search tasks, client..." onkeyup="renderAll(true)" style="flex: 1; min-width: 200px;">
+                    <input type="date" id="filterTaskDate" onchange="renderAll(true)" style="width: auto;" title="Filter by Specific Date">
+                    <select id="filterTaskStatus" onchange="renderAll(true)" style="width: auto; max-width: 150px;">
+                        <option value="All">All Status</option>
+                        <option value="Pending">Pending</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                    <button class="btn-sec" style="font-size: 0.75rem; padding: 0.5rem 0.8rem;" onclick="document.getElementById('searchTask').value=''; document.getElementById('filterTaskDate').value=''; document.getElementById('filterTaskStatus').value='All'; renderAll(true);">Clear Filters</button>
+                </div>
+
                 <div id="form-task" class="inline-form" style="display: none;">
                     <input type="hidden" id="taskId">
                     <input type="text" id="taskTitle" placeholder="Task Description / Title" class="full">
@@ -1234,7 +1247,7 @@
                 else db.investments.push({ id: 'i'+Date.now(), name: 'Main Cash/Savings', type: 'Cash/Savings', current: -r.amount });
             }
 
-            r.lastPaidMonth = getLocalDate().slice(0, 7); // Set to current YYYY-MM
+            r.lastPaidMonth = getLocalDate().slice(0, 7); 
             saveDB();
             const audio = getEl('moneySound');
             if(audio) audio.play().catch(e=>{});
@@ -1361,8 +1374,21 @@
                 if(getEl('tk-pend')) getEl('tk-pend').innerText = tPend;
                 if(getEl('tk-score')) getEl('tk-score').innerText = tScore + '%';
 
-                const fTasks = filterData(db.tasks).sort((a,b)=>new Date(a.date)-new Date(b.date));
-                getEl('tblTasks').innerHTML = fTasks.map(t => {
+                // TASK FILTER LOGIC
+                const sQTask = getVal('searchTask') ? getVal('searchTask').toLowerCase() : '';
+                const sStatusTask = getVal('filterTaskStatus') || 'All';
+                const sDateTask = getVal('filterTaskDate');
+
+                const fTasksFiltered = filterData(db.tasks)
+                    .filter(t => {
+                        const matchSearch = t.title.toLowerCase().includes(sQTask) || (t.client && t.client.toLowerCase().includes(sQTask));
+                        const matchStatus = sStatusTask === 'All' || t.status === sStatusTask;
+                        const matchDate = sDateTask ? t.date === sDateTask : true;
+                        return matchSearch && matchStatus && matchDate;
+                    })
+                    .sort((a,b)=>new Date(a.date)-new Date(b.date));
+
+                getEl('tblTasks').innerHTML = fTasksFiltered.map(t => {
                     let badgeCls = t.status === 'Completed' ? 'completed' : t.status === 'In Progress' ? 'progress' : 'pending';
                     return `<tr><td><strong>${sanitize(t.title)}</strong></td><td>${sanitize(t.client) || '--'}</td><td>${t.date} <br><span style="font-size:0.7rem; color:${t.priority==='High'?'var(--red)':t.priority==='Medium'?'var(--orange)':'var(--text-muted)'}">${t.priority} Priority</span></td><td><span class="status-badge ${badgeCls}" onclick="toggleTaskStatus('${t.id}')">${t.status}</span></td><td><button class="btn-edit" onclick="editRecord('task','${t.id}','tasks')">Edit</button><button class="btn-danger" onclick="deleteRecord('tasks','${t.id}')">Del</button></td></tr>`;
                 }).join('') || '<tr><td colspan="5">No tasks found.</td></tr>';
