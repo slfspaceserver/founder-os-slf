@@ -75,6 +75,7 @@
         .btn-sec:hover { background: var(--panel-border); }
         .btn-danger { background: transparent; color: var(--red); border: none; padding: 0; font-size: 0.8rem; text-decoration: underline;}
         .btn-edit { background: transparent; color: var(--text-muted); border: none; padding: 0; font-size: 0.8rem; text-decoration: underline; margin-right: 0.75rem;}
+        
         .status-badge { font-size:0.7rem; padding:0.2rem 0.5rem; border-radius:4px; background:var(--panel-border); color:var(--text); font-weight: 600; cursor:pointer; display: inline-block;}
         .status-badge.pending { color: var(--orange); }
         .status-badge.progress { color: var(--blue); }
@@ -90,6 +91,15 @@
         .progress-fill { background: var(--text); height: 100%; transition: width 0.3s; }
         .toolbar { display: flex; gap: 0.5rem; align-items: center; width: 100%; max-width: 100%; flex-wrap: wrap;}
 
+        /* Venture Grid & Drag Drop Styles */
+        .venture-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
+        .venture-card { background: var(--panel); border: 1px solid var(--panel-border); border-radius: 8px; padding: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; transition: transform 0.2s; cursor: grab;}
+        .venture-card:active { cursor: grabbing; }
+        .venture-card.dragging { opacity: 0.4; border: 1px dashed var(--blue); transform: scale(0.98); }
+        .venture-card:hover { border-color: var(--text-muted); }
+
+        .vd-header { display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1.5rem; }
+
         @media (max-width: 900px) {
             .two-col-grid { grid-template-columns: 1fr; }
             .inline-form { grid-template-columns: 1fr; }
@@ -99,15 +109,32 @@
             aside { transform: translateX(-100%); width: 280px; box-shadow: none; }
             aside.open { transform: translateX(0); box-shadow: 0 0 0 10000px rgba(0,0,0,0.5), 5px 0 25px rgba(0,0,0,0.8); }
             .close-menu-btn { display: block; }
-            main { margin-left: 0; width: 100vw; padding: 1rem; padding-top: 80px; }
+            
+            /* INCREASED TOP PADDING TO PREVENT OVERLAP */
+            main { margin-left: 0; width: 100vw; padding: 1rem; padding-top: 110px; padding-bottom: 3rem; }
             .mobile-header { display: flex; }
-            header { flex-direction: column; align-items: flex-start; margin-top: 0.5rem; }
+            header { flex-direction: column; align-items: flex-start; margin-top: 0; margin-bottom: 1.5rem;}
             .header-controls { align-items: flex-start; width: 100%; margin-top: 0.5rem; }
+            .toolbar { max-width: 100%; }
             .card { padding: 1rem; } 
+            
             .data-table th, .data-table td { padding: 0.6rem 0.5rem; font-size: 0.8rem; }
             .metric-value { font-size: 1.2rem; }
             .card-title { flex-direction: column; align-items: flex-start; font-size: 0.85rem; gap: 0.5rem; }
             .card-title > div { width: 100%; display: flex; justify-content: space-between; align-items: center; }
+            
+            /* STICKY ACTION COLUMN FOR MOBILE */
+            .data-table td:last-child, .data-table th:last-child {
+                position: sticky;
+                right: 0;
+                background: var(--panel);
+                border-left: 1px solid var(--panel-border);
+                box-shadow: -4px 0 10px rgba(0,0,0,0.2);
+                z-index: 10;
+            }
+
+            /* STACKED VENTURE HEADER FOR MOBILE */
+            .vd-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
         }
     </style>
 </head>
@@ -149,7 +176,7 @@
         </div>
         <ul class="nav-links">
             <div class="nav-group-label">Overview</div>
-            <li class="nav-item active" onclick="navigate('dashboard')">Dashboard</li>
+            <li class="nav-item" onclick="navigate('dashboard')" id="nav-dashboard">Dashboard</li>
             <li class="nav-item" onclick="navigate('analytics')">Analytics Hub</li>
             
             <div class="nav-group-label">Operations</div>
@@ -160,7 +187,7 @@
             <li class="nav-item" onclick="navigate('reminders')">Reminders & SIPs</li>
             
             <div class="nav-group-label">Ecosystem</div>
-            <li class="nav-item" onclick="navigate('ventures')">Ventures</li>
+            <li class="nav-item" onclick="navigate('ventures')">Venture Management</li>
             <li class="nav-item" onclick="navigate('team')">Team & Shares</li>
             <li class="nav-item" onclick="navigate('investments')">Investments & Equity</li>
             
@@ -195,7 +222,7 @@
         </header>
 
         <!-- DASHBOARD VIEW -->
-        <section id="view-dashboard" class="view-section active">
+        <section id="view-dashboard" class="view-section">
             <div class="metrics-grid">
                 <div class="metric-card" style="border-top: 2px solid var(--green);"><div class="metric-label">Gross Revenue</div><div class="metric-value green" id="m-rev">0</div><div class="growth-txt" id="g-rev">0%</div></div>
                 <div class="metric-card" style="border-top: 2px solid var(--red);"><div class="metric-label">Company Ops Exp</div><div class="metric-value red" id="m-exp">0</div><div class="growth-txt" id="g-exp">0%</div></div>
@@ -304,10 +331,10 @@
         <!-- TASKS & WORKFLOW VIEW -->
         <section id="view-tasks" class="view-section">
             <div class="metrics-grid">
-                <div class="metric-card"><div class="metric-label">Today's Tasks</div><div class="metric-value blue" id="tk-total">0</div></div>
+                <div class="metric-card"><div class="metric-label">Total Selected</div><div class="metric-value blue" id="tk-total">0</div></div>
                 <div class="metric-card"><div class="metric-label">Completed</div><div class="metric-value green" id="tk-done">0</div></div>
                 <div class="metric-card"><div class="metric-label">Pending</div><div class="metric-value orange" id="tk-pend">0</div></div>
-                <div class="metric-card"><div class="metric-label">Daily Score</div><div class="metric-value purple" id="tk-score">0%</div></div>
+                <div class="metric-card"><div class="metric-label">Success Rate</div><div class="metric-value purple" id="tk-score">0%</div></div>
             </div>
 
             <div class="card">
@@ -318,9 +345,17 @@
                     </div>
                 </div>
                 
-                <!-- NEW TASKS TOOLBAR -->
                 <div class="toolbar" style="margin-bottom: 1rem; flex-wrap: wrap; max-width: 100%;">
                     <input type="text" id="searchTask" placeholder="Search tasks, client..." onkeyup="renderAll(true)" style="flex: 1; min-width: 200px;">
+                    
+                    <select id="filterTaskTime" onchange="renderAll(true)" style="width: auto; max-width: 150px;">
+                        <option value="All">All Time</option>
+                        <option value="Yesterday">Due Yesterday</option>
+                        <option value="Today">Due Today</option>
+                        <option value="Tomorrow">Due Tomorrow</option>
+                        <option value="ThisMonth">Due This Month</option>
+                    </select>
+
                     <input type="date" id="filterTaskDate" onchange="renderAll(true)" style="width: auto;" title="Filter by Specific Date">
                     <select id="filterTaskStatus" onchange="renderAll(true)" style="width: auto; max-width: 150px;">
                         <option value="All">All Status</option>
@@ -328,7 +363,7 @@
                         <option value="In Progress">In Progress</option>
                         <option value="Completed">Completed</option>
                     </select>
-                    <button class="btn-sec" style="font-size: 0.75rem; padding: 0.5rem 0.8rem;" onclick="document.getElementById('searchTask').value=''; document.getElementById('filterTaskDate').value=''; document.getElementById('filterTaskStatus').value='All'; renderAll(true);">Clear Filters</button>
+                    <button class="btn-sec" style="font-size: 0.75rem; padding: 0.5rem 0.8rem;" onclick="document.getElementById('searchTask').value=''; document.getElementById('filterTaskDate').value=''; document.getElementById('filterTaskTime').value='All'; document.getElementById('filterTaskStatus').value='All'; renderAll(true);">Clear Filters</button>
                 </div>
 
                 <div id="form-task" class="inline-form" style="display: none;">
@@ -395,7 +430,7 @@
                     <select id="payStatus"><option value="Paid">Paid</option><option value="Pending">Pending</option></select>
                     
                     <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--green); cursor: pointer;" class="full">
-                        <input type="checkbox" id="payAddSavings" onchange="localStorage.setItem('founder_os_auto_save', this.checked)"> 
+                        <input type="checkbox" id="payAddSavings"> 
                         Auto-add Paid amount to "Cash Savings"
                     </label>
 
@@ -443,7 +478,7 @@
                     <input type="text" id="expNotes" placeholder="Notes / Description" class="full">
 
                     <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--red); cursor: pointer;" class="full">
-                        <input type="checkbox" id="expDeductSavings" onchange="localStorage.setItem('founder_os_auto_deduct', this.checked)"> 
+                        <input type="checkbox" id="expDeductSavings"> 
                         Auto-deduct amount from "Cash Savings"
                     </label>
 
@@ -472,6 +507,9 @@
                     <input type="text" id="cliName" placeholder="Client / Company Name" class="full">
                     <input type="email" id="cliEmail" placeholder="Email Address">
                     <input type="text" id="cliService" placeholder="Core Service">
+                    
+                    <select id="cliVenture"><option value="">-- Associate with Venture --</option></select>
+                    
                     <input type="number" id="cliFee" placeholder="Recurring Retainer / MRR Fee" step="0.01">
                     <input type="date" id="cliStart" placeholder="Start Date">
                     
@@ -483,7 +521,6 @@
                     </select>
                     <select id="cliStatus"><option value="Active">Billing Status: Active</option><option value="Completed">Billing Status: Completed / Inactive</option></select>
                     
-                    <!-- AUTOMATION SETTINGS -->
                     <div class="full" style="font-weight:bold; margin-top:1rem; color:var(--text); border-top:1px solid var(--panel-border); padding-top:1rem;">Automated Billing Cycle & Expenses Setup</div>
                     
                     <div>
@@ -511,7 +548,7 @@
                 </div>
                 <div class="data-table-wrapper">
                     <table class="data-table">
-                        <thead><tr><th>Client Details</th><th>Service Focus</th><th>MRR & Cycle</th><th>Project Status</th><th>Actions</th></tr></thead>
+                        <thead><tr><th>Client Details</th><th>Service & Venture</th><th>MRR & Cycle</th><th>Project Status</th><th>Actions</th></tr></thead>
                         <tbody id="tblClients"></tbody>
                     </table>
                 </div>
@@ -550,25 +587,94 @@
             </div>
         </section>
 
-        <!-- OTHER SECTIONS -->
+        <!-- VENTURES SECTION (MAIN GRID) -->
         <section id="view-ventures" class="view-section">
-            <div class="card">
-                <div class="card-title">Active Ventures 
-                    <div style="display:flex; gap:0.5rem; align-items:center;">
-                        <button class="btn-sec" style="font-size:0.75rem; padding:0.3rem 0.6rem; margin:0;" onclick="exportSectionData('ventures')">Export Data</button>
-                        <button style="margin:0;" onclick="openForm('venture')">+ Add Venture</button>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 1.5rem; align-items: center;">
+                <h2 style="font-size: 1.2rem;">Active Ventures</h2>
+                <div style="display:flex; gap:0.5rem; align-items:center;">
+                    <button class="btn-sec" style="font-size:0.75rem; padding:0.3rem 0.6rem; margin:0;" onclick="exportSectionData('ventures')">Export Data</button>
+                    <button style="margin:0;" onclick="openForm('venture')">+ Add Venture</button>
+                </div>
+            </div>
+            
+            <div id="form-venture" class="inline-form" style="display: none;">
+                <input type="hidden" id="vId">
+                <input type="text" id="vName" class="full" placeholder="Venture Name">
+                <input type="text" id="vDesc" class="full" placeholder="Description">
+                <div class="full" style="display: flex; gap: 0.5rem;"><button onclick="saveVenture()">Save Venture</button><button class="btn-sec" onclick="closeForm('venture')">Cancel</button></div>
+            </div>
+
+            <!-- VENTURE CARDS GRID -->
+            <div id="venturesGrid" class="venture-grid"></div>
+        </section>
+
+        <!-- VENTURE DETAILS (SUB-VIEW) -->
+        <section id="view-venture-detail" class="view-section">
+            <!-- BACK BUTTON EXACTLY LIKE SCREENSHOT -->
+            <div class="vd-header">
+                <button class="btn-sec" style="padding: 0.4rem 0.8rem; border-radius: 6px; font-weight: 500;" onclick="closeVentureDetail()">← Back to Ventures</button>
+                <h2 id="vd-name" style="font-size: 1.5rem; font-weight: 700; margin: 0; line-height: 1.2;">Venture Analytics & Strategy</h2>
+            </div>
+            
+            <div class="metrics-grid">
+                <div class="metric-card" style="border-top: 2px solid var(--green);"><div class="metric-label">Venture Revenue</div><div class="metric-value green" id="vd-rev">0</div></div>
+                <div class="metric-card" style="border-top: 2px solid var(--red);"><div class="metric-label">Venture Expenses</div><div class="metric-value red" id="vd-exp">0</div></div>
+                <div class="metric-card" style="border-top: 2px solid var(--blue);"><div class="metric-label">Net Profit</div><div class="metric-value" id="vd-net">0</div></div>
+                <div class="metric-card" style="border-top: 2px solid var(--purple);"><div class="metric-label">Profit Margin</div><div class="metric-value purple" id="vd-margin">0%</div></div>
+            </div>
+
+            <div class="two-col-grid" style="margin-bottom: 1.5rem;">
+                <div class="card" style="margin-bottom: 0;">
+                    <div class="card-title">Financial Growth & Cash Flow</div>
+                    <div style="height: 250px; margin-top:1rem;"><canvas id="chartVentureDetail"></canvas></div>
+                </div>
+                
+                <div class="card" style="margin-bottom: 0;">
+                    <div class="card-title">Strategy & Goal Targets</div>
+                    <input type="hidden" id="vd-id">
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
+                        <div>
+                            <label style="font-size:0.7rem; color:var(--text-muted); display:block;">Target MRR (Revenue)</label>
+                            <input type="number" id="vd-goal-rev" placeholder="e.g. 500000" style="padding:0.4rem;">
+                        </div>
+                        <div>
+                            <label style="font-size:0.7rem; color:var(--text-muted); display:block;">Target Active Clients</label>
+                            <input type="number" id="vd-goal-cli" placeholder="e.g. 10" style="padding:0.4rem;">
+                        </div>
+                    </div>
+
+                    <div id="vd-progress-bars" style="margin-bottom: 1rem; border: 1px solid var(--panel-border); padding: 0.75rem; border-radius: 6px;"></div>
+
+                    <label style="font-size:0.75rem; color:var(--text-muted); margin-bottom:0.3rem; display:block; text-transform:uppercase; font-weight:600;">Current Situation</label>
+                    <textarea id="vd-situation" rows="2" style="margin-bottom: 0.75rem;" placeholder="E.g., Stable MRR, low churn, need more leads..."></textarea>
+                    
+                    <label style="font-size:0.75rem; color:var(--text-muted); margin-bottom:0.3rem; display:block; text-transform:uppercase; font-weight:600;">Next Plan / Action</label>
+                    <textarea id="vd-plan" rows="2" style="margin-bottom: 1rem;" placeholder="E.g., Hire a setter, revamp ad campaigns..."></textarea>
+                    
+                    <div style="display:flex; justify-content:flex-end;">
+                        <button onclick="saveVentureStrategy()">Save Targets & Strategy</button>
                     </div>
                 </div>
-                <div id="form-venture" class="inline-form" style="display: none;">
-                    <input type="hidden" id="vId">
-                    <input type="text" id="vName" class="full" placeholder="Venture Name">
-                    <input type="text" id="vDesc" class="full" placeholder="Description">
-                    <div class="full" style="display: flex; gap: 0.5rem;"><button onclick="saveVenture()">Save Venture</button><button class="btn-sec" onclick="closeForm('venture')">Cancel</button></div>
+            </div>
+            
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="card-title">Venture Clients 
+                    <button class="btn-sec" style="font-size:0.75rem; padding:0.3rem 0.6rem;" onclick="openForm('client'); setVal('cliVenture', getEl('vd-id').value); navigate('clients');">+ Add Client</button>
                 </div>
-                <div class="data-table-wrapper">
+                <div class="data-table-wrapper scrollable-table-wrap">
                     <table class="data-table">
-                        <thead><tr><th>Venture Name</th><th>Description</th><th>Actions</th></tr></thead>
-                        <tbody id="tblVentures"></tbody>
+                        <thead><tr><th>Client Details</th><th>Service Focus</th><th>MRR & Status</th></tr></thead>
+                        <tbody id="vd-clients"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Recent Venture Activity Logs</div>
+                <div class="data-table-wrapper scrollable-table-wrap">
+                    <table class="data-table">
+                        <tbody id="vd-activity"></tbody>
                     </table>
                 </div>
             </div>
@@ -599,55 +705,59 @@
             </div>
         </section>
 
-        <section id="view-investments" class="view-section">
-            <div class="two-col-grid">
-                <div class="card">
-                    <div class="card-title">Liquid Assets & Savings 
-                        <div style="display:flex; gap:0.5rem; align-items:center;">
-                            <button class="btn-sec" style="font-size:0.75rem; padding:0.3rem 0.6rem; margin:0;" onclick="exportSectionData('investments')">Export Data</button>
-                            <button style="margin:0;" onclick="openForm('investment')">+ Add Asset</button>
-                        </div>
-                    </div>
-                    <div id="form-investment" class="inline-form" style="display: none; grid-template-columns: 1fr;">
-                        <input type="hidden" id="invId">
-                        <input type="text" id="invName" placeholder="Asset Name (e.g. HDFC Savings, BMW Car)">
-                        <select id="invType">
-                            <option value="Cash/Savings">Cash & Savings</option>
-                            <option value="Mutual Funds">Mutual Funds</option>
-                            <option value="Physical Asset">Physical Asset (Car, Real Estate, Gold)</option>
-                            <option value="Crypto">Crypto</option>
-                            <option value="Stocks">Stocks</option>
-                            <option value="Other">Other</option>
-                        </select>
-                        <input type="number" id="invCurrent" placeholder="Current Realizable Value" step="0.01">
-                        <div style="display: flex; gap: 0.5rem;"><button onclick="saveInvestment()">Save</button><button class="btn-sec" onclick="closeForm('investment')">Cancel</button></div>
-                    </div>
-                    <table class="data-table">
-                        <thead><tr><th>Asset Name / Type</th><th>Current Value</th><th>Actions</th></tr></thead>
-                        <tbody id="tblInvestments"></tbody>
-                    </table>
-                </div>
-                <div class="card">
-                    <div class="card-title">Private Company Equities 
-                        <div style="display:flex; gap:0.5rem; align-items:center;">
-                            <button class="btn-sec" style="font-size:0.75rem; padding:0.3rem 0.6rem; margin:0;" onclick="exportSectionData('equities')">Export Data</button>
-                            <button style="margin:0;" onclick="openForm('equity')">+ Add Equity</button>
-                        </div>
-                    </div>
-                    <div id="form-equity" class="inline-form" style="display: none; grid-template-columns: 1fr;">
-                        <input type="hidden" id="eqId">
-                        <input type="text" id="eqName" placeholder="Company Name">
-                        <input type="number" id="eqPercent" placeholder="Your Ownership %" step="0.01">
-                        <input type="number" id="eqVal" placeholder="Estimated Total Company Valuation" step="0.01">
-                        <div style="display: flex; gap: 0.5rem;"><button onclick="saveEquity()">Save</button><button class="btn-sec" onclick="closeForm('equity')">Cancel</button></div>
-                    </div>
-                    <table class="data-table">
-                        <thead><tr><th>Company</th><th>Stake %</th><th>Stake Value</th><th>Actions</th></tr></thead>
-                        <tbody id="tblEquities"></tbody>
-                    </table>
+<section id="view-investments" class="view-section">
+    <div class="two-col-grid">
+        <div class="card">
+            <div class="card-title">Liquid Assets & Savings 
+                <div style="display:flex; gap:0.5rem; align-items:center;">
+                    <button class="btn-sec" style="font-size:0.75rem; padding:0.3rem 0.6rem; margin:0;" onclick="exportSectionData('investments')">Export Data</button>
+                    <button style="margin:0;" onclick="openForm('investment')">+ Add Asset</button>
                 </div>
             </div>
-        </section>
+            <div id="form-investment" class="inline-form" style="display: none; grid-template-columns: 1fr;">
+                <input type="hidden" id="invId">
+                <input type="text" id="invName" placeholder="Asset Name (e.g. HDFC Savings, BMW Car)">
+                <select id="invType">
+                    <option value="Cash/Savings">Cash & Savings</option>
+                    <option value="Mutual Funds">Mutual Funds</option>
+                    <option value="Physical Asset">Physical Asset (Car, Real Estate, Gold)</option>
+                    <option value="Crypto">Crypto</option>
+                    <option value="Stocks">Stocks</option>
+                    <option value="Other">Other</option>
+                </select>
+                <input type="number" id="invCurrent" placeholder="Current Realizable Value" step="0.01">
+                <div style="display: flex; gap: 0.5rem;"><button onclick="saveInvestment()">Save</button><button class="btn-sec" onclick="closeForm('investment')">Cancel</button></div>
+            </div>
+            <div class="data-table-wrapper scrollable-table-wrap">
+                <table class="data-table">
+                    <thead><tr><th>Asset Name / Type</th><th style="white-space: nowrap;">Current Value</th><th>Actions</th></tr></thead>
+                    <tbody id="tblInvestments"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-title">Private Company Equities 
+                <div style="display:flex; gap:0.5rem; align-items:center;">
+                    <button class="btn-sec" style="font-size:0.75rem; padding:0.3rem 0.6rem; margin:0;" onclick="exportSectionData('equities')">Export Data</button>
+                    <button style="margin:0;" onclick="openForm('equity')">+ Add Equity</button>
+                </div>
+            </div>
+            <div id="form-equity" class="inline-form" style="display: none; grid-template-columns: 1fr;">
+                <input type="hidden" id="eqId">
+                <input type="text" id="eqName" placeholder="Company Name">
+                <input type="number" id="eqPercent" placeholder="Your Ownership %" step="0.01">
+                <input type="number" id="eqVal" placeholder="Estimated Total Company Valuation" step="0.01">
+                <div style="display: flex; gap: 0.5rem;"><button onclick="saveEquity()">Save</button><button class="btn-sec" onclick="closeForm('equity')">Cancel</button></div>
+            </div>
+            <div class="data-table-wrapper scrollable-table-wrap">
+                <table class="data-table">
+                    <thead><tr><th>Company</th><th style="white-space: nowrap;">Stake %</th><th style="white-space: nowrap;">Stake Value</th><th>Actions</th></tr></thead>
+                    <tbody id="tblEquities"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
 
         <section id="view-goals" class="view-section">
             <div class="card">
@@ -727,10 +837,18 @@
     <script>
         var db = { logo: null, payments: [], expenses: [], clients: [], reminders: [], tasks: [], ventures: [], team: [], investments: [], equities: [], goals: [], documents: [] };
         var sys_filter = '30days';
-        var activeView = 'dashboard';
+        var activeView = ''; 
         var currency = '₹';
         var charts = {};
         const DEFAULT_LOGO = "https://founderos.slfspace.com/img/logo-founder-os-slf.png";
+
+        // ENSURE AUTOSAVE IS ENABLED BY DEFAULT
+        if (localStorage.getItem('founder_os_auto_save') === null) {
+            localStorage.setItem('founder_os_auto_save', 'true');
+        }
+        if (localStorage.getItem('founder_os_auto_deduct') === null) {
+            localStorage.setItem('founder_os_auto_deduct', 'true');
+        }
 
         function getLocalDate(dateObj = new Date()) {
             const tzOffset = dateObj.getTimezoneOffset() * 60000;
@@ -827,13 +945,13 @@
 
         window.initializeAppUI = function() {
             if (!localStorage.getItem('founder_os_v11') && db.payments.length === 0) {
-                db.ventures = [{ id: 'v1', name: 'Linkdify', desc: 'LinkedIn positioning agency.' }];
+                db.ventures = [{ id: 'v1', name: 'Linkdify', desc: 'LinkedIn positioning agency.', situation: '', nextPlan: '', goalRev: 500000, goalCli: 10 }];
                 db.team = [{ id: 't1', name: 'Fidha Farzana', role: 'Partner', type: 'Partner', share: 50 }];
                 db.payments = [{ id: 'p1', client: 'Acme Corp', venture: 'Linkdify', service: 'Profile Optimization', stream: 'Service', amount: 85000, date: getLocalDate(), status: 'Paid', addedToSavings: true, savingsImpact: 85000 }];
                 db.expenses = [{ id: 'e1', category: 'Software & API', venture: 'Linkdify', amount: 5000, date: getLocalDate(), notes: 'API Cost', teamId: '', deductedFromSavings: false }];
                 db.clients = [{ 
                     id: 'c1', name: 'Acme Corp', email: 'hello@acme.co', service: 'Growth', fee: 40000, 
-                    nextBillingDate: getLocalDate(), cycle: 1, 
+                    nextBillingDate: getLocalDate(), cycle: 1, venture: 'Linkdify',
                     softwares: [{name: 'LinkedIn Sales Nav', amt: 5000}], 
                     teamPayouts: [{teamId: 't1', amt: 10000}], 
                     start: getLocalDate(), status: 'Active', projectStatus: 'Active' 
@@ -861,7 +979,9 @@
             if (db.logo) window.applyLogo(db.logo);
             else { const localLogo = localStorage.getItem('founder_os_logo'); window.applyLogo(localLogo || null); }
             
-            window.renderAll(false); 
+            let savedView = localStorage.getItem('founder_os_active_view') || 'dashboard';
+            if (savedView === 'venture-detail') savedView = 'ventures'; 
+            navigate(savedView);
         }
 
         function saveDB() {
@@ -872,13 +992,27 @@
 
         function navigate(view) {
             activeView = view;
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            event.currentTarget.classList.add('active');
-            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
-            getEl(`view-${view}`).classList.add('active');
             
-            const titles = { dashboard:'Overview Dashboard', analytics:'Analytics & Profitability', tasks: 'Tasks & Workflow', payments:'Revenue Ledger', expenses:'Expenses & Payouts', clients:'Client Roster & Portfolio', reminders: 'Monthly Reminders & SIPs', ventures:'Venture Management', team:'Team & Equity Directory', investments:'Investments & Equity', goals:'Milestone Goals', documents:'Secure Documents', settings:'System Settings' };
-            getEl('viewTitle').innerText = titles[view] || view;
+            if (view !== 'venture-detail') {
+                localStorage.setItem('founder_os_active_view', view);
+            }
+
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(el => {
+                if(el.getAttribute('onclick') && el.getAttribute('onclick').includes(`navigate('${view === 'venture-detail' ? 'ventures' : view}')`)) {
+                    el.classList.add('active');
+                }
+            });
+
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            if(getEl(`view-${view}`)) getEl(`view-${view}`).classList.add('active');
+            
+            const titles = { dashboard:'Overview Dashboard', analytics:'Analytics & Profitability', tasks: 'Tasks & Workflow', payments:'Revenue Ledger', expenses:'Expenses & Payouts', clients:'Client Roster & Portfolio', reminders: 'Monthly Reminders & SIPs', ventures:'Venture Management', team:'Team & Equity Directory', investments:'Investments & Equity', goals:'Milestone Goals', documents:'Secure Documents', settings:'System Settings', 'venture-detail': 'Venture Analytics' };
+            
+            if (titles[view]) getEl('viewTitle').innerText = titles[view];
+            
             getEl('sidebar').classList.remove('open'); 
             
             window.renderAll(view !== 'dashboard');
@@ -920,9 +1054,10 @@
         }
         
         function updateDropdowns() {
-            const vOpts = db.ventures.map(v => `<option value="${sanitize(v.name)}">${sanitize(v.name)}</option>`).join('');
-            if(getEl('payVentureSelect')) getEl('payVentureSelect').innerHTML = vOpts;
-            if(getEl('expVentureSelect')) getEl('expVentureSelect').innerHTML = vOpts;
+            const vOpts = `<option value="">-- Associate with Venture --</option>` + db.ventures.map(v => `<option value="${sanitize(v.name)}">${sanitize(v.name)}</option>`).join('');
+            if(getEl('payVentureSelect')) getEl('payVentureSelect').innerHTML = db.ventures.map(v => `<option value="${sanitize(v.name)}">${sanitize(v.name)}</option>`).join('');
+            if(getEl('expVentureSelect')) getEl('expVentureSelect').innerHTML = db.ventures.map(v => `<option value="${sanitize(v.name)}">${sanitize(v.name)}</option>`).join('');
+            if(getEl('cliVenture')) getEl('cliVenture').innerHTML = vOpts;
             
             const tOpts = `<option value="">-- Select Team Member --</option>` + db.team.map(t => `<option value="${t.id}">${sanitize(t.name)} (${sanitize(t.role)})</option>`).join('');
             if(getEl('expTeamSelect')) getEl('expTeamSelect').innerHTML = tOpts;
@@ -937,7 +1072,11 @@
         window.autoFillRevenue = function() {
             const val = getVal('payClient');
             const c = db.clients.find(x => x.name === val);
-            if (c) { setVal('payAmount', c.fee); setVal('payService', c.service); }
+            if (c) { 
+                setVal('payAmount', c.fee); 
+                setVal('payService', c.service); 
+                if (c.venture) setVal('payVentureSelect', c.venture);
+            }
         };
 
         window.addCliSoftRow = function(name = '', amt = '') {
@@ -961,9 +1100,9 @@
             form.querySelectorAll('input[type="date"]').forEach(el => el.value = getLocalDate());
             
             if(type === 'payment') {
-                setTimeout(() => { if(getEl('payAddSavings')) getEl('payAddSavings').checked = localStorage.getItem('founder_os_auto_save') === 'true'; }, 10);
+                setTimeout(() => { if(getEl('payAddSavings')) getEl('payAddSavings').checked = localStorage.getItem('founder_os_auto_save') !== 'false'; }, 10);
             } else if (type === 'expense') {
-                setTimeout(() => { if(getEl('expDeductSavings')) getEl('expDeductSavings').checked = localStorage.getItem('founder_os_auto_deduct') === 'true'; }, 10);
+                setTimeout(() => { if(getEl('expDeductSavings')) getEl('expDeductSavings').checked = localStorage.getItem('founder_os_auto_deduct') !== 'false'; }, 10);
             } else if (type === 'client') {
                 getEl('cliSoftRows').innerHTML = '';
                 getEl('cliTeamRows').innerHTML = '';
@@ -982,13 +1121,13 @@
             if (!c) return 0;
             
             let expTotal = 0;
-            const deductSavings = localStorage.getItem('founder_os_auto_deduct') === 'true';
+            const deductSavings = localStorage.getItem('founder_os_auto_deduct') !== 'false';
             
             const applyExp = (cat, teamId, expAmt, notes) => {
                 db.expenses.push({ 
                     id: 'e'+Date.now()+Math.random().toString(36).substr(2,5), category: cat, venture: ventureName, 
                     clientId: c.name, teamId: teamId, amount: expAmt, date: baseDate, notes: notes, 
-                    deductedFromSavings: false, // Managed strictly via the parent payment's net impact
+                    deductedFromSavings: false, 
                     linkedPaymentId: linkedPaymentId 
                 });
                 if (deductSavings) expTotal += expAmt;
@@ -1013,14 +1152,12 @@
             const oldRecord = id ? db.payments.find(x => x.id === id) : null;
             const targetId = id || 'p'+Date.now();
             
-            // 1. REVERSE PREVIOUS IMPACT FIRST (If editing)
             if (oldRecord && oldRecord.status === 'Paid') {
                 if (oldRecord.addedToSavings) {
                     let savings = db.investments.find(i => i.type === 'Cash/Savings');
                     if(savings) savings.current -= (oldRecord.savingsImpact !== undefined ? oldRecord.savingsImpact : oldRecord.amount); 
                 }
                 
-                // If it is being changed to Pending, we MUST completely destroy linked expenses
                 if (status === 'Pending') {
                     let linkedExps = db.expenses.filter(e => e.linkedPaymentId === targetId);
                     linkedExps.forEach(e => {
@@ -1039,15 +1176,12 @@
                 date: getVal('payDate'), status: status, addedToSavings: false, savingsImpact: 0 
             }; 
             
-            // 2. APPLY NEW IMPACT
             if(status === 'Paid' && addToSavings && amt > 0) {
                 let expDeductions = 0;
                 
-                // If brand new OR if it was previously Pending and now moving to Paid -> Trigger Auto Expenses
                 if ((!oldRecord || oldRecord.status === 'Pending') && clientName) {
                     expDeductions = applyClientAutoExpenses(clientName, getVal('payVentureSelect'), getVal('payDate'), targetId);
                 } else if (oldRecord && oldRecord.status === 'Paid') {
-                    // It was already Paid and stays Paid. Read existing linked expenses for net calculation.
                     let linkedExps = db.expenses.filter(e => e.linkedPaymentId === targetId);
                     expDeductions = linkedExps.reduce((sum, e) => sum + e.amount, 0);
                 }
@@ -1103,7 +1237,6 @@
                             let savings = db.investments.find(i => i.type === 'Cash/Savings');
                             if(savings) savings.current -= (record.savingsImpact !== undefined ? record.savingsImpact : record.amount);
                         }
-                        // DELETE LINKED EXPENSES ALSO!
                         let linkedExps = db.expenses.filter(e => e.linkedPaymentId === id);
                         linkedExps.forEach(e => {
                             if (e.deductedFromSavings) {
@@ -1127,7 +1260,7 @@
             const p = db.payments.find(x => x.id === id); 
             if(p && p.status !== 'Paid'){ 
                 p.status = 'Paid'; 
-                const addToSavings = localStorage.getItem('founder_os_auto_save') === 'true';
+                const addToSavings = localStorage.getItem('founder_os_auto_save') !== 'false';
                 
                 if(addToSavings && !p.addedToSavings) {
                     let expDeductions = applyClientAutoExpenses(p.client, p.venture, getLocalDate(), p.id);
@@ -1149,16 +1282,16 @@
             if(!c) return;
 
             const today = getLocalDate();
-            const addToSavings = localStorage.getItem('founder_os_auto_save') === 'true';
+            const addToSavings = localStorage.getItem('founder_os_auto_save') !== 'false';
             
             let rAmt = parseFloat(c.fee) || 0;
             const newPayId = 'p'+Date.now()+'_a';
-            let expDeductions = applyClientAutoExpenses(c.name, 'Client Retainer', today, newPayId);
+            let expDeductions = applyClientAutoExpenses(c.name, c.venture || 'Client Retainer', today, newPayId);
             let netProfit = rAmt - expDeductions;
 
             if (rAmt > 0) {
                 db.payments.push({ 
-                    id: newPayId, client: c.name, venture: 'Client Retainer', service: c.service, stream: 'Service', 
+                    id: newPayId, client: c.name, venture: c.venture || 'Client Retainer', service: c.service, stream: 'Service', 
                     amount: rAmt, date: today, status: 'Paid', addedToSavings: addToSavings, savingsImpact: addToSavings ? netProfit : 0 
                 });
                 
@@ -1180,7 +1313,6 @@
             if(audio) audio.play().catch(e=>{});
         };
 
-        // --- OTHER FUNCTIONS ---
         function saveTask() {
             const id = getVal('taskId');
             const obj = { id: id||'t'+Date.now(), title: getVal('taskTitle'), status: getVal('taskStatus'), priority: getVal('taskPriority'), date: getVal('taskDate'), client: getVal('taskClient') };
@@ -1216,7 +1348,7 @@
 
             const obj = { 
                 id: id||'c'+Date.now(), name: getVal('cliName'), email: getVal('cliEmail'), service: getVal('cliService'), fee: parseFloat(getVal('cliFee'))||0, 
-                nextBillingDate: getVal('cliNextBilling'), cycle: parseInt(getVal('cliCycle'))||1, softwares: softwares, teamPayouts: teamPayouts,
+                nextBillingDate: getVal('cliNextBilling'), cycle: parseInt(getVal('cliCycle'))||1, venture: getVal('cliVenture'), softwares: softwares, teamPayouts: teamPayouts,
                 start: getVal('cliStart'), status: getVal('cliStatus'), projectStatus: getVal('cliProjectStatus') || 'Active'
             }; 
             if(id) db.clients = db.clients.map(x=>x.id===id?obj:x); else db.clients.push(obj); 
@@ -1227,7 +1359,7 @@
             const r = db.reminders.find(x => x.id === id);
             if(!r) return;
 
-            const deductSavings = localStorage.getItem('founder_os_auto_deduct') === 'true';
+            const deductSavings = localStorage.getItem('founder_os_auto_deduct') !== 'false';
 
             db.expenses.push({
                 id: 'e'+Date.now(),
@@ -1260,7 +1392,22 @@
             saveDB(); closeForm('reminder'); 
         }
         
-        function saveVenture() { const id = getVal('vId'); const obj = { id: id||'v'+Date.now(), name: getVal('vName'), desc: getVal('vDesc') }; if(id) db.ventures = db.ventures.map(x=>x.id===id?obj:x); else db.ventures.push(obj); saveDB(); closeForm('venture'); }
+        function saveVenture() { 
+            const id = getVal('vId'); 
+            const old = db.ventures.find(x=>x.id===id);
+            const obj = { 
+                id: id||'v'+Date.now(), 
+                name: getVal('vName'), 
+                desc: getVal('vDesc'),
+                situation: old ? old.situation : '',
+                nextPlan: old ? old.nextPlan : '',
+                goalRev: old ? old.goalRev : 0,
+                goalCli: old ? old.goalCli : 0
+            }; 
+            if(id) db.ventures = db.ventures.map(x=>x.id===id?obj:x); else db.ventures.push(obj); 
+            saveDB(); closeForm('venture'); 
+        }
+
         function saveTeamMember() { const id = getVal('teamId'); const obj = { id: id||'team'+Date.now(), name: getVal('teamName'), role: getVal('teamRole'), type: getVal('teamType'), share: parseFloat(getVal('teamShare'))||0 }; if(id) db.team = db.team.map(x=>x.id===id?obj:x); else db.team.push(obj); saveDB(); closeForm('team'); }
         function saveInvestment() { const id = getVal('invId'); const obj = { id: id||'i'+Date.now(), name: getVal('invName'), type: getVal('invType'), current: parseFloat(getVal('invCurrent'))||0 }; if(id) db.investments = db.investments.map(x=>x.id===id?obj:x); else db.investments.push(obj); saveDB(); closeForm('investment'); }
         function saveEquity() { const id = getVal('eqId'); const obj = { id: id||'eq'+Date.now(), name: getVal('eqName'), percent: parseFloat(getVal('eqPercent'))||0, companyVal: parseFloat(getVal('eqVal'))||0 }; if(id) db.equities = db.equities.map(x=>x.id===id?obj:x); else db.equities.push(obj); saveDB(); closeForm('equity'); }
@@ -1286,6 +1433,7 @@
             if(type==='client') { 
                 if(getEl('cliProjectStatus')) getEl('cliProjectStatus').value = obj.projectStatus || 'Active'; 
                 if(getEl('cliCycle')) getEl('cliCycle').value = obj.cycle || 1;
+                if(getEl('cliVenture')) getEl('cliVenture').value = obj.venture || '';
                 if(getEl('cliNextBilling')) getEl('cliNextBilling').value = obj.nextBillingDate || '';
                 
                 getEl('cliSoftRows').innerHTML = '';
@@ -1298,6 +1446,129 @@
             }
         }
         
+        // --- DRAG AND DROP VENTURES ---
+        let dragStartIndex = -1;
+        window.handleDragStart = function(e, index) {
+            dragStartIndex = index;
+            e.dataTransfer.effectAllowed = 'move';
+            e.target.classList.add('dragging');
+        };
+        window.handleDragOver = function(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        };
+        window.handleDrop = function(e, dropIndex) {
+            e.preventDefault();
+            if (dragStartIndex === -1 || dragStartIndex === dropIndex) return;
+            const movedItem = db.ventures.splice(dragStartIndex, 1)[0];
+            db.ventures.splice(dropIndex, 0, movedItem);
+            saveDB();
+        };
+        window.handleDragEnd = function(e) {
+            e.target.classList.remove('dragging');
+            dragStartIndex = -1;
+        };
+
+        // --- VENTURE DETAILS LOGIC ---
+        window.openVentureDetail = function(vId, isUpdate = false) {
+            const v = db.ventures.find(x => x.id === vId);
+            if(!v) return;
+            
+            getEl('vd-id').value = v.id;
+            getEl('vd-name').innerText = sanitize(v.name) + ' - Analytics & Strategy';
+            
+            if (!isUpdate) {
+                getEl('vd-goal-rev').value = v.goalRev || '';
+                getEl('vd-goal-cli').value = v.goalCli || '';
+                getEl('vd-situation').value = v.situation || '';
+                getEl('vd-plan').value = v.nextPlan || '';
+            }
+
+            // Calculate Metrics
+            let fRevs = filterData(db.payments).sort((a,b)=>new Date(b.date)-new Date(a.date));
+            let fExps = filterData(db.expenses).sort((a,b)=>new Date(b.date)-new Date(a.date));
+            let vRevs = fRevs.filter(p => p.venture === v.name && p.status === 'Paid');
+            let vExps = fExps.filter(e => e.venture === v.name);
+            
+            const vRevTotal = vRevs.reduce((a,b) => a + b.amount, 0);
+            const vExpTotal = vExps.reduce((a,b) => a + b.amount, 0);
+            const vNet = vRevTotal - vExpTotal;
+            const vMargin = vRevTotal > 0 ? ((vNet / vRevTotal) * 100).toFixed(1) : 0;
+
+            getEl('vd-rev').innerText = formatMoney(vRevTotal);
+            getEl('vd-exp').innerText = formatMoney(vExpTotal);
+            getEl('vd-net').innerText = formatMoney(vNet);
+            getEl('vd-margin').innerText = vMargin + '%';
+
+            // Specific Clients & Client Count Goal
+            let vClients = db.clients.filter(c => c.venture === v.name);
+            getEl('vd-clients').innerHTML = vClients.map(c => {
+                const cycleTxt = c.cycle == 1 ? 'Monthly' : `Every ${c.cycle}M`;
+                return `<tr><td><strong>${sanitize(c.name)}</strong></td><td>${sanitize(c.service)}</td><td>${currency}${c.fee.toLocaleString()} <span style="font-size:0.7rem; color:var(--text-muted)">(${cycleTxt})</span><br><span class="status-badge" style="margin-top:4px;">${c.projectStatus||'Active'}</span></td></tr>`;
+            }).join('') || '<tr><td colspan="3" style="color:var(--text-muted);">No clients linked to this venture.</td></tr>';
+
+            // Goals Progress
+            const revTarget = parseFloat(v.goalRev) || 0;
+            const cliTarget = parseFloat(v.goalCli) || 0;
+            const revPct = revTarget > 0 ? Math.min(Math.round((vRevTotal / revTarget) * 100), 100) : 0;
+            const cliPct = cliTarget > 0 ? Math.min(Math.round((vClients.length / cliTarget) * 100), 100) : 0;
+            
+            getEl('vd-progress-bars').innerHTML = `
+                <div style="margin-bottom: 0.75rem;">
+                    <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-muted);"><span>Revenue Target (${revPct}%)</span> <span>${formatMoney(vRevTotal)} / ${formatMoney(revTarget)}</span></div>
+                    <div class="progress-bg"><div class="progress-fill" style="width:${revPct}%; background:var(--green);"></div></div>
+                </div>
+                <div>
+                    <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-muted);"><span>Client Target (${cliPct}%)</span> <span>${vClients.length} / ${cliTarget}</span></div>
+                    <div class="progress-bg"><div class="progress-fill" style="width:${cliPct}%; background:var(--blue);"></div></div>
+                </div>
+            `;
+
+            // Generate Chart
+            const dates = [...new Set([...vRevs, ...vExps].map(x => x.date))].sort();
+            const rData = dates.map(d => vRevs.filter(r => r.date === d).reduce((s, r) => s + r.amount, 0));
+            const eData = dates.map(d => vExps.filter(e => e.date === d).reduce((s, e) => s + e.amount, 0));
+
+            if (charts.vdChart) charts.vdChart.destroy();
+            charts.vdChart = new Chart(getEl('chartVentureDetail').getContext('2d'), { 
+                type: 'line', 
+                data: { labels: dates, datasets: [
+                    { label: 'Revenue', data: rData, borderColor: '#22c55e', tension: 0.3 }, 
+                    { label: 'Expenses', data: eData, borderColor: '#ef4444', tension: 0.3 }
+                ]}, 
+                options: { responsive: true, maintainAspectRatio: false } 
+            });
+
+            // Activity Table
+            let allAct = [...vRevs, ...vExps].sort((a,b) => new Date(b.date) - new Date(a.date));
+            getEl('vd-activity').innerHTML = allAct.map(a => {
+                let isRev = a.client !== undefined;
+                return `<tr><td><strong>${sanitize(a.client||a.category)}</strong><br><span style="font-size:0.7rem; color:var(--text-muted);">${a.date}</span></td><td class="${isRev?'green':'red'}" style="text-align:right; font-weight:600;">${isRev?'+':'-'}${currency}${a.amount.toLocaleString()}</td></tr>`;
+            }).join('') || '<tr><td style="color:var(--text-muted);">No activity recorded.</td></tr>';
+
+            // Switch View
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            getEl('view-venture-detail').classList.add('active');
+            localStorage.setItem('founder_os_active_view', 'venture-detail');
+        };
+
+        window.closeVentureDetail = function() {
+            navigate('ventures');
+        };
+
+        window.saveVentureStrategy = function() {
+            const vId = getVal('vd-id');
+            const v = db.ventures.find(x => x.id === vId);
+            if(v) {
+                v.goalRev = parseFloat(getVal('vd-goal-rev')) || 0;
+                v.goalCli = parseInt(getVal('vd-goal-cli')) || 0;
+                v.situation = getVal('vd-situation');
+                v.nextPlan = getVal('vd-plan');
+                saveDB();
+                alert('Targets & Strategy Saved!');
+            }
+        };
+
         function calculateNetWorth() {
             const liquid = db.investments.reduce((sum, i) => sum + i.current, 0);
             const equity = db.equities.reduce((sum, e) => sum + ((e.percent/100)*e.companyVal), 0);
@@ -1364,29 +1635,51 @@
             
             if (activeView === 'tasks') {
                 const todayStr = getLocalDate();
-                let todaysTasks = db.tasks.filter(t => t.date === todayStr);
-                const tDone = todaysTasks.filter(t => t.status === 'Completed').length;
-                const tPend = todaysTasks.length - tDone;
-                const tScore = todaysTasks.length > 0 ? Math.round((tDone / todaysTasks.length) * 100) : 0;
-                
-                if(getEl('tk-total')) getEl('tk-total').innerText = todaysTasks.length;
-                if(getEl('tk-done')) getEl('tk-done').innerText = tDone;
-                if(getEl('tk-pend')) getEl('tk-pend').innerText = tPend;
-                if(getEl('tk-score')) getEl('tk-score').innerText = tScore + '%';
+                const today = new Date(todayStr);
+                const yesterday = new Date(todayStr); yesterday.setDate(yesterday.getDate() - 1);
+                const yesterdayStr = getLocalDate(yesterday);
+                const tomorrow = new Date(todayStr); tomorrow.setDate(tomorrow.getDate() + 1);
+                const tomorrowStr = getLocalDate(tomorrow);
 
-                // TASK FILTER LOGIC
+                // TASK PAGE FILTER LOGIC
                 const sQTask = getVal('searchTask') ? getVal('searchTask').toLowerCase() : '';
                 const sStatusTask = getVal('filterTaskStatus') || 'All';
-                const sDateTask = getVal('filterTaskDate');
+                const sDateSpecific = getVal('filterTaskDate');
+                const sTimeFilter = getVal('filterTaskTime') || 'All';
 
                 const fTasksFiltered = filterData(db.tasks)
                     .filter(t => {
                         const matchSearch = t.title.toLowerCase().includes(sQTask) || (t.client && t.client.toLowerCase().includes(sQTask));
                         const matchStatus = sStatusTask === 'All' || t.status === sStatusTask;
-                        const matchDate = sDateTask ? t.date === sDateTask : true;
-                        return matchSearch && matchStatus && matchDate;
+                        
+                        let matchTime = true;
+                        if (sDateSpecific) {
+                            matchTime = t.date === sDateSpecific;
+                        } else if (sTimeFilter === 'Yesterday') {
+                            matchTime = t.date === yesterdayStr;
+                        } else if (sTimeFilter === 'Today') {
+                            matchTime = t.date === todayStr;
+                        } else if (sTimeFilter === 'Tomorrow') {
+                            matchTime = t.date === tomorrowStr;
+                        } else if (sTimeFilter === 'ThisMonth') {
+                            if(t.date) {
+                                const d = new Date(t.date);
+                                matchTime = d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear();
+                            }
+                        }
+
+                        return matchSearch && matchStatus && matchTime;
                     })
                     .sort((a,b)=>new Date(a.date)-new Date(b.date));
+
+                const tDone = fTasksFiltered.filter(t => t.status === 'Completed').length;
+                const tPend = fTasksFiltered.length - tDone;
+                const tScore = fTasksFiltered.length > 0 ? Math.round((tDone / fTasksFiltered.length) * 100) : 0;
+                
+                if(getEl('tk-total')) getEl('tk-total').innerText = fTasksFiltered.length;
+                if(getEl('tk-done')) getEl('tk-done').innerText = tDone;
+                if(getEl('tk-pend')) getEl('tk-pend').innerText = tPend;
+                if(getEl('tk-score')) getEl('tk-score').innerText = tScore + '%';
 
                 getEl('tblTasks').innerHTML = fTasksFiltered.map(t => {
                     let badgeCls = t.status === 'Completed' ? 'completed' : t.status === 'In Progress' ? 'progress' : 'pending';
@@ -1406,26 +1699,50 @@
                     let r = sanitize(e.notes); 
                     if(e.category==='Salary / Payout'&&e.teamId){ const t=db.team.find(x=>x.id===e.teamId); if(t) r=`To: ${sanitize(t.name)} (${sanitize(e.notes)})`; } 
                     if(e.clientId) { r += `<br><span style="font-size:0.7rem; color:var(--blue);">Client: ${sanitize(e.clientId)}</span>`; }
-                    return `<tr><td>${e.date}</td><td><strong>${e.category}</strong><br><span style="font-size:0.7rem;color:var(--text-muted);">${sanitize(e.venture)}</span></td><td>${r}</td><td style="color:var(--red); font-weight:600;">${currency}${e.amount.toLocaleString()}</td><td><button class="btn-edit" onclick="editRecord('expense','${e.id}','expenses')">Edit</button><button class="btn-danger" onclick="deleteRecord('expenses','${e.id}')">Del</button></td></tr>`;
+                    return `<tr><td>${e.date}</td><td><strong>${e.category}</strong><br><span style="font-size:0.7rem;color:var(--text-muted);">${sanitize(e.venture)}</span></td><td>${r}</td><td style="color:var(--red); font-weight:600;">-${currency}${e.amount.toLocaleString()}</td><td><button class="btn-edit" onclick="editRecord('expense','${e.id}','expenses')">Edit</button><button class="btn-danger" onclick="deleteRecord('expenses','${e.id}')">Del</button></td></tr>`;
                 }).join('') || '<tr><td colspan="5">No records found.</td></tr>'; 
             }
             if (activeView === 'clients') { 
                 getEl('tblClients').innerHTML = db.clients.map(c => {
                     const cycleTxt = c.cycle == 1 ? 'Monthly' : c.cycle == 3 ? 'Quarterly' : c.cycle == 12 ? 'Annually' : `Every ${c.cycle}M`;
-                    return `<tr><td><strong>${sanitize(c.name)}</strong><br><span style="font-size:0.7rem;color:var(--text-muted);">${sanitize(c.email)}</span></td><td>${sanitize(c.service)}</td><td><span style="font-weight:600;">${currency}${c.fee.toLocaleString()}</span> <span style="font-size:0.7rem; font-weight:normal;">(${cycleTxt})</span> <br><span style="font-size:0.7rem; color:var(--text-muted);">Next Due: ${c.nextBillingDate || 'N/A'}</span></td><td><span class="status-badge">${c.projectStatus || 'Active'}</span></td><td><button class="btn-edit" onclick="editRecord('client','${c.id}','clients')">Edit</button><button class="btn-danger" onclick="deleteRecord('clients','${c.id}')">Del</button></td></tr>`;
+                    return `<tr><td><strong>${sanitize(c.name)}</strong><br><span style="font-size:0.7rem;color:var(--text-muted);">${sanitize(c.email)}</span></td><td>${sanitize(c.service)}<br><span style="font-size:0.7rem;color:var(--blue);">${sanitize(c.venture||'Unassigned')}</span></td><td><span style="font-weight:600;">${currency}${c.fee.toLocaleString()}</span> <span style="font-size:0.7rem; font-weight:normal;">(${cycleTxt})</span> <br><span style="font-size:0.7rem; color:var(--text-muted);">Next Due: ${c.nextBillingDate || 'N/A'}</span></td><td><span class="status-badge">${c.projectStatus || 'Active'}</span></td><td><button class="btn-edit" onclick="editRecord('client','${c.id}','clients')">Edit</button><button class="btn-danger" onclick="deleteRecord('clients','${c.id}')">Del</button></td></tr>`;
                 }).join('') || '<tr><td colspan="5">No clients found.</td></tr>'; 
             }
             if (activeView === 'reminders') {
-                getEl('tblReminders').innerHTML = db.reminders.map(r => `<tr><td><strong>${sanitize(r.title)}</strong></td><td>${r.type}</td><td style="color:var(--red); font-weight:600;">${currency}${r.amount.toLocaleString()}</td><td>Day ${r.day}</td><td><button class="btn-edit" onclick="editRecord('reminder','${r.id}','reminders')">Edit</button><button class="btn-danger" onclick="deleteRecord('reminders','${r.id}')">Del</button></td></tr>`).join('') || '<tr><td colspan="5">No reminders found.</td></tr>'; 
+                getEl('tblReminders').innerHTML = db.reminders.map(r => `<tr><td><strong>${sanitize(r.title)}</strong></td><td>${r.type}</td><td style="color:var(--red); font-weight:600;">-${currency}${r.amount.toLocaleString()}</td><td>Day ${r.day}</td><td><button class="btn-edit" onclick="editRecord('reminder','${r.id}','reminders')">Edit</button><button class="btn-danger" onclick="deleteRecord('reminders','${r.id}')">Del</button></td></tr>`).join('') || '<tr><td colspan="5">No reminders found.</td></tr>'; 
             }
-            if (activeView === 'ventures') { getEl('tblVentures').innerHTML = db.ventures.map(v => `<tr><td><strong>${sanitize(v.name)}</strong></td><td>${sanitize(v.desc)}</td><td><button class="btn-edit" onclick="editRecord('venture','${v.id}','ventures')">Edit</button><button class="btn-danger" onclick="deleteRecord('ventures','${v.id}')">Del</button></td></tr>`).join(''); }
+            if (activeView === 'ventures') { 
+                getEl('venturesGrid').innerHTML = db.ventures.map((v, index) => {
+                    const vRev = db.payments.filter(r => r.venture === v.name && r.status === 'Paid').reduce((s, r) => s + r.amount, 0);
+                    const vExp = db.expenses.filter(e => e.venture === v.name).reduce((s, e) => s + e.amount, 0);
+                    const vNet = vRev - vExp;
+                    return `
+                    <div class="venture-card" draggable="true" ondragstart="handleDragStart(event, ${index})" ondragover="handleDragOver(event)" ondrop="handleDrop(event, ${index})" ondragend="handleDragEnd(event)">
+                        <strong style="font-size:1.1rem; pointer-events: none;">${sanitize(v.name)}</strong>
+                        <p style="font-size:0.75rem; color:var(--text-muted); min-height: 2.5em; pointer-events: none;">${sanitize(v.desc)}</p>
+                        <div style="display:flex; justify-content:space-between; align-items:flex-end; margin-top:0.5rem; pointer-events: none;">
+                            <div>
+                                <div style="font-size:0.65rem; text-transform:uppercase; color:var(--text-muted);">Net Profit</div>
+                                <strong style="font-size:1.1rem; color:${vNet>=0?'var(--green)':'var(--red)'}">${currency}${vNet.toLocaleString()}</strong>
+                            </div>
+                            <button class="btn-sec" style="font-size:0.7rem; padding:0.3rem 0.6rem; border-color:var(--panel-border); pointer-events: auto;" onclick="openVentureDetail('${v.id}')">Dashboard →</button>
+                        </div>
+                    </div>`;
+                }).join(''); 
+            }
             if (activeView === 'team') { getEl('tblTeam').innerHTML = db.team.map(t => { const pay = fExps.filter(e=>e.teamId===t.id).reduce((s,e)=>s+e.amount,0); return `<tr><td><strong>${sanitize(t.name)}</strong></td><td>${t.role} <span style="font-size:0.7rem;color:var(--text-muted)">(${t.type})</span></td><td>${t.share}%</td><td style="color:var(--purple);font-weight:600;">${currency}${pay.toLocaleString()}</td><td><button class="btn-edit" onclick="editRecord('team','${t.id}','team')">Edit</button><button class="btn-danger" onclick="deleteRecord('team','${t.id}')">Del</button></td></tr>`;}).join(''); }
             if (activeView === 'investments') { 
-                getEl('tblInvestments').innerHTML = db.investments.map(i => `<tr><td><strong>${sanitize(i.name)}</strong><br><span style="font-size:0.7rem;color:var(--text-muted)">${i.type}</span></td><td style="font-weight:600;">${currency}${i.current.toLocaleString()}</td><td><button class="btn-edit" onclick="editRecord('investment','${i.id}','investments')">Edit</button><button class="btn-danger" onclick="deleteRecord('investments','${i.id}')">Del</button></td></tr>`).join('');
-                getEl('tblEquities').innerHTML = db.equities.map(e => `<tr><td><strong>${sanitize(e.name)}</strong></td><td>${e.percent}%</td><td style="font-weight:600;">${currency}${((e.percent/100)*e.companyVal).toLocaleString()}</td><td><button class="btn-edit" onclick="editRecord('equity','${e.id}','equities')">Edit</button><button class="btn-danger" onclick="deleteRecord('equities','${e.id}')">Del</button></td></tr>`).join('');
+                getEl('tblInvestments').innerHTML = db.investments.map(i => `<tr><td><strong>${sanitize(i.name)}</strong><br><span style="font-size:0.7rem;color:var(--text-muted)">${i.type}</span></td><td style="font-weight:600; white-space:nowrap;">${currency}${i.current.toLocaleString()}</td><td><button class="btn-edit" onclick="editRecord('investment','${i.id}','investments')">Edit</button><button class="btn-danger" onclick="deleteRecord('investments','${i.id}')">Del</button></td></tr>`).join('');
+                getEl('tblEquities').innerHTML = db.equities.map(e => `<tr><td><strong>${sanitize(e.name)}</strong></td><td>${e.percent}%</td><td style="font-weight:600; white-space:nowrap;">${currency}${((e.percent/100)*e.companyVal).toLocaleString()}</td><td><button class="btn-edit" onclick="editRecord('equity','${e.id}','equities')">Edit</button><button class="btn-danger" onclick="deleteRecord('equities','${e.id}')">Del</button></td></tr>`).join('');
             }
             if (activeView === 'goals') renderGoals(fRevs);
             if (activeView === 'documents') { getEl('tblDocuments').innerHTML = db.documents.map(d => `<tr><td><strong>${sanitize(d.name)}</strong></td><td>${d.category}</td><td><a href="${sanitize(d.link)}" target="_blank" style="color:var(--text); text-decoration:underline;">Open</a></td><td><button class="btn-edit" onclick="editRecord('document','${d.id}','documents')">Edit</button><button class="btn-danger" onclick="deleteRecord('documents','${d.id}')">Del</button></td></tr>`).join(''); }
+
+            // Re-render sub-view if it's currently open
+            if (getEl('view-venture-detail') && getEl('view-venture-detail').classList.contains('active')) {
+                const openId = getVal('vd-id');
+                if (openId) window.openVentureDetail(openId, true);
+            }
         }
 
         function renderDashboard(revs, exps) {
@@ -1580,6 +1897,26 @@
                 return `<div class="card" style="margin-bottom:0;"><div style="display:flex; justify-content:space-between;"><strong>${sanitize(g.name)} <span style="font-size:0.6rem; font-weight:normal; color:var(--text-muted)">(${g.type})</span></strong><div><span class="btn-edit" onclick="editRecord('goal','${g.id}','goals')">Edit</span><span class="btn-danger" onclick="deleteRecord('goals','${g.id}')">Del</span></div></div><div style="font-size:1.5rem; font-weight:700; margin-top:0.5rem;">${pct}%</div><div class="progress-bg"><div class="progress-fill" style="width:${pct}%"></div></div><div style="font-size:0.75rem; color:var(--text-muted); display:flex; justify-content:space-between; margin-top:0.5rem;"><span>Current: ${curr.toLocaleString()}</span><span>Target: ${g.val.toLocaleString()}</span></div></div>`;
             }).join('');
         }
+        
+        // INSTANT LOAD CACHED DATA TO PREVENT FLASHING
+        if (localStorage.getItem('founder_os_v11')) {
+            try {
+                let cachedDb = JSON.parse(localStorage.getItem('founder_os_v11'));
+                if(cachedDb.payments) {
+                    db = cachedDb;
+                    currency = localStorage.getItem('founder_os_cur') || '₹';
+                    if(getEl('optCurrency')) getEl('optCurrency').value = currency;
+                    
+                    let savedView = localStorage.getItem('founder_os_active_view') || 'dashboard';
+                    if (savedView === 'venture-detail') savedView = 'ventures';
+                    
+                    document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+                    navigate(savedView);
+                }
+            } catch(e) {}
+        } else {
+            window.initializeAppUI();
+        }
     </script>
 
     <script type="module">
@@ -1714,7 +2051,7 @@
                         
                         window.renderAll(false);
                     } else {
-                        window.initializeAppUI(); 
+                        if(db.payments.length === 0) { window.initializeAppUI(); }
                     }
                 }, (error) => {
                     console.error("Firestore Listener Error:", error);
