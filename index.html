@@ -140,7 +140,9 @@
             }
 
             .vd-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
-            .task-item { flex-direction: column; align-items: flex-start; }
+            
+            /* Enhanced Task layout for mobile to fit new buttons */
+            .task-item { flex-direction: column; align-items: flex-start; padding: 0.8rem; }
             .task-item > div:last-child { width: 100%; justify-content: space-between; margin-top: 0.5rem; }
         }
     </style>
@@ -389,7 +391,7 @@
                     <input type="date" id="taskDate" placeholder="Due Date">
                     <select id="taskClient"><option value="">-- Associate Client/Venture (Optional) --</option></select>
                     
-                    <!-- NEW RECURRING OPTION UI -->
+                    <!-- RECURRING OPTION UI -->
                     <div class="full" style="display:flex; align-items:center; gap:0.5rem; background: rgba(139, 92, 246, 0.05); padding: 0.75rem; border-radius: 6px; border: 1px dashed rgba(139, 92, 246, 0.3);">
                         <input type="checkbox" id="taskIsRecurring" onchange="document.getElementById('taskRecurWrap').style.display = this.checked ? 'block' : 'none'">
                         <label for="taskIsRecurring" style="font-size:0.8rem; color:var(--text-muted); cursor: pointer; margin-right:auto;">Make this a Recurring Task</label>
@@ -401,7 +403,7 @@
                     <div class="full" style="display: flex; gap: 0.5rem;"><button onclick="saveTask()">Save Task</button><button class="btn-sec" onclick="closeForm('task')">Cancel</button></div>
                 </div>
 
-                <!-- NEW DUAL LIST CARD LAYOUT -->
+                <!-- DUAL LIST CARD LAYOUT -->
                 <div class="two-col-grid" style="align-items: start;">
                     <div>
                         <h3 style="font-size:0.85rem; text-transform:uppercase; color:var(--text-muted); margin-bottom: 1rem;">To Do / In Progress</h3>
@@ -1371,7 +1373,15 @@
             saveDB(); closeForm('task');
         }
 
-        window.snoozeTask = function(id, days) {
+        window.snoozeTask = function(id) {
+            const daysStr = prompt("How many days do you want to extend this task?", "3");
+            if(daysStr === null) return; // User cancelled
+            const days = parseInt(daysStr);
+            if(isNaN(days) || days <= 0) {
+                alert("Please enter a valid number of days.");
+                return;
+            }
+
             const t = db.tasks.find(x => x.id === id);
             if(t) {
                 let baseDate = t.date ? t.date : getLocalDate();
@@ -1779,22 +1789,22 @@
                 const renderTaskCard = (t) => {
                     let borderCol = t.priority === 'High' ? 'var(--red)' : t.priority === 'Medium' ? 'var(--orange)' : 'var(--text-muted)';
                     let badgeCls = t.status === 'Completed' ? 'completed' : t.status === 'In Progress' ? 'progress' : 'pending';
-                    let recurBadge = t.recurDays > 0 ? `<span style="font-size:0.65rem; background:rgba(139, 92, 246, 0.15); color:var(--purple); padding:2px 6px; border-radius:4px; margin-left:0.5rem;">🔁 Every ${t.recurDays}D</span>` : '';
+                    let recurBadge = t.recurDays > 0 ? `<span style="font-size:0.6rem; color:var(--purple); margin-left:4px;">🔁 Every ${t.recurDays}D</span>` : '';
 
                     return `
                     <div class="task-item ${t.priority}" style="border-left-color: ${borderCol}">
-                        <div style="flex:1;">
+                        <div style="flex:1; margin-bottom: 0.5rem;">
                             <strong style="font-size:0.95rem; display:block; margin-bottom:0.2rem;">${sanitize(t.title)}</strong>
                             <span style="font-size:0.75rem; color:var(--text-muted); margin-right: 0.5rem;">${sanitize(t.client) || 'Internal Task'}</span>
                             <span style="font-size:0.7rem; background:rgba(255,255,255,0.05); padding:2px 6px; border-radius:4px;">${t.date}</span>
                             ${recurBadge}
                         </div>
-                        <div style="display:flex; align-items:center; gap: 1rem;">
+                        <div style="display:flex; align-items:center; gap: 0.75rem; width: 100%; justify-content: space-between; flex-wrap: wrap;">
                             <span class="status-badge ${badgeCls}" onclick="toggleTaskStatus('${t.id}')">${t.status}</span>
-                            <div style="display:flex; gap:0.5rem;">
-                                <button class="btn-sec" style="font-size:0.65rem; padding:0.2rem 0.4rem; border-color:var(--panel-border);" title="Snooze +3 Days" onclick="snoozeTask('${t.id}', 3)">⏱️ +3D</button>
-                                <button class="btn-edit" style="margin:0;" onclick="editRecord('task','${t.id}','tasks')">✎</button>
-                                <button class="btn-danger" style="margin:0;" onclick="deleteRecord('tasks','${t.id}')">✕</button>
+                            <div style="display:flex; gap:0.5rem; flex-wrap: wrap;">
+                                <button class="btn-sec" style="font-size:0.75rem; padding:0.3rem 0.6rem; border-color:var(--panel-border);" onclick="snoozeTask('${t.id}')">Extend</button>
+                                <button class="btn-sec" style="font-size:0.75rem; padding:0.3rem 0.6rem; border-color:var(--panel-border);" onclick="editRecord('task','${t.id}','tasks')">Edit</button>
+                                <button class="btn-danger" style="font-size:0.75rem; padding:0.3rem 0.6rem; background:rgba(239, 68, 68, 0.1); text-decoration:none; border-radius:4px;" onclick="deleteRecord('tasks','${t.id}')">Delete</button>
                             </div>
                         </div>
                     </div>`;
@@ -1941,7 +1951,7 @@
                             <span style="font-size:0.7rem; color:var(--text-muted);">${sanitize(t.client) || 'Internal'}${dateTag}</span>
                         </td>
                         <td style="text-align:right; white-space:nowrap;">
-                            <button class="btn-sec" style="font-size:0.6rem; padding:0.15rem 0.3rem; border-color:var(--panel-border); margin-right:0.3rem;" title="Snooze +3 Days" onclick="snoozeTask('${t.id}', 3)">+3D</button>
+                            <button class="btn-sec" style="font-size:0.65rem; padding:0.25rem 0.5rem; border-color:var(--panel-border); margin-right:0.3rem;" onclick="snoozeTask('${t.id}')">Extend</button>
                             <span class="status-badge ${badgeCls}" onclick="toggleTaskStatus('${t.id}')">${t.status}</span>
                         </td>
                     </tr>`;
