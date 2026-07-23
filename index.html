@@ -91,7 +91,7 @@
         .progress-fill { background: var(--text); height: 100%; transition: width 0.3s; }
         .toolbar { display: flex; gap: 0.5rem; align-items: center; width: 100%; max-width: 100%; flex-wrap: wrap;}
 
-        /* Venture Grid & Drag Drop Styles */
+        /* Venture Grid & Task Lists */
         .venture-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
         .venture-card { background: var(--panel); border: 1px solid var(--panel-border); border-radius: 8px; padding: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; transition: transform 0.2s; cursor: grab;}
         .venture-card:active { cursor: grabbing; }
@@ -99,6 +99,14 @@
         .venture-card:hover { border-color: var(--text-muted); }
 
         .vd-header { display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1.5rem; }
+        
+        /* TASK LIST CARD STYLES */
+        .task-list { display: flex; flex-direction: column; gap: 0.5rem; }
+        .task-item { background: var(--panel); border: 1px solid var(--panel-border); border-left: 3px solid var(--text-muted); border-radius: 6px; padding: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; transition: background 0.2s;}
+        .task-item:hover { background: rgba(255,255,255,0.02); }
+        .task-item.High { border-left-color: var(--red); }
+        .task-item.Medium { border-left-color: var(--orange); }
+        .task-item.Low { border-left-color: var(--text-muted); }
 
         @media (max-width: 900px) {
             .two-col-grid { grid-template-columns: 1fr; }
@@ -110,7 +118,6 @@
             aside.open { transform: translateX(0); box-shadow: 0 0 0 10000px rgba(0,0,0,0.5), 5px 0 25px rgba(0,0,0,0.8); }
             .close-menu-btn { display: block; }
             
-            /* INCREASED TOP PADDING TO PREVENT OVERLAP */
             main { margin-left: 0; width: 100vw; padding: 1rem; padding-top: 110px; padding-bottom: 3rem; }
             .mobile-header { display: flex; }
             header { flex-direction: column; align-items: flex-start; margin-top: 0; margin-bottom: 1.5rem;}
@@ -123,7 +130,6 @@
             .card-title { flex-direction: column; align-items: flex-start; font-size: 0.85rem; gap: 0.5rem; }
             .card-title > div { width: 100%; display: flex; justify-content: space-between; align-items: center; }
             
-            /* STICKY ACTION COLUMN FOR MOBILE */
             .data-table td:last-child, .data-table th:last-child {
                 position: sticky;
                 right: 0;
@@ -133,8 +139,9 @@
                 z-index: 10;
             }
 
-            /* STACKED VENTURE HEADER FOR MOBILE */
             .vd-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+            .task-item { flex-direction: column; align-items: flex-start; }
+            .task-item > div:last-child { width: 100%; justify-content: space-between; margin-top: 0.5rem; }
         }
     </style>
 </head>
@@ -250,7 +257,7 @@
                 
                 <div class="card" style="margin-bottom: 0;">
                     <div class="card-title">
-                        <div>Today's Action Plan</div>
+                        <div>Action Plan (Today & Overdue)</div>
                         <div style="font-size:0.7rem; font-weight:normal; color:var(--text-muted);"><span id="taskProgressTxt">0%</span> Completed</div>
                     </div>
                     <div class="progress-bg" style="margin-top:0; margin-bottom:1rem;"><div class="progress-fill" id="taskProgressBar" style="width:0%; background:var(--blue);"></div></div>
@@ -381,13 +388,29 @@
                     </select>
                     <input type="date" id="taskDate" placeholder="Due Date">
                     <select id="taskClient"><option value="">-- Associate Client/Venture (Optional) --</option></select>
+                    
+                    <!-- NEW RECURRING OPTION UI -->
+                    <div class="full" style="display:flex; align-items:center; gap:0.5rem; background: rgba(139, 92, 246, 0.05); padding: 0.75rem; border-radius: 6px; border: 1px dashed rgba(139, 92, 246, 0.3);">
+                        <input type="checkbox" id="taskIsRecurring" onchange="document.getElementById('taskRecurWrap').style.display = this.checked ? 'block' : 'none'">
+                        <label for="taskIsRecurring" style="font-size:0.8rem; color:var(--text-muted); cursor: pointer; margin-right:auto;">Make this a Recurring Task</label>
+                        <div id="taskRecurWrap" style="display:none;">
+                            <input type="number" id="taskRecurDays" placeholder="Recur every X days" style="width:180px; padding:0.3rem;">
+                        </div>
+                    </div>
+
                     <div class="full" style="display: flex; gap: 0.5rem;"><button onclick="saveTask()">Save Task</button><button class="btn-sec" onclick="closeForm('task')">Cancel</button></div>
                 </div>
-                <div class="data-table-wrapper">
-                    <table class="data-table">
-                        <thead><tr><th>Task Description</th><th>Client / Venture</th><th>Due Date & Priority</th><th>Status</th><th>Actions</th></tr></thead>
-                        <tbody id="tblTasks"></tbody>
-                    </table>
+
+                <!-- NEW DUAL LIST CARD LAYOUT -->
+                <div class="two-col-grid" style="align-items: start;">
+                    <div>
+                        <h3 style="font-size:0.85rem; text-transform:uppercase; color:var(--text-muted); margin-bottom: 1rem;">To Do / In Progress</h3>
+                        <div id="taskListPending" class="task-list"></div>
+                    </div>
+                    <div>
+                        <h3 style="font-size:0.85rem; text-transform:uppercase; color:var(--green); margin-bottom: 1rem;">Completed</h3>
+                        <div id="taskListCompleted" class="task-list"></div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -610,7 +633,6 @@
 
         <!-- VENTURE DETAILS (SUB-VIEW) -->
         <section id="view-venture-detail" class="view-section">
-            <!-- BACK BUTTON EXACTLY LIKE SCREENSHOT -->
             <div class="vd-header">
                 <button class="btn-sec" style="padding: 0.4rem 0.8rem; border-radius: 6px; font-weight: 500;" onclick="closeVentureDetail()">← Back to Ventures</button>
                 <h2 id="vd-name" style="font-size: 1.5rem; font-weight: 700; margin: 0; line-height: 1.2;">Venture Analytics & Strategy</h2>
@@ -705,59 +727,59 @@
             </div>
         </section>
 
-<section id="view-investments" class="view-section">
-    <div class="two-col-grid">
-        <div class="card">
-            <div class="card-title">Liquid Assets & Savings 
-                <div style="display:flex; gap:0.5rem; align-items:center;">
-                    <button class="btn-sec" style="font-size:0.75rem; padding:0.3rem 0.6rem; margin:0;" onclick="exportSectionData('investments')">Export Data</button>
-                    <button style="margin:0;" onclick="openForm('investment')">+ Add Asset</button>
+        <section id="view-investments" class="view-section">
+            <div class="two-col-grid">
+                <div class="card">
+                    <div class="card-title">Liquid Assets & Savings 
+                        <div style="display:flex; gap:0.5rem; align-items:center;">
+                            <button class="btn-sec" style="font-size:0.75rem; padding:0.3rem 0.6rem; margin:0;" onclick="exportSectionData('investments')">Export Data</button>
+                            <button style="margin:0;" onclick="openForm('investment')">+ Add Asset</button>
+                        </div>
+                    </div>
+                    <div id="form-investment" class="inline-form" style="display: none; grid-template-columns: 1fr;">
+                        <input type="hidden" id="invId">
+                        <input type="text" id="invName" placeholder="Asset Name (e.g. HDFC Savings, BMW Car)">
+                        <select id="invType">
+                            <option value="Cash/Savings">Cash & Savings</option>
+                            <option value="Mutual Funds">Mutual Funds</option>
+                            <option value="Physical Asset">Physical Asset (Car, Real Estate, Gold)</option>
+                            <option value="Crypto">Crypto</option>
+                            <option value="Stocks">Stocks</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <input type="number" id="invCurrent" placeholder="Current Realizable Value" step="0.01">
+                        <div style="display: flex; gap: 0.5rem;"><button onclick="saveInvestment()">Save</button><button class="btn-sec" onclick="closeForm('investment')">Cancel</button></div>
+                    </div>
+                    <div class="data-table-wrapper scrollable-table-wrap">
+                        <table class="data-table">
+                            <thead><tr><th>Asset Name / Type</th><th style="white-space: nowrap;">Current Value</th><th>Actions</th></tr></thead>
+                            <tbody id="tblInvestments"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Private Company Equities 
+                        <div style="display:flex; gap:0.5rem; align-items:center;">
+                            <button class="btn-sec" style="font-size:0.75rem; padding:0.3rem 0.6rem; margin:0;" onclick="exportSectionData('equities')">Export Data</button>
+                            <button style="margin:0;" onclick="openForm('equity')">+ Add Equity</button>
+                        </div>
+                    </div>
+                    <div id="form-equity" class="inline-form" style="display: none; grid-template-columns: 1fr;">
+                        <input type="hidden" id="eqId">
+                        <input type="text" id="eqName" placeholder="Company Name">
+                        <input type="number" id="eqPercent" placeholder="Your Ownership %" step="0.01">
+                        <input type="number" id="eqVal" placeholder="Estimated Total Company Valuation" step="0.01">
+                        <div style="display: flex; gap: 0.5rem;"><button onclick="saveEquity()">Save</button><button class="btn-sec" onclick="closeForm('equity')">Cancel</button></div>
+                    </div>
+                    <div class="data-table-wrapper scrollable-table-wrap">
+                        <table class="data-table">
+                            <thead><tr><th>Company</th><th style="white-space: nowrap;">Stake %</th><th style="white-space: nowrap;">Stake Value</th><th>Actions</th></tr></thead>
+                            <tbody id="tblEquities"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-            <div id="form-investment" class="inline-form" style="display: none; grid-template-columns: 1fr;">
-                <input type="hidden" id="invId">
-                <input type="text" id="invName" placeholder="Asset Name (e.g. HDFC Savings, BMW Car)">
-                <select id="invType">
-                    <option value="Cash/Savings">Cash & Savings</option>
-                    <option value="Mutual Funds">Mutual Funds</option>
-                    <option value="Physical Asset">Physical Asset (Car, Real Estate, Gold)</option>
-                    <option value="Crypto">Crypto</option>
-                    <option value="Stocks">Stocks</option>
-                    <option value="Other">Other</option>
-                </select>
-                <input type="number" id="invCurrent" placeholder="Current Realizable Value" step="0.01">
-                <div style="display: flex; gap: 0.5rem;"><button onclick="saveInvestment()">Save</button><button class="btn-sec" onclick="closeForm('investment')">Cancel</button></div>
-            </div>
-            <div class="data-table-wrapper scrollable-table-wrap">
-                <table class="data-table">
-                    <thead><tr><th>Asset Name / Type</th><th style="white-space: nowrap;">Current Value</th><th>Actions</th></tr></thead>
-                    <tbody id="tblInvestments"></tbody>
-                </table>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-title">Private Company Equities 
-                <div style="display:flex; gap:0.5rem; align-items:center;">
-                    <button class="btn-sec" style="font-size:0.75rem; padding:0.3rem 0.6rem; margin:0;" onclick="exportSectionData('equities')">Export Data</button>
-                    <button style="margin:0;" onclick="openForm('equity')">+ Add Equity</button>
-                </div>
-            </div>
-            <div id="form-equity" class="inline-form" style="display: none; grid-template-columns: 1fr;">
-                <input type="hidden" id="eqId">
-                <input type="text" id="eqName" placeholder="Company Name">
-                <input type="number" id="eqPercent" placeholder="Your Ownership %" step="0.01">
-                <input type="number" id="eqVal" placeholder="Estimated Total Company Valuation" step="0.01">
-                <div style="display: flex; gap: 0.5rem;"><button onclick="saveEquity()">Save</button><button class="btn-sec" onclick="closeForm('equity')">Cancel</button></div>
-            </div>
-            <div class="data-table-wrapper scrollable-table-wrap">
-                <table class="data-table">
-                    <thead><tr><th>Company</th><th style="white-space: nowrap;">Stake %</th><th style="white-space: nowrap;">Stake Value</th><th>Actions</th></tr></thead>
-                    <tbody id="tblEquities"></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</section>
+        </section>
 
         <section id="view-goals" class="view-section">
             <div class="card">
@@ -849,6 +871,17 @@
         if (localStorage.getItem('founder_os_auto_deduct') === null) {
             localStorage.setItem('founder_os_auto_deduct', 'true');
         }
+
+        // INSTANT VIEW SWITCH ON INITIAL SCRIPT RUN (PREVENTS DASHBOARD FLASH)
+        (function() {
+            let sv = localStorage.getItem('founder_os_active_view');
+            if(sv && sv !== 'venture-detail') {
+                const section = document.getElementById('view-' + sv);
+                if(section) section.classList.add('active');
+            } else {
+                document.getElementById('view-dashboard').classList.add('active');
+            }
+        })();
 
         function getLocalDate(dateObj = new Date()) {
             const tzOffset = dateObj.getTimezoneOffset() * 60000;
@@ -957,7 +990,7 @@
                     start: getLocalDate(), status: 'Active', projectStatus: 'Active' 
                 }];
                 db.reminders = [{ id: 'r1', title: 'Nippon Mutual Fund SIP', type: 'Mutual Fund', amount: 15000, day: parseInt(getLocalDate().split('-')[2]), lastPaidMonth: '' }];
-                db.tasks = [{ id: 't1', title: 'Review Client Outreach Scripts', status: 'Pending', priority: 'High', date: getLocalDate(), client: 'Acme Corp' }];
+                db.tasks = [{ id: 't1', title: 'Review Client Outreach Scripts', status: 'Pending', priority: 'High', date: getLocalDate(), client: 'Acme Corp', recurDays: 0 }];
                 db.investments = [{ id: 'i1', name: 'Main Cash/Savings', type: 'Cash/Savings', current: 150000 }, { id: 'i2', name: 'Nippon India', type: 'Mutual Funds', current: 200000 }];
                 db.goals = [{ id:'g1', name:'Emergency Fund', type:'Cash Savings', val: 1000000 }];
                 saveDB();
@@ -1106,6 +1139,12 @@
             } else if (type === 'client') {
                 getEl('cliSoftRows').innerHTML = '';
                 getEl('cliTeamRows').innerHTML = '';
+            } else if (type === 'task') {
+                if(getEl('taskIsRecurring')) {
+                    getEl('taskIsRecurring').checked = false;
+                    getEl('taskRecurWrap').style.display = 'none';
+                    getEl('taskRecurDays').value = '';
+                }
             } else {
                 form.querySelectorAll('input[type="checkbox"]').forEach(el => el.checked = false);
             }
@@ -1313,19 +1352,67 @@
             if(audio) audio.play().catch(e=>{});
         };
 
+        // --- TASK & SNOOZE LOGIC ---
         function saveTask() {
             const id = getVal('taskId');
-            const obj = { id: id||'t'+Date.now(), title: getVal('taskTitle'), status: getVal('taskStatus'), priority: getVal('taskPriority'), date: getVal('taskDate'), client: getVal('taskClient') };
+            const recurDays = getEl('taskIsRecurring').checked ? parseInt(getVal('taskRecurDays')) : 0;
+            
+            const obj = { 
+                id: id||'t'+Date.now(), 
+                title: getVal('taskTitle'), 
+                status: getVal('taskStatus'), 
+                priority: getVal('taskPriority'), 
+                date: getVal('taskDate'), 
+                client: getVal('taskClient'),
+                recurDays: recurDays || 0 
+            };
+            
             if(id) db.tasks = db.tasks.map(x=>x.id===id?obj:x); else db.tasks.push(obj);
             saveDB(); closeForm('task');
+        }
+
+        window.snoozeTask = function(id, days) {
+            const t = db.tasks.find(x => x.id === id);
+            if(t) {
+                let baseDate = t.date ? t.date : getLocalDate();
+                let parts = baseDate.split('-');
+                let d = new Date(parts[0], parts[1]-1, parts[2]);
+                d.setDate(d.getDate() + days);
+                t.date = getLocalDate(d);
+                
+                if(t.status === 'Completed') t.status = 'Pending';
+                
+                saveDB();
+            }
         }
 
         window.toggleTaskStatus = function(id) {
             const t = db.tasks.find(x => x.id === id);
             if(t) {
-                if(t.status === 'Pending') t.status = 'In Progress';
-                else if(t.status === 'In Progress') t.status = 'Completed';
-                else t.status = 'Pending';
+                if(t.status === 'Pending') {
+                    t.status = 'In Progress';
+                } else if(t.status === 'In Progress') {
+                    t.status = 'Completed';
+                    
+                    // RECURRING LOGIC: Auto-clone task to future date
+                    if (t.recurDays && parseInt(t.recurDays) > 0) {
+                        let parts = t.date.split('-');
+                        let d = new Date(parts[0], parts[1]-1, parts[2]);
+                        d.setDate(d.getDate() + parseInt(t.recurDays));
+                        
+                        db.tasks.push({
+                            id: 't' + Date.now() + Math.random().toString(36).substr(2,5),
+                            title: t.title,
+                            status: 'Pending',
+                            priority: t.priority,
+                            date: getLocalDate(d),
+                            client: t.client,
+                            recurDays: t.recurDays
+                        });
+                    }
+                } else {
+                    t.status = 'Pending';
+                }
                 saveDB();
             }
         }
@@ -1443,6 +1530,14 @@
                 getEl('cliTeamRows').innerHTML = '';
                 if(obj.teamPayouts) obj.teamPayouts.forEach(t => window.addCliTeamRow(t.teamId, t.amt));
                 else if(obj.expTeamAmt > 0) window.addCliTeamRow(obj.expTeamId, obj.expTeamAmt);
+            }
+            
+            if(type==='task') {
+                if(obj.recurDays > 0) {
+                    getEl('taskIsRecurring').checked = true;
+                    getEl('taskRecurWrap').style.display = 'block';
+                    getEl('taskRecurDays').value = obj.recurDays;
+                }
             }
         }
         
@@ -1681,10 +1776,35 @@
                 if(getEl('tk-pend')) getEl('tk-pend').innerText = tPend;
                 if(getEl('tk-score')) getEl('tk-score').innerText = tScore + '%';
 
-                getEl('tblTasks').innerHTML = fTasksFiltered.map(t => {
+                const renderTaskCard = (t) => {
+                    let borderCol = t.priority === 'High' ? 'var(--red)' : t.priority === 'Medium' ? 'var(--orange)' : 'var(--text-muted)';
                     let badgeCls = t.status === 'Completed' ? 'completed' : t.status === 'In Progress' ? 'progress' : 'pending';
-                    return `<tr><td><strong>${sanitize(t.title)}</strong></td><td>${sanitize(t.client) || '--'}</td><td>${t.date} <br><span style="font-size:0.7rem; color:${t.priority==='High'?'var(--red)':t.priority==='Medium'?'var(--orange)':'var(--text-muted)'}">${t.priority} Priority</span></td><td><span class="status-badge ${badgeCls}" onclick="toggleTaskStatus('${t.id}')">${t.status}</span></td><td><button class="btn-edit" onclick="editRecord('task','${t.id}','tasks')">Edit</button><button class="btn-danger" onclick="deleteRecord('tasks','${t.id}')">Del</button></td></tr>`;
-                }).join('') || '<tr><td colspan="5">No tasks found.</td></tr>';
+                    let recurBadge = t.recurDays > 0 ? `<span style="font-size:0.65rem; background:rgba(139, 92, 246, 0.15); color:var(--purple); padding:2px 6px; border-radius:4px; margin-left:0.5rem;">🔁 Every ${t.recurDays}D</span>` : '';
+
+                    return `
+                    <div class="task-item ${t.priority}" style="border-left-color: ${borderCol}">
+                        <div style="flex:1;">
+                            <strong style="font-size:0.95rem; display:block; margin-bottom:0.2rem;">${sanitize(t.title)}</strong>
+                            <span style="font-size:0.75rem; color:var(--text-muted); margin-right: 0.5rem;">${sanitize(t.client) || 'Internal Task'}</span>
+                            <span style="font-size:0.7rem; background:rgba(255,255,255,0.05); padding:2px 6px; border-radius:4px;">${t.date}</span>
+                            ${recurBadge}
+                        </div>
+                        <div style="display:flex; align-items:center; gap: 1rem;">
+                            <span class="status-badge ${badgeCls}" onclick="toggleTaskStatus('${t.id}')">${t.status}</span>
+                            <div style="display:flex; gap:0.5rem;">
+                                <button class="btn-sec" style="font-size:0.65rem; padding:0.2rem 0.4rem; border-color:var(--panel-border);" title="Snooze +3 Days" onclick="snoozeTask('${t.id}', 3)">⏱️ +3D</button>
+                                <button class="btn-edit" style="margin:0;" onclick="editRecord('task','${t.id}','tasks')">✎</button>
+                                <button class="btn-danger" style="margin:0;" onclick="deleteRecord('tasks','${t.id}')">✕</button>
+                            </div>
+                        </div>
+                    </div>`;
+                };
+
+                const pendingTasks = fTasksFiltered.filter(t => t.status !== 'Completed');
+                const completedTasks = fTasksFiltered.filter(t => t.status === 'Completed');
+
+                getEl('taskListPending').innerHTML = pendingTasks.map(renderTaskCard).join('') || '<div style="color:var(--text-muted); font-size:0.8rem;">No pending tasks for this filter.</div>';
+                getEl('taskListCompleted').innerHTML = completedTasks.map(renderTaskCard).join('') || '<div style="color:var(--text-muted); font-size:0.8rem;">No completed tasks.</div>';
             }
 
             if (activeView === 'payments') { 
@@ -1786,23 +1906,46 @@
                 alertsTable.innerHTML = alertsHtml || '<tr><td colspan="3" style="text-align:center; padding:1.5rem;"><span style="color:var(--text-muted);">No pending actions! 🎉</span></td></tr>';
             }
 
+            // DASHBOARD ACTION PLAN (Today + Overdue)
             const dashTasksTable = getEl('dashTasks');
             if(dashTasksTable) {
                 const todayStr = getLocalDate();
-                let todaysTasks = db.tasks.filter(t => t.date === todayStr);
                 
-                todaysTasks.sort((a,b) => (a.status==='Completed'?1:0) - (b.status==='Completed'?1:0));
+                let actionPlanTasks = db.tasks.filter(t => {
+                    const isToday = t.date === todayStr;
+                    const isOverdueUncompleted = t.date < todayStr && t.status !== 'Completed';
+                    return isToday || isOverdueUncompleted;
+                });
 
-                const completed = todaysTasks.filter(t => t.status === 'Completed').length;
-                const progressPct = todaysTasks.length > 0 ? Math.round((completed / todaysTasks.length) * 100) : 0;
+                actionPlanTasks.sort((a,b) => {
+                    if (a.status === 'Completed' && b.status !== 'Completed') return 1;
+                    if (a.status !== 'Completed' && b.status === 'Completed') return -1;
+                    return new Date(a.date) - new Date(b.date);
+                });
+
+                const completed = actionPlanTasks.filter(t => t.status === 'Completed').length;
+                const progressPct = actionPlanTasks.length > 0 ? Math.round((completed / actionPlanTasks.length) * 100) : 0;
                 
                 getEl('taskProgressTxt').innerText = progressPct + '%';
                 getEl('taskProgressBar').style.width = progressPct + '%';
 
-                dashTasksTable.innerHTML = todaysTasks.map(t => {
+                dashTasksTable.innerHTML = actionPlanTasks.map(t => {
                     let badgeCls = t.status === 'Completed' ? 'completed' : t.status === 'In Progress' ? 'progress' : 'pending';
-                    return `<tr><td><strong>${sanitize(t.title)}</strong><br><span style="font-size:0.7rem; color:var(--text-muted);">${sanitize(t.client) || 'Internal'}</span></td><td style="text-align:right;"><span class="status-badge ${badgeCls}" onclick="toggleTaskStatus('${t.id}')">${t.status}</span></td></tr>`;
-                }).join('') || '<tr><td colspan="2" style="text-align:center; padding:1.5rem;"><span style="color:var(--text-muted);">No tasks scheduled for today. Take a break! ☕</span></td></tr>';
+                    let isOverdue = t.date < todayStr && t.status !== 'Completed';
+                    let dateTag = isOverdue ? `<span style="color:var(--red); font-size:0.65rem; font-weight:600;"> Overdue (${t.date})</span>` : '';
+                    let recurBadge = t.recurDays > 0 ? `<span style="font-size:0.6rem; color:var(--purple); margin-left:4px;">🔁</span>` : '';
+
+                    return `<tr>
+                        <td>
+                            <strong>${sanitize(t.title)}</strong>${recurBadge}<br>
+                            <span style="font-size:0.7rem; color:var(--text-muted);">${sanitize(t.client) || 'Internal'}${dateTag}</span>
+                        </td>
+                        <td style="text-align:right; white-space:nowrap;">
+                            <button class="btn-sec" style="font-size:0.6rem; padding:0.15rem 0.3rem; border-color:var(--panel-border); margin-right:0.3rem;" title="Snooze +3 Days" onclick="snoozeTask('${t.id}', 3)">+3D</button>
+                            <span class="status-badge ${badgeCls}" onclick="toggleTaskStatus('${t.id}')">${t.status}</span>
+                        </td>
+                    </tr>`;
+                }).join('') || '<tr><td colspan="2" style="text-align:center; padding:1.5rem;"><span style="color:var(--text-muted);">No tasks pending or scheduled for today. Take a break! ☕</span></td></tr>';
             }
 
             const snapTable = getEl('dashClients');
